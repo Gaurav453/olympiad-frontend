@@ -1,0 +1,271 @@
+import { useEffect ,useState} from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import logo from '../assets/images/Logo009_min2.png';
+import {saveProfile} from '../slices/auth'
+import { Navigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Country, State, City }  from 'country-state-city';
+
+
+const ProfilePage = () => {
+
+  let user = useSelector(state => state.auth);
+  user = user?.user;
+  const [ email , setEmail] = useState("");
+  const [ whatsapp , setWhatsapp ] = useState("");
+  const [ phone , setPhone ] = useState(user.phone_no);
+
+  const [ isSame , setisSame ] = useState(false);
+
+  const [ category , setCategory ] = useState("");
+  const [ clas , setClas ] = useState("");
+  const [ schoolCode , seschoolCode ] = useState("");
+  const [ schoolName , setSchoolName ] = useState("");
+
+  const [ referrer , sereferrer ] = useState("");
+
+
+  const [loading , setLoading ] = useState(false);
+
+  const [emailError , serEmailError ] = useState(false);
+  const [whatsappError , setWhatsappError ] = useState(false);
+
+  const [country,setCountry] = useState('IN');
+  const [state,setState] = useState('');
+  const [city,setCity] = useState('');
+
+  const [stateList,setStateList] = useState(State.getStatesOfCountry(country));
+  const [cityList,setCityList] = useState([]);
+  
+
+
+  const dispatch = useDispatch();
+
+  console.log(user);
+
+  let errorMessage = function(message){
+    toast.error(message, {
+      position: "bottom-center",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      theme: "dark",
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+
+  }
+
+  useEffect(() => {
+    let emailRegex = /\S+@\S+\.\S+/;
+    if(email !== "" && !emailRegex.test(email)){
+      serEmailError("Please enter a valid email");
+    }
+    else{
+      serEmailError(""); 
+    }
+
+
+
+  },[email])
+
+  useEffect(() => {
+    if(isSame){
+      setWhatsapp(phone)
+    }
+    else{
+      setWhatsapp("")
+
+    }
+
+  },[isSame,phone]);
+
+
+
+
+
+  let handleSubmit  = function(){
+    if(!state ||  !city || !whatsapp || !email || (category === 'School' && ( clas === ""))){
+      errorMessage("Please enter all required information");
+
+      return;
+    }
+    else if(emailError){
+      errorMessage("Please enter a valid email");
+
+    }
+
+    setLoading(true);
+
+    let data = {
+      "whats_no" : whatsapp,
+      "email" : email,
+      "school_code" : schoolCode,
+      "ref" : referrer || "none", 
+      "school_name" : schoolName,
+      "class" : clas,
+       "state" : state,
+       "city" : city
+    }
+    dispatch(saveProfile(data))
+    .unwrap()
+    .then(() => {
+      console.log('navigate to dashbaord')
+      return <Navigate to="/dashboard" />;
+      
+    })
+    .catch(() => {
+      'some error occured'
+    })
+
+
+
+
+  }
+
+
+
+  return (
+    <div className="profile">
+      <div className="mobile-logo" >
+        <div>   
+          <img alt="main-logo"  src={logo}/>
+
+        </div>
+        <h5>
+        International Humanity Olympiad
+        </h5>
+
+      </div>
+      <div className="box">
+        <div className="main-heading">
+          <h1>Build Your Profile</h1>
+        </div>
+        <div className="form" >
+          <div>
+             <p>Email</p> 
+             <input onChange={(e) => setEmail(e.target.value)} placeholder="Please enter your Email"className="form-input" ></input>
+               <p className="error-message"  >{emailError}</p> 
+
+          </div>
+          <div>
+             <p>Phone Number : {phone}</p>
+          </div>
+          <div  style={{display:'flex'}} >
+            <div>
+              <input onClick={() => setisSame(!isSame)} type="checkbox" />
+            </div>
+            <div style={{marginLeft:20}}  >
+              <span  >Check if WhatsApp  number is same as above</span>
+            </div>
+          </div>{
+            !isSame ? 
+            <div>
+            <p>WhatsApp Number</p>
+            <input   onChange={(e) => setWhatsapp(e.target.value)}  placeholder="Please enter your WhatsApp Phone Number"className="form-input" ></input>
+            <p className="error-message"  >{whatsappError}</p> 
+          </div> : <></>
+          }
+
+          <div className="userLocation">
+          <div className="drop-downs">
+            <div className="dropdown">
+              <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {state ? state :"Select State"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 stateList.map(entry => {
+                   return <button onClick={() => { setState(entry.name);setCityList(City.getCitiesOfState(country,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name}
+
+                     </button>
+
+                 })
+               }
+              </div>
+            </div>
+            {
+              state ? 
+              <div className="dropdown">
+              <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {city ? city :"Select City"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 cityList.map(entry => {
+                   return <button onClick={() => setCity(entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name}
+
+                     </button>
+
+                 })
+               }
+              </div>
+               
+            </div>  : <></>
+            }
+     
+       
+          </div>
+
+          </div>
+        
+          <div className="drop-downs">
+            <div className="dropdown">
+              <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {category ? category :"Category"} 
+              </button>
+              <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button onClick={() => setCategory("School")} className={category === "School" ? 'dropdown-item active' : 'dropdown-item'}>School</button>
+                <button onClick={() => setCategory("College")} className={category === "College" ? 'dropdown-item active' : 'dropdown-item'}>College</button>
+                <button onClick={() => setCategory("Individual")} className={category === "Individual" ? 'dropdown-item active' : 'dropdown-item'}>Individual</button>
+              </div>
+            </div>
+            {
+              category === "School" ? 
+              <div className="dropdown">
+              <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                { clas ? clas  :  "Enter Class"}
+              </button>
+              <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button onClick={() => setClas("6th")} className={clas === "6th" ? 'dropdown-item active' : 'dropdown-item'}>6th</button>
+                <button onClick={() => setClas("7th")} className={clas === "7th" ? 'dropdown-item active' : 'dropdown-item'}>7th</button>
+                <button onClick={() => setClas("8th")} className={clas === "8th" ? 'dropdown-item active' : 'dropdown-item'}>8th</button>
+                <button onClick={() => setClas("9th")} className={clas === "9th" ? 'dropdown-item active' : 'dropdown-item'}>9th</button>
+                <button onClick={() => setClas("10th")} className={clas === "10th" ? 'dropdown-item active' : 'dropdown-item'}>10th</button>
+                <button onClick={() => setClas("11th")} className={clas === "11th" ? 'dropdown-item active' : 'dropdown-item'}>11th</button>
+                <button onClick={() => setClas("12th")} className={clas === "12th" ? 'dropdown-item active' : 'dropdown-item'}>12th</button>
+              </div>
+            </div> : <></>
+            }
+       
+          </div>
+          {
+            category === 'School' ? 
+            <div class="school_code" >
+            <p>School Code</p>
+            <input  onChange={(e) => seschoolCode(e.target.value)} className="form-input" ></input>
+            <span>School Name</span>
+          </div> : <></>
+          }
+        
+          <div >
+            <p>Referrer</p>
+            <input  onChange={(e) => sereferrer(e.target.value)} placeholder="Please enter Referrer code or leave blank" className="form-input" ></input>
+          </div>
+          <div >
+                  <button onClick={handleSubmit} className="form-button"  >Submit</button>
+            </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+};
+
+export default ProfilePage;
