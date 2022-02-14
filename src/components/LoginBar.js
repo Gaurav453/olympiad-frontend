@@ -96,7 +96,6 @@ const LoginBar = ({isHome}) => {
         </div> : 
 
         <div  className="col" style={{textAlign: 'end'}}>
-          <FontAwesomeIcon icon={faUser} className="profile" />
         <button onClick={handleLogout} className="form-button"  >Logout</button>
             
         </div>
