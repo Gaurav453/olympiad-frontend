@@ -18,10 +18,12 @@
 
 body {
   font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
 }
 
 #app, #app>div{
   min-height: 100vh;
+
 }
 #app>div{
   height: 100vh;
@@ -587,7 +589,7 @@ img{
 
 }
 .dashboard{
-  min-height: calc(100% - 80px)
+  min-height: calc(100% - 100px)
 }
 th svg{
   margin-left: 5px;
