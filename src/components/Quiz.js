@@ -43,36 +43,7 @@ const Quiz = () => {
     let set = 0;
     let gridArr = []
     // Modal.setAppElement('#quiz');
-    let instruction = [ '1. This test is based on MCQ pattern',
-
-      '2. There can be more than one correct option (even for a single fill in the blanks)',
-
-      
-      '3. Time duration : 15 minutes',
-      
-      '4. Questions : 25',
-      
-      '5. Marking Scheme : +4 for every right answer & -1 for every wrong answer',
-      
-       "6. Passing percentage : 40%",
-      
-        "7. After completion of test, you will be redirected to an additional bonus round - 'Spin the wheel' to improve your score",
-        "8. There will be no negative marking for the Bonus round",
-        "9.  Instant result and certificate after submission of test"]
-
-    let errorMessage = function(message){
-        toast.error(message, {
-          position: "bottom-center",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          theme: "dark",
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          });
-    
-      }
+ 
     let initializeGrid = () => {
         for(let i=1; i<=25; i++){
             gridArr.push({
@@ -99,8 +70,14 @@ const Quiz = () => {
   let [time,setTime] = useState(0);
   const [modalIsOpen, setIsOpen] = React.useState(false);
   const [isSubmitted, setSubmitted] = React.useState(false);
+  let [optionShuffle , setOptionShuffle] = useState({})
+  let [option , setOption] = useState([])
+
+
 
   const [loading , setLoading ] = useState(false);
+  const [mainLoader , setMainLoader ] = useState(true);
+
 
 
   function closeModal() {
@@ -108,10 +85,163 @@ const Quiz = () => {
   }
 
 
+  let makeGrid = (attempt) => {
+    setGrid([])
+  let answerRegex = /a[0-9]/
+  let questionRegex = /q[0-9]/
 
+  for(let key in attempt) {
+      if(answerRegex.test(key)){
+          if(!attempt[key]) continue
+          let index = parseInt(key.substring(1))-1;
+          gridArr[index].answer = attempt[key];
+      }
+      else if(questionRegex.test(key)){
+          if(!attempt[key]) continue
+          let index = parseInt(key.substring(1))-1;
+          gridArr[index].question = attempt[key];
+      }
+  }
+  setGrid(gridArr)
+
+}
+
+let initialize = () => {
+    setMainLoader(true)
+    dispatch(currentAttempt({}))
+    .unwrap()
+    .then(res => {
+        if(res){
+          makeGrid(res);
+          setAttempt(res.id)
+          setCurrent(res.lastque_sno)
+          setTime(res.time_left);
+        }
+        else{
+            
+        }
+        fetchQuestion(res.id,res.lastque_sno);
+    })
+}
+
+let fetchQuestion = (attempt,current) => {
+    if(!localStorage.getItem('language')) return;
+    console.log(attempt)
+    let data = {
+        attempt_id : attempt,
+        language : localStorage.getItem('language'),
+        question_sno : current || 1
+    }
+    setMainLoader(true);
+
+  dispatch(getQuestion(data))
+  .unwrap()
+  .then(res => {
+      let que = JSON.parse(res.data.question)
+      if(!attempt){
+          initialize();
+      }
+      let temp = grid;
+      if(temp[current-1] ){
+       
+          console.log(temp)
+          console.log(que)
+          temp[current-1].question = que.qq.qid
+          console.log(temp[current-1])
+          setGrid(temp)
+
+      }
+     
+
+      setQuestion(que);
+      if(res.data.selected_answer){
+          setAnswer(res.data.selected_answer.split(","));
+
+      }
+      else
+          setAnswer([]);
+  
+      setMainLoader(false);
+      try{
+          testDivRef.current.scrollIntoView(); 
+  
+          }
+          catch(e){
+              
+      }
+      setOptions(que);
+      setMainLoader(false);
+
+     
+
+  })
+  .catch(err =>{ 
+      setMainLoader(false)
+  })
+}
+
+let setOptions = function(question){
+    let temp =  answer
+    let arr =[]
+    let optionRegex = /c[0-9]/;
+    for(let key in question){
+        if(optionRegex.test(key)){
+            arr.push({
+                text : question[key].o,
+                url : question[key].url,
+                value : key,
+                index : parseInt(key.substring(1)),
+                isSelected : temp.includes(key) ? true : false
+            })
+        }
+    }
+    shuffleArray(arr)
+    setOption(arr);
+
+}
+
+let gridElementClass = function(element){
+  // console.log(element)
+  if(!element.answer && !element.isReviewd && !element.question && element.id !== current){
+      return "grid-element"
+  }
+  else if(element.id === current){
+      return "current grid-element"
+  }
+  else if(element.isReviewd){
+      return "reviewed grid-element"
+  }
+  else if(element.answer){
+      return "answered grid-element"
+  }
+  else if(element.question){
+      return "opened grid-element"
+
+  }
+
+}
+let handleChange = (entry) => {
+      if(answer.length !== 0){
+          handleSave(entry.id);
+      }
+      else{
+          setCurrent(entry.id);
+          fetchQuestion(attempt,entry.id);
+         
+      }
+      try{
+      testDivRef.current.scrollIntoView(); 
+
+      }
+      catch(e){
+          
+      }
+  }
 
 
   useEffect(() => {
+    setMainLoader(true);
+
     initializeGrid();
     setGrid([]);
     initialize();
@@ -144,138 +274,10 @@ const Quiz = () => {
 
 
  var saveRemaining = function(){
-     set = 0;
     dispatch(saveRemainingTime({time_left : time-1, attempt_id : attempt}))
  }
 
-  let makeGrid = (attempt) => {
-      setGrid([])
-    let answerRegex = /a[0-9]/
-    let questionRegex = /q[0-9]/
 
-    for(let key in attempt) {
-        if(answerRegex.test(key)){
-            if(!attempt[key]) continue
-            let index = parseInt(key.substring(1))-1;
-            gridArr[index].answer = attempt[key];
-        }
-        else if(questionRegex.test(key)){
-            if(!attempt[key]) continue
-            let index = parseInt(key.substring(1))-1;
-            gridArr[index].question = attempt[key];
-        }
-    }
-    setGrid(gridArr)
-
-  }
-
-  let initialize = () => {
-      dispatch(currentAttempt({}))
-      .unwrap()
-      .then(res => {
-          if(res){
-            makeGrid(res);
-            setAttempt(res.id)
-            setCurrent(res.lastque_sno)
-            setTime(res.time_left);
-          }
-          else{
-              
-          }
-          fetchQuestion(res.id,res.lastque_sno);
-      })
-  }
-
-  let fetchQuestion = (attempt,current) => {
-      if(!localStorage.getItem('language')) return;
-      console.log(attempt)
-      let data = {
-          attempt_id : attempt,
-          language : localStorage.getItem('language'),
-          question_sno : current || 1
-      }
-      setLoading(true);
-
-    dispatch(getQuestion(data))
-    .unwrap()
-    .then(res => {
-        let que = JSON.parse(res.data.question)
-        if(!attempt){
-            initialize();
-        }
-        let temp = grid;
-        if(temp[current-1] ){
-         
-            console.log(temp)
-            console.log(que)
-            temp[current-1].question = que.qq.qid
-            console.log(temp[current-1])
-            setGrid(temp)
-
-        }
-       
-
-        setQuestion(que);
-        if(res.data.selected_answer){
-            setAnswer(res.data.selected_answer.split(","));
-
-        }
-        else
-            setAnswer([]);
-    
-        setLoading(false);
-        try{
-            testDivRef.current.scrollIntoView(); 
-    
-            }
-            catch(e){
-                
-        }
-       
-
-    })
-    .catch(err =>{ 
-        setLoading(false)
-    })
-  }
-
-  let gridElementClass = function(element){
-    // console.log(element)
-    if(!element.answer && !element.isReviewd && !element.question && element.id !== current){
-        return "grid-element"
-    }
-    else if(element.id === current){
-        return "current grid-element"
-    }
-    else if(element.isReviewd){
-        return "reviewed grid-element"
-    }
-    else if(element.answer){
-        return "answered grid-element"
-    }
-    else if(element.question){
-        return "opened grid-element"
-
-    }
-  
-  }
-  let handleChange = (entry) => {
-        if(answer.length !== 0){
-            handleSave(entry.id);
-        }
-        else{
-            setCurrent(entry.id);
-            fetchQuestion(attempt,entry.id);
-           
-        }
-        try{
-        testDivRef.current.scrollIntoView(); 
-
-        }
-        catch(e){
-            
-        }
-    }
 
   const GridDiv = function() {
       return <div className="grid" >
@@ -296,7 +298,7 @@ const Quiz = () => {
   }
 
   let optionClass = function(element){
-      if(element.isSelected){
+      if(answer.includes(element.value)){
           return "selected answerBlock"
       }
       else{
@@ -316,22 +318,29 @@ const Quiz = () => {
     setAnswer([...temp])
   }
 
-  let Option = function(){
-    let temp =  answer
-    let arr =[]
-    let optionRegex = /c[0-9]/;
-    for(let key in question){
-        if(optionRegex.test(key)){
-            arr.push({
-                text : question[key].o,
-                url : question[key].url,
-                value : key,
-                index : parseInt(key.substring(1)),
-                isSelected : temp.includes(key) ? true : false
-            })
+
+  let shuffleArray = (array,order) => {
+      let r = []
+      let k = 0
+    for (var i = array.length - 1; i > 0; i--) {
+        var j;
+        if(order){
+            j = order[k]
         }
+        else{
+            j = Math.floor(Math.random() * (i + 1));
+        }
+        r.push(j);
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+        k++;
     }
-    return arr.map(element => {
+    return r;
+}
+  let Option = function(){
+
+    return option.map(element => {
         return <div className="col-lg-3 col-md-4 col-sm-6 col-xs-12">
                 <div key={element.index} onClick={() => selectOption(element)} className={optionClass(element)}>
            <div className="a-img">
@@ -402,7 +411,7 @@ const Quiz = () => {
 
   }
 
-  let handleSave = function(id){
+  let handleSave = function(id,bool){
  
       let temp = "";
       for(let a of answer){
@@ -414,37 +423,38 @@ const Quiz = () => {
           attempt_id :  attempt,
           question_sno :  current,
       }
-      setLoading(true);
+      setMainLoader(true);
       dispatch(saveAnswer(data)).unwrap()
       .then(res => {
-        let temp = grid;
-        if(temp[current-1] ){
-            temp[current-1].answer = temp;
-            setGrid(temp)
-    
-        }
-        setCurrent(typeof id === 'number' ? id : current+1)
-        fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
+          if(!bool){
+            let temp = grid;
+            if(temp[current-1] ){
+                temp[current-1].answer = temp;
+                setGrid(temp)
         
-   
+            }
+            setCurrent(typeof id === 'number' ? id : current+1)
+            fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
+          }
+      
       })
       .catch(err =>{
-          setLoading(false)
+          setMainLoader(false)
       })
    
   }
 
   let handleSubmit =  function(){
-    setLoading(true);
+    setMainLoader(true);
     dispatch(submitQuiz({attempt_id : attempt}))
     .unwrap()
     .then(res => {
         localStorage.setItem('score',JSON.stringify(res.data));
-        setLoading(false)
+        setMainLoader(false)
         navigae('/result');
     })
     .catch(err =>{ 
-        setLoading(false)
+        setMainLoader(false)
     })
 
   }
@@ -496,7 +506,7 @@ const Quiz = () => {
         <div className="submitBut col-lg-3 col-md-3 col-sm-3  col-6" >
         <div class="bottom" >
         
-            <button  onClick={() => {handleSave(25);handleSubmit();}} className="text-white px-2 py-2 bg-submit rounded-lg shadow-sm font-bold" >
+            <button  onClick={() => setIsOpen(true)}  className="text-white px-2 py-2 bg-submit rounded-lg shadow-sm font-bold" >
                 Submit Quiz
             </button>
         </div>
@@ -508,7 +518,9 @@ const Quiz = () => {
   
 
   return (
-
+    mainLoader ?
+    <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
+    : 
     <div id="quiz" className="quiz">
         <div style={{justifyContent: 'space-between'}} className="row" >
             <div className="quiz-logo" >
@@ -516,7 +528,7 @@ const Quiz = () => {
             </div>
             <Timer />
         </div>
-        <div className="row" >
+            <div className="row" >
             <div className="col-lg-9 col-md-8 col-12" >
                 <div className="row" >
                 {
@@ -544,19 +556,15 @@ const Quiz = () => {
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="instructions"
-        shouldCloseOnOverlayClick={false}
+        className="instructions-div"
       >
-        <h5>Instructions</h5>
-        {
-            instruction.map((element,index) =>{
-                return <div key={index} >
-                    <p>
-                        {element}
-                    </p>
-                </div>
-            })
-        }
-        <Link to="/result" className="checkScore" >Check Score</Link>
+          <h5>Submit Quiz</h5>
+        <p>Do you Want to Submit the quiz?</p>
+        <div className="btnn" >
+               <button  onClick={() => {handleSave(25,true);handleSubmit();}} style={{display:'inline-block',marginRight:'10px'}} >Yes</button> 
+               <button  onClick={() => setIsOpen(false)} style={{display:'inline-block',marginRight:'10px'}} >No</button> 
+
+        </div>
       </Modal>
     </div>
         

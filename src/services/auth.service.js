@@ -1,3 +1,4 @@
+import authHeader from "./auth-header";
 import axios from "axios";
 
 // const API_URL = "http://localhost:8000/api/";
@@ -16,6 +17,15 @@ const register = (token,data) => {
     }
   }
 
+  );
+};
+
+const loginGuest = (data) => {
+  return axios.post(API_URL + "signup/v1/loginGuest", {
+ 
+    ...data,
+ 
+  },
   );
 };
 const genrateOtp = (phone) => {
@@ -40,6 +50,63 @@ const login = (username, password) => {
     })
 };
 
+const forgetUserName = (phone) => {
+  return axios
+    .post(API_URL + "auth/v1/username", {
+     phone
+    })
+};
+
+const school = (code) => {
+  return axios
+    .get(API_URL + "signup/v1/school/" + code)
+};
+
+const userSchool = () => {
+  return axios
+    .get(API_URL + "signup/v1/userSchool/"  ,
+    {
+      headers:authHeader(),
+    })
+};
+
+const editSchool = (code) => {
+  return axios
+    .post(API_URL + "signup/v1/school" ,{
+      school_name  : code
+    },
+    {
+      headers:authHeader(),
+    })
+};
+
+
+
+const getUserName = (phone,otp) => {
+  return axios
+    .post(API_URL + "auth/v1/getUsername", {
+     otp,
+     phone
+    })
+};
+
+const forgetPassword = (username) => {
+  return axios
+    .post(API_URL + "auth/v1/forgotPassword", {
+     username
+    })
+};
+const resetPassword = (username,otp,password) => {
+  console.log(username);
+  return axios
+    .post(API_URL + "auth/v1/resetPassword", {
+      username,
+     otp,
+     password
+    })
+};
+
+
 const logout = () => {
   localStorage.removeItem("user");
   localStorage.clear();
@@ -47,10 +114,18 @@ const logout = () => {
 
 const authService = {
   register,
+  loginGuest,
   login,
   logout,
   genrateOtp,
-  verifyOtp
+  verifyOtp,
+  forgetPassword,
+  forgetUserName,
+  getUserName,
+  resetPassword,
+  school,
+  userSchool,
+  editSchool,
 };
 
 export default authService;

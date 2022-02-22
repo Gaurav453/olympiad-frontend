@@ -1,7 +1,7 @@
 import { useEffect ,useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import logo from '../assets/images/Logo009_min2.png';
-import {saveProfile} from '../slices/auth'
+import {saveProfile ,school } from '../slices/auth'
 import { Navigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -72,6 +72,21 @@ const ProfilePage = () => {
   },[email])
 
   useEffect(() => {
+    dispatch(school({
+      code : schoolCode
+    }))
+    .unwrap()
+    .then(res => {
+      if(res.data?.name){
+        setSchoolName(res.data?.name)
+      }
+      else{
+        setSchoolName("")
+      }
+    })
+  },[schoolCode,dispatch])
+
+  useEffect(() => {
     if(isSame){
       setWhatsapp(phone)
     }
@@ -104,10 +119,11 @@ const ProfilePage = () => {
       "email" : email,
       "school_code" : schoolCode,
       "ref" : referrer || "none", 
-      "school_name" : schoolName,
       "class" : clas,
        "state" : state,
-       "city" : city
+       "city" : city,
+       "country" : 'India',
+       "category" : category
     }
     dispatch(saveProfile(data))
     .unwrap()
@@ -248,7 +264,7 @@ const ProfilePage = () => {
             <div class="school_code" >
             <p>School Code</p>
             <input  onChange={(e) => seschoolCode(e.target.value)} className="form-input" ></input>
-            <span>School Name</span>
+            <span>{schoolName}</span>
           </div> : <></>
           }
         

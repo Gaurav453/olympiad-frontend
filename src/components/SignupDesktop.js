@@ -1,12 +1,15 @@
 import { useEffect ,useState} from 'react';
 import { useDispatch } from 'react-redux';
-import { genrateOtp , verifyOtp ,register} from "../slices/auth";
-import { Navigate,Link } from "react-router-dom";
+import { genrateOtp , verifyOtp ,register , loginGuest as lg} from "../slices/auth";
+import { Navigate,Link ,useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit } from '@fortawesome/free-solid-svg-icons'
 import Modal from 'react-modal';
+import { Country, State, City }  from 'country-state-city';
+
+
 
 
 import useMergedState from '../hooks/MergeState';
@@ -21,11 +24,29 @@ const override = `
 
 const SignupDesktop = () => {
 
+  const navigate = useNavigate();
+
+  let loginGuestObj = {
+    "firstName": "Gaurav",
+    "lastName" : "ak",
+    "phone" : "8787878787",
+    "whats_no":"8787878787",
+    "email" : "g@g.com",
+    "state" : "Delhi",
+    "city" : "Delhi",
+    "country" : "India",
+    "userip": "",
+    "language" : "ENGLISH"
+
+  }
+
   const [ firstName , setfirstName ] = useMergedState("");
   const [ lastName , setlastName ] = useMergedState("");
   const [ phone , setphone ] = useMergedState("");
   const [ password , setpassword ] = useMergedState("");
   const [ otp , setOtp ] = useMergedState("");
+  const [ isSame , setisSame ] = useState(false);
+
 
   let [loading , setLoading ] = useMergedState(false);
   const [isOtpGenrated , setIsOtpGenrated ] = useMergedState(false);
@@ -42,6 +63,40 @@ const SignupDesktop = () => {
   const [userName , setuserName ] = useMergedState("");
 
   const [modalIsOpen, setIsOpen] = useState(false);
+
+  const [modalIsOpenIns, setModalIsOpenIns] = useState(false);
+
+  const [loginGuest,setLoginGuest] = useState(loginGuestObj);
+  const [isLoginGuest,setIsLoginGuest] = useState(false);
+
+
+  const [country,setCountry] = useState();
+  const [state,setState] = useState('');
+  const [city,setCity] = useState('');
+
+  const [countryList,setCountryList] = useState(Country.getAllCountries());
+  const [stateList,setStateList] = useState([]);
+  const [cityList,setCityList] = useState([]);
+
+///State.getStatesOfCountry(country)
+
+let instruction = [ '1. This test is based on MCQ pattern',
+
+'2. There can be more than one correct option (even for a single fill in the blanks)',
+
+
+'3. Time duration : 15 minutes',
+
+'4. Questions : 25',
+
+'5. Marking Scheme : +4 for every right answer & -1 for every wrong answer',
+
+ "6. Passing percentage : 40%",
+
+  "7. After completion of test, you will be redirected to an additional bonus round - 'Spin the wheel' to improve your score",
+  "8. There will be no negative marking for the Bonus round",
+  "9.  Instant result and certificate after submission of test"]
+
 
   function openModal() {
     setIsOpen(true);
@@ -67,11 +122,10 @@ const SignupDesktop = () => {
 
   }
 
-  
-
 
   const dispatch = useDispatch();
 
+  let emailRegex = /\S+@\S+\.\S+/;
 
   useEffect(() => {
     let nameRegex = /^[a-z ,.'-]+$/i;
@@ -167,6 +221,34 @@ const SignupDesktop = () => {
 
   }
 
+  let handleLoginGuest = function(){
+    let {firstName, lastName,phone,email,whats_no,state,city,country} = loginGuest;
+    console.log(isSame);
+    if(!firstName || !lastName || !phone || !email || (!whats_no && !isSame) || !state || !city || !country){  
+      errorMessage("Please Fill all correct details")
+      return;
+
+    }
+    if(phone.length !== 10 ||( whats_no.length >0 && whats_no.length !==10 )){
+      errorMessage("Please enter valid phone no")
+      return;
+
+    }
+    if(!emailRegex.test(email)){
+      errorMessage("Please enter valid email")
+      return;
+    }
+    if(isSame) {
+      handleGuestLoginChange('whats_no',phone)
+    }
+    setIsLoginGuest(false);
+    setModalIsOpenIns(true)
+
+
+
+
+  }
+
   let handleSubmit  = function(){
 
     closeModal();
@@ -246,12 +328,39 @@ const SignupDesktop = () => {
     },
   };
 
+  let handleGuestLoginChange = (key,value) =>{
+    let  obj = {};
+    obj[key] = value
+    setLoginGuest(pre => {
+      return {
+        ...pre,
+        ...obj
+      }
+    })
+  }
+
+  let navigateQuiz = () =>{
+    dispatch(lg(loginGuest))
+    .unwrap()
+    .then((res => {
+      localStorage.setItem('language',loginGuest.language);
+      setModalIsOpenIns(false);
+      navigate('/quiz',{ replace: true })
+     
+
+
+    }))
+    .catch(err =>{ 
+      console.log(err);
+    })
+   
+  }
 
   return (
     loading ?
     <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
     :
-    <div style={{height: '90vh'}} className="signup-desktop">
+    <div style={{height: '100%'}} className="signup-desktop">
 
       <div className="box">
         <div className="main-heading">
@@ -321,8 +430,13 @@ const SignupDesktop = () => {
           </div>
           <div  >
                   <button  onClick={() => { 
-                    isDetailsFilled() ? openModal() : console.log("Er") }} className="form-button"  >Register</button>
+                    isDetailsFilled() ? openModal() : console.log("Er") }} className="form-button"  >Register</button> or 
+              <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
+                <span onClick={() => setIsLoginGuest(true)} >Login as guest</span>
+
+              </div>
             </div>
+            
 
         </div>
 
@@ -343,6 +457,160 @@ const SignupDesktop = () => {
               <button onClick={handleSubmit} > Okay!</button>
             </div>
           </Modal>
+
+          <Modal
+          isOpen={isLoginGuest}
+          onRequestClose={() => setIsLoginGuest(false)}
+          style={customStyles}
+          contentLabel="instructions"
+          shouldCloseOnOverlayClick={false}
+          className="instructions-div"
+          >
+          <h5>Login As Guest</h5>
+          <div className="box">
+        <div className="form" >
+          <div>
+             <p>First Name</p> 
+             <input value={loginGuest.firstName} onChange={(e) => handleGuestLoginChange("firstName",e.target.value)} placeholder="Please enter your First Name"className="form-input" ></input>
+
+          </div>
+          <div>
+             <p>Last Name</p>
+             <input  value={loginGuest.lastName}  onChange={(e) => handleGuestLoginChange("lastName",e.target.value)}  placeholder="Please enter your Last Name"className="form-input" ></input>
+          </div>
+          <div>
+              <p>Phone Number</p>
+             <input  value={loginGuest.phone}  onChange={(e) => handleGuestLoginChange("phone",e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" ></input>
+
+          </div>
+          <div  style={{display:'flex',margin:"10px 0"}} >
+            <div>
+              <input onClick={() => setisSame(!isSame)} type="checkbox" />
+            </div>
+            <div style={{marginLeft:20}}  >
+              <span  >Check if WhatsApp  number is same as above</span>
+            </div>
+          </div>
+          {
+            !isSame ? 
+            <div>
+            <p>WhatsApp Number</p>
+            <input value={loginGuest.whats_no}   onChange={(e) => handleGuestLoginChange("whats_no",e.target.value)}  placeholder="Please enter your WhatsApp Phone Number"className="form-input" ></input>
+          </div> : <></>
+          }
+          <div>
+             <p>Email</p> 
+             <input  value={loginGuest.email}  onChange={(e) => handleGuestLoginChange("email",e.target.value)} placeholder="Please enter your Email"className="form-input" ></input>
+          </div>
+   
+
+ <div className="userLocation">
+          <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Country state and city</p>
+          <div className="drop-downs">
+          <div style={{marginRight : "10px"}} className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {loginGuest.country ? loginGuest.country :"Select Country"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 countryList.map(entry => {
+                   return <button onClick={() => { handleGuestLoginChange('country',entry.name);setStateList(State.getStatesOfCountry(entry.isoCode))}} key={entry.isoCode} className={country === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name}
+
+                     </button>
+
+                 })
+               }
+              </div>
+            </div>
+            {
+              loginGuest.country ? 
+              <div style={{marginRight : "10px"}}   className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {loginGuest.state ? loginGuest.state :"Select State"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 stateList.map(entry => {
+                   return <button onClick={() => { handleGuestLoginChange('state',entry.name);setCityList(City.getCitiesOfState(entry.countryCode,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name + entry.countryCode}
+
+                     </button>
+
+                 })
+               }
+              </div>
+            </div> : <></>
+
+            }
+     
+            {
+              loginGuest.state ? 
+              <div className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {loginGuest.city ? loginGuest.city :"Select City"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 cityList.map(entry => {
+                   return <button onClick={() => handleGuestLoginChange('city',entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name}
+
+                     </button>
+
+                 })
+               }
+              </div>
+               
+            </div>  : <></>
+            }
+     
+       
+          </div>
+
+          </div> 
+
+          <div style={{marginTop : '20px'}} className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                { loginGuest.language  ? loginGuest.language : "Select Language" }
+              </button>
+              <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button onClick={() => handleGuestLoginChange("language","ENGLISH")} className={loginGuest.language === "ENGLISH" ? 'dropdown-item active' : 'dropdown-item'}>English</button>
+                <button onClick={() =>  handleGuestLoginChange("language","HINDI")} className={loginGuest.language === "HINDI" ? 'dropdown-item active' : 'dropdown-item'}>Hindi</button>
+                <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button>
+              </div>
+            </div>
+        </div>
+
+      </div>
+          <div  class="btnn">
+            <button onClick={handleLoginGuest} > Register</button>
+          </div>
+          </Modal>
+
+        <Modal
+        isOpen={modalIsOpenIns}
+        onRequestClose={() => setModalIsOpenIns(false)}
+        style={customStyles}
+        contentLabel="instructions"
+        shouldCloseOnOverlayClick={false}
+        className="instructions-div"
+        >
+        <h5>Instructions</h5>
+        {
+            instruction.map((element,index) =>{
+                return <div key={index} >
+                    <p>
+                        {element}
+                    </p>
+                </div>
+            })
+        }
+        <div class="btnn">
+        <button onClick={() => navigateQuiz()} >Start</button>
+
+        </div>
+        </Modal>
 
     </div>
   );

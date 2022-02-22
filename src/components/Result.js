@@ -14,7 +14,9 @@ import imag from '../assets/images/try_again.jpg';
 const Result = (props) => {
     let score = localStorage.getItem('score');
     let user = useSelector(state => state.auth);
+    let state = useSelector(state => state.auth);
     user = user?.user;
+    console.log(user)
     score = JSON.parse(score);
     localStorage.removeItem('language')
 
@@ -34,7 +36,7 @@ const Result = (props) => {
                
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-7 " >
                     <div className="name" >
-                        {user.name}
+                        {user.first_name}   {user.last_name} 
                     </div>
                     <div className="score row" >
                         <div className="col-xs-12 col-sm-12 col-md-4 col-lg-5" >
@@ -100,7 +102,7 @@ const Result = (props) => {
 
                         </div>
                         <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6 attempt" >
-                        <Link to="/dashboard"> Attempt Again </Link>
+                        <Link to={state.isGuest ? '/' : "/dashboard"}> Attempt Again </Link>
 
                         </div>
 
@@ -114,7 +116,6 @@ const Result = (props) => {
                         <img style={{marginBottom : 20 + 'px'}} alt="try-again" src={imag} ></img>
                         <div>
                         <div className="attempt" >
-                            <Link to="/dashboard"> Attempt Again </Link>
 
                         </div>                        </div>
 

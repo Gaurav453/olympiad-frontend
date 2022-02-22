@@ -16,11 +16,13 @@ const Home = () => {
   let user = useSelector(state => state.auth);
   user = user?.user;
 
+  let state = useSelector(state => state.auth)
+
   const breakpoint = 620;
   useEffect(() => {
 
   }, []);
-  if(user) {
+  if(user && !state.isGuest) {
     if(user.email){
       return <Navigate to="/dashboard" />;
     } 

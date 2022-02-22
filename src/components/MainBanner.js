@@ -7,7 +7,7 @@ const AboutPage = () => {
     <div
       style={{
         backgroundImage: `url(${MainBanner})`,
-        height:"90vh"
+        height:"100%"
       }}
       className="main-banner"
     ></div>

@@ -11,7 +11,7 @@ import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 import Quiz from "./components/Quiz";
 import Result from "./components/Result";
-
+import EditProfile from "./components/editProfile";
 
 
 import { ToastContainer} from 'react-toastify';
@@ -34,6 +34,7 @@ const App = () => {
           <Routes>
             <Route exact path="/" element={<Home />} />
             <Route exact path="/profile" element={<Profile />} />
+            <Route exact path="/editProfile" element={<EditProfile />} />
             <Route exact path="/dashboard" element={<Dashboard />} />
             <Route exact path="/quiz" element={<Quiz />} />
             <Route exact path="/result" element={<Result />} />

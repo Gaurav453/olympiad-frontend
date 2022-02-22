@@ -1,7 +1,10 @@
 import { useEffect ,useState} from 'react';
 import {  useDispatch } from 'react-redux';
-import { genrateOtp , verifyOtp ,register, login} from "../slices/auth";
-import { Navigate } from "react-router-dom";
+import { genrateOtp , verifyOtp ,register, login ,  loginGuest as lg} from "../slices/auth";
+import {  forgetUserName, forgetPassword as forgetP, getUserName, resetPassword } from "../slices/auth";
+import { Country, State, City }  from 'country-state-city';
+
+import { Navigate  ,useNavigate} from "react-router-dom";
 import logo from '../assets/images/Logo009_min2.png';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,12 +20,46 @@ const override = `
 
 
 const SignupMobile = () => {
+  let navigate = useNavigate();
 
+  let loginGuestObj = {
+    "firstName": "Gaurav",
+    "lastName" : "ak",
+    "phone" : "8787878787",
+    "whats_no":"8787878787",
+    "email" : "g@g.com",
+    "state" : "Delhi",
+    "city" : "Delhi",
+    "country" : "India",
+    "userip": "",
+    "language" : "ENGLISH"
+
+  }
   const [ firstName , setfirstName ] = useState("");
   const [ lastName , setlastName ] = useState("");
   const [ phone , setphone ] = useState("");
   const [ password , setpassword ] = useState("");
-  const [ otp , setOtp ] = useState("");
+  const [otpSent , setOtpSent] = useState(false);
+  const [otpVerified , setOtpVerified] = useState(false);
+  const [otp , setOtp] = useState("");
+  const [usernames , setUsernames] = useState([]);
+  const [forgetUsername,setFotgetUsername] = useState(false);;
+  const [forgetPassword,setFotgetPassword] = useState(false);;
+  const [modalIsOpenIns, setModalIsOpenIns] = useState(false);
+
+  const [loginGuest,setLoginGuest] = useState(loginGuestObj);
+  const [isLoginGuest,setIsLoginGuest] = useState(false);
+  const [ isSame , setisSame ] = useState(false);
+
+
+
+  const [country,setCountry] = useState();
+  const [state,setState] = useState('');
+  const [city,setCity] = useState('');
+
+  const [countryList,setCountryList] = useState(Country.getAllCountries());
+  const [stateList,setStateList] = useState([]);
+  const [cityList,setCityList] = useState([]);
 
   const [loading , setLoading ] = useState(false);
   const [isOtpGenrated , setIsOtpGenrated ] = useState(false);
@@ -68,8 +105,7 @@ const SignupMobile = () => {
 
 
   
-
-
+  let emailRegex = /\S+@\S+\.\S+/;
   const dispatch = useDispatch();
 
 
@@ -153,6 +189,88 @@ const SignupMobile = () => {
     }
 
   }
+
+  let handlerForgotPassword = () => {
+    setOtpVerified(false);
+    setOtpSent(false);
+    setFotgetPassword(true);
+
+  }
+
+  let handlerForgotUserName= () => {
+    setOtpVerified(false);
+    setOtpSent(false);
+    setFotgetUsername(true);
+  }
+
+  let  otpForgetUserName = () => {  
+    dispatch(forgetUserName({phone}))
+    .unwrap()
+    .then(res => {
+      console.log(res);
+      setOtpSent(true);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+
+  }
+
+  let  submitForgetUserName = () =>{
+    dispatch(getUserName({phone,otp}))
+    .unwrap()
+    .then(res => {
+      console.log(res);
+      setOtpVerified(true);
+      setpassword("");
+      setuserName("");
+      setUsernames(res.data.map(element => element.username))
+    })
+    .catch(err => {
+      console.log(err);
+    })
+  }
+
+  let  otpForgetPassword = () => {
+    dispatch(forgetP({userName}))
+    .unwrap()
+    .then(res => {
+      console.log(res);
+      setOtpSent(true);
+    })
+    .catch(err => {
+      console.log(err);
+    })
+
+  }
+
+  let  submitForgetPassword = () =>{
+    dispatch(resetPassword({userName,otp,password}))
+    .unwrap()
+    .then(res => {
+      console.log(res);
+      setOtpSent(false);
+      setFotgetPassword(false);
+      setOtpVerified(false);
+      setpassword("");
+      setuserName("");
+      toast.success("Password changed, Please login to continue", {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        theme: "dark",
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+
+    })
+    .catch(err => {
+      console.log(err);
+    })
+
+  }
     
   let errorMessage = function(message){
     toast.error(message, {
@@ -168,6 +286,25 @@ const SignupMobile = () => {
 
   }
 
+let instruction = [ '1. This test is based on MCQ pattern',
+
+'2. There can be more than one correct option (even for a single fill in the blanks)',
+
+
+'3. Time duration : 15 minutes',
+
+'4. Questions : 25',
+
+'5. Marking Scheme : +4 for every right answer & -1 for every wrong answer',
+
+ "6. Passing percentage : 40%",
+
+  "7. After completion of test, you will be redirected to an additional bonus round - 'Spin the wheel' to improve your score",
+  "8. There will be no negative marking for the Bonus round",
+  "9.  Instant result and certificate after submission of test"]
+
+
+
   let handleGenrateOtp = function(){
     setLoading(true);
     dispatch(genrateOtp({phone}))
@@ -178,6 +315,60 @@ const SignupMobile = () => {
       setLoading(true);
 
     })
+  }
+  let handleLoginGuest = function(){
+    let {firstName, lastName,phone,email,whats_no,state,city,country} = loginGuest;
+    console.log(isSame);
+    if(!firstName || !lastName || !phone || !email || (!whats_no && !isSame) || !state || !city || !country){  
+      errorMessage("Please Fill all correct details")
+      return;
+
+    }
+    if(phone.length !== 10 ||( whats_no.length >0 && whats_no.length !==10 )){
+      errorMessage("Please enter valid phone no")
+      return;
+
+    }
+    if(!emailRegex.test(email)){
+      errorMessage("Please enter valid email")
+      return;
+    }
+    if(isSame) {
+      handleGuestLoginChange('whats_no',phone)
+    }
+    setIsLoginGuest(false);
+    setModalIsOpenIns(true)
+
+
+
+
+  }
+  let handleGuestLoginChange = (key,value) =>{
+    let  obj = {};
+    obj[key] = value
+    setLoginGuest(pre => {
+      return {
+        ...pre,
+        ...obj
+      }
+    })
+  }
+
+  let navigateQuiz = () =>{
+    dispatch(lg(loginGuest))
+    .unwrap()
+    .then((res => {
+      localStorage.setItem('language',loginGuest.language);
+      setModalIsOpenIns(false);
+      navigate('/quiz',{ replace: true })
+     
+
+
+    }))
+    .catch(err =>{ 
+      console.log(err);
+    })
+   
   }
   
   useEffect(() => {
@@ -251,7 +442,7 @@ const SignupMobile = () => {
     loading ?
     <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
     :
-    <div style={{height: '90vh'}} className="signup-mobile">
+    <div style={{height: '100%'}} className="signup-mobile">
       <div className="mobile-logo" >
         <div>   
           <img alt="main-logo"  src={logo}/>
@@ -273,12 +464,21 @@ const SignupMobile = () => {
              <p>User Name</p> 
              <input  onChange={(e) => setuserName(e.target.value)} placeholder="Please enter your username"className="form-input" ></input>
                <p className="error-message"  >{firstNameError}</p> 
+               <div className="forgot">
+               <span onClick={handlerForgotUserName} >Forgot UserName</span>
+   
+             </div>
 
           </div>
+        
           <div> 
              <p>Password</p>
              <input disabled={isOtpVerified} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Please enter your Password" className="form-input" ></input>
              <p className="error-message"  >{passwordError}</p> 
+             <div className="forgot">
+             <span onClick={handlerForgotPassword} >Forgot Password</span>
+
+           </div>
 
 
           </div>
@@ -355,7 +555,12 @@ const SignupMobile = () => {
         </div>
    <div >
            <button onClick={openModal} className="form-button"  >Register</button>
+           <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
+                <span onClick={() => setIsLoginGuest(true)} >Login as guest</span>
+
+              </div>
      </div>
+    
      <div style={{margin: "15px 0",textAlign: "center"}} >
            or
      </div>
@@ -384,6 +589,248 @@ const SignupMobile = () => {
               <button onClick={handleSubmit} > Okay!</button>
             </div>
           </Modal>
+
+<Modal
+isOpen={ forgetPassword}
+onRequestClose={() => setFotgetPassword(false)}
+style={customStyles}
+contentLabel="forget-password"
+shouldCloseOnOverlayClick={false}
+className="instructions-div forget-modal"
+>
+
+{
+  otpSent === false && !otpVerified?
+  <div>
+     <h5>Forget Password</h5>
+
+  <span class="note" > Username : &nbsp; </span>
+  <input placeholder="Enter your username" style={{display: 'inline-block',width: '75%'}} value={userName} onChange={(e) => setuserName(e.target.value)}  type="text" className="form-input"></input>
+  <div  class="btnn">
+  <button onClick={otpForgetPassword} >Sent otp!</button>
+</div>
+  </div> : otpSent && !otpVerified  ? 
+  <div>
+     <h5>Reset Password</h5>
+    <p style={{fontWeight:'bold'}} >Enter Otp and new password</p>
+    <input placeholder="Enter otp" style={{display: 'inline-block',width: '75%'}} type="text" onChange={(e) => setOtp(e.target.value)} value={otp} className="form-input"></input>
+    <div style={{marginTop:'20px'}} ></div>
+    <input placeholder="Enter New Password" style={{display: 'inline-block',width: '75%'}} type="text" onChange={(e) => setpassword(e.target.value)} value={password} className="form-input"></input>
+   
+    <div  class="btnn">
+     <button onClick={submitForgetPassword}> Reset Password!</button>
+  </div>
+  </div> : <div>
+
+  </div>
+
+}
+
+</Modal>
+
+
+<Modal
+isOpen={forgetUsername}
+onRequestClose={() => setFotgetUsername(false)}
+style={customStyles}
+contentLabel="forget-username"
+shouldCloseOnOverlayClick={false}
+className="instructions-div forget-modal"
+>
+        {
+  otpSent === false && !otpVerified?
+  <div>
+     <h5>Forget username</h5>
+
+  <span class="note" > Phone : &nbsp; </span>
+  <input placeholder="Please enter your phone no" style={{display: 'inline-block',width: '75%'}} value={phone} onChange={(e) => setphone(e.target.value)}  type="text" className="form-input"></input>
+  <div  class="btnn">
+  <button onClick={otpForgetUserName} >Sent otp!</button>
+</div>
+  </div> : otpSent && !otpVerified  ? 
+  <div>
+     <h5>Enter Otp</h5>
+
+    <p class="note" > Enter otp</p>
+    <input  placeholder="Please enter otp" type="text" onChange={(e) => setOtp(e.target.value)} value={otp} className="form-input"></input>
+    <div  class="btnn">
+  <button onClick={submitForgetUserName}> Submit!</button>
+</div>
+  </div> : <div>
+  <h5>Associcated Users</h5>
+  {
+
+    usernames.map((entry,index) =>  {
+      return <li  key={index} >{entry}</li>;
+    })
+    
+  }
+  <h6 style={{ fontWeight:"bold",marginTop: "20px" }}>  Please note this usernames</h6>
+  <div class="btnn" style={{textAlign: "center"}} >
+  <button onClick={() => setFotgetUsername(false)}> Noted!</button>
+
+  </div>
+
+
+
+  </div>
+
+}
+</Modal>
+          <Modal
+          isOpen={isLoginGuest}
+          onRequestClose={() => setIsLoginGuest(false)}
+          style={customStyles}
+          contentLabel="instructions"
+          shouldCloseOnOverlayClick={false}
+          className="instructions-div"
+          >
+          <h5>Login As Guest</h5>
+          <div className="box">
+        <div className="form" >
+          <div>
+             <p>First Name</p> 
+             <input value={loginGuest.firstName} onChange={(e) => handleGuestLoginChange("firstName",e.target.value)} placeholder="Please enter your First Name"className="form-input" ></input>
+
+          </div>
+          <div>
+             <p>Last Name</p>
+             <input  value={loginGuest.lastName}  onChange={(e) => handleGuestLoginChange("lastName",e.target.value)}  placeholder="Please enter your Last Name"className="form-input" ></input>
+          </div>
+          <div>
+              <p>Phone Number</p>
+             <input  value={loginGuest.phone}  onChange={(e) => handleGuestLoginChange("phone",e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" ></input>
+
+          </div>
+          <div  style={{display:'flex',margin:"10px 0"}} >
+            <div>
+              <input onClick={() => setisSame(!isSame)} type="checkbox" />
+            </div>
+            <div style={{marginLeft:20}}  >
+              <span  >Check if WhatsApp  number is same as above</span>
+            </div>
+          </div>
+          {
+            !isSame ? 
+            <div>
+            <p>WhatsApp Number</p>
+            <input value={loginGuest.whats_no}   onChange={(e) => handleGuestLoginChange("whats_no",e.target.value)}  placeholder="Please enter your WhatsApp Phone Number"className="form-input" ></input>
+          </div> : <></>
+          }
+          <div>
+             <p>Email</p> 
+             <input  value={loginGuest.email}  onChange={(e) => handleGuestLoginChange("email",e.target.value)} placeholder="Please enter your Email"className="form-input" ></input>
+          </div>
+   
+
+ <div className="userLocation">
+          <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Country state and city</p>
+          <div className="drop-downs">
+          <div style={{marginRight : "10px"}} className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {loginGuest.country ? loginGuest.country :"Select Country"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 countryList.map(entry => {
+                   return <button onClick={() => { handleGuestLoginChange('country',entry.name);setStateList(State.getStatesOfCountry(entry.isoCode))}} key={entry.isoCode} className={country === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name}
+
+                     </button>
+
+                 })
+               }
+              </div>
+            </div>
+            {
+              loginGuest.country ? 
+              <div style={{marginRight : "10px"}}   className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {loginGuest.state ? loginGuest.state :"Select State"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 stateList.map(entry => {
+                   return <button onClick={() => { handleGuestLoginChange('state',entry.name);setCityList(City.getCitiesOfState(entry.countryCode,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name + entry.countryCode}
+
+                     </button>
+
+                 })
+               }
+              </div>
+            </div> : <></>
+
+            }
+     
+            {
+              loginGuest.state ? 
+              <div className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {loginGuest.city ? loginGuest.city :"Select City"} 
+              </button>
+              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+               {
+                 cityList.map(entry => {
+                   return <button onClick={() => handleGuestLoginChange('city',entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                     {entry.name}
+
+                     </button>
+
+                 })
+               }
+              </div>
+               
+            </div>  : <></>
+            }
+     
+       
+          </div>
+
+          </div> 
+
+          <div style={{marginTop : '20px'}} className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                { loginGuest.language  ? loginGuest.language : "Select Language" }
+              </button>
+              <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button onClick={() => handleGuestLoginChange("language","ENGLISH")} className={loginGuest.language === "ENGLISH" ? 'dropdown-item active' : 'dropdown-item'}>English</button>
+                <button onClick={() =>  handleGuestLoginChange("language","HINDI")} className={loginGuest.language === "HINDI" ? 'dropdown-item active' : 'dropdown-item'}>Hindi</button>
+                <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button>
+              </div>
+            </div>
+        </div>
+
+      </div>
+          <div  class="btnn">
+            <button onClick={handleLoginGuest} > Register</button>
+          </div>
+          </Modal>
+
+        <Modal
+        isOpen={modalIsOpenIns}
+        onRequestClose={() => setModalIsOpenIns(false)}
+        style={customStyles}
+        contentLabel="instructions"
+        shouldCloseOnOverlayClick={false}
+        className="instructions-div"
+        >
+        <h5>Instructions</h5>
+        {
+            instruction.map((element,index) =>{
+                return <div key={index} >
+                    <p>
+                        {element}
+                    </p>
+                </div>
+            })
+        }
+        <div class="btnn">
+        <button onClick={() => navigateQuiz()} >Start</button>
+
+        </div>
+        </Modal>
+
     
     </div>
   );

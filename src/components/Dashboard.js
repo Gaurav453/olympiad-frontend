@@ -1,7 +1,13 @@
 import React , { useEffect,useState } from "react";
 import {useSelector ,useDispatch } from 'react-redux';
 import { Navigate,Link } from "react-router-dom";
-import { getPreviousAttempts } from '../slices/quiz'
+import { getPreviousAttempts ,performance } from '../slices/quiz'
+import { userSchool } from '../slices/auth'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
+import { faAngleUp} from '@fortawesome/free-solid-svg-icons'
+import  Footer from './footer'
+
 import LoginBar from './LoginBar'
 import { useNavigate } from "react-router-dom";
 import Modal from 'react-modal';
@@ -33,31 +39,56 @@ const Dashboard = () => {
   }
 
 
-  useEffect(() => {
-    previousAttempts();
-
-  },[])
 
   const [attempts,setAttempts] = useState([]);
   const [completed,setCompleted] = useState(false);
   const [language,setLangauge] = useState(false);
   let [loading , setLoading ] = useState(false);
+  let [school , setSchool ] = useState(false);
+  let [sort,setSort] = useState(0)
+  let [myperformance , setPerformance ] = useState({
+    "city" : -1,
+    "state" : -1,
+    "total" : -1,
+    "school" : -1,
+  });
 
 
 
 
-  if(!user){
-    return <Navigate to="/" />;
+
+
+
+  let handleSort = (v)=>{
+    if(sort === 1 && v === 1) v=-1
+    setSort(v);
+    previousAttempts(v);
+
 
   }
-  else if(!user.email)
-    return <Navigate to="/profile" />;
 
- 
-
-  let previousAttempts = ()=>{
+ let getPerformance = ()=>{
     
-    dispatch(getPreviousAttempts({}))
+    dispatch(performance({}))
+    .unwrap()
+    .then((res)=>{
+      console.log(res);
+      setPerformance((obj) => {return {
+        ...obj,
+        ...res.data
+      }})
+      console.log(performance)
+
+    })
+    .catch(() =>{
+
+    })
+
+
+  }
+  let previousAttempts = (v)=>{
+    
+    dispatch(getPreviousAttempts({sort:v}))
     .unwrap()
     .then((res)=>{
       console.log(res);
@@ -104,10 +135,22 @@ const Dashboard = () => {
 
   }
 
+  let getuserSchool = function(){
+    dispatch(userSchool({}))
+    .unwrap()
+    .then((res) => {
+      if(res.data?.name){
+        setSchool(res.data?.name)
+      }
+      
+    })
+  }
+
   let startQuiz = function() {
 
     console.log('start quiz');
     localStorage.setItem('language',language);
+    navigate('/quiz')
 
   }
 
@@ -126,17 +169,12 @@ const Dashboard = () => {
           <LoginBar login={false} />
         </div>
       </div>
-      <div className="row">
-        <div className="col-3">
+      <div className="row top">
+        <div className="col-12">
+          <h4>Welcome to Olympiad {user.first_name}</h4>
         </div>
-        <div className="col-6">
-          <div className="mx-auto">
-            Welcome to Olympiad {user.first_name}
-    
-          </div>
-        </div>
-        <div className="col">
-          <div className="shadow-lg p-4 rounded-lg drop-downs startQuiz" >
+        <div className="col-12">
+        <div className=" drop-downs startQuiz" >
             <div className="text-center mb-2 font-extrabold" >
               <h5>Start Quiz</h5>
             </div>
@@ -153,43 +191,115 @@ const Dashboard = () => {
             </div>
             <button onClick={instructions} className="bg-main text-white px-2 py-1 rounded-lg mt-3 form-button" >Start Quiz</button>
           </div>
-     
-        <div className="shadow-lg p-4 rounded-lg  previousAttempts">
-        <div className="text-center mb-2 font-extrabold" >
-              <h5>Your Last Attempts are</h5>
-            </div>
+        </div>
+      </div>
+      <div className="row second">
+        <div className="col-12 col-md-8">
+          <div>
+
+          <div className="table">
+          <h5>Previous Attempts</h5>
+
+          <table >
+          <thead>
+            <tr>
+              <th scope="col">Sno</th>
+              <th onClick={() => handleSort(0)} scope="col">Score
+              {
+                sort === 0 ? <FontAwesomeIcon icon={faAngleUp}/>   : <></>
+              }
+              </th>
+              <th scope="col">Result</th>
+              <th onClick={() => handleSort(1)} scope="col">Attempt Date
+              {
+                sort === -1 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 1 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
+              }
+              
+              
+              </th>
+            </tr>
+          </thead>
+          <tbody>
           {
             attempts.map((element,index) => {
 
-              return <div key={index} className="attempt mb-2">
-                <span className="mr-4 " >{index+1} .</span>
-                {
-                  element.isCompleted ? 
-                  <div style={{ display : 'inline-block' }}>
-                     <span>You scored  {element.score.percentage} %</span>
-                     <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element.score)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
+              return    <tr key={index}  >
+              <th scope="row">{index+1}</th>
+              <td> {element.isCompleted ?  element.score?.percentage +  "%" :  'N/A'} </td>
+              <td>      
+                   { element.isCompleted ?            <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element.score)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
+             :  <button style={{leftMargin : 15 + 'px'}} onClick={() => startQuiz()} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Continue Attempt</button>
+                    }
+              
+              </td>
+              <td>{element.created_at}</td>
+            </tr>
+              
 
-                  </div>
-
-                  : 
-                  <div className="inline-block" >
-                    <Link to="/quiz" onClick={startQuiz} className="bg-main text-white px-2 py-2 rounded-lg font-bold form-button">
-                    Continue attempt 
-
-                    </Link>
-                  </div>
-                }
-              </div>
             })
           }
+         
+    
+          </tbody>
+        </table>
+          </div>
+          </div>
+         
+    
+        
         </div>
-        </div>
+        <div className="col-12 col-md-4">
+          {
+            myperformance.state !== -1 ||  myperformance.city !== -1 || myperformance.total !== -1 || (myperformance.school !== -1 && school) ?
+            <div className="performance">
+            <h5>Your Perdfomance</h5>
+
+              {
+                myperformance.city !== -1 ?
+                <li>You are in top {myperformance.city} in your city</li>  : <></>
+              }
+              {
+                myperformance.state !== -1 ?
+                <li>You are in top {myperformance.state} in your state</li>  : <></>
+              }
+              {
+                myperformance.total !== -1 ?
+                <li>You are in top {myperformance.total} in your total</li>  : <></>
+              }
+              {
+                myperformance.school !== -1 && school ?
+                <li>You are in top {myperformance.school} in your school</li>  : <></>
+              }
+
+            </div>
+            :<></>
+
+          }
+    
+       
+     
+          </div>
       </div>
     </div>
    
     
   
   }
+
+
+  useEffect(() => {
+    getuserSchool();
+    previousAttempts(0);
+    getPerformance();
+
+  },[])
+
+  if(!user){
+    return <Navigate to="/" />;
+
+  }
+  else if(!user.email)
+    return <Navigate to="/profile" />;
   const customStyles = {
     content: {
       top: '50%',
@@ -226,6 +336,8 @@ const Dashboard = () => {
 
     <div className="instructions">
       <Layout/>
+      <Footer />
+
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}

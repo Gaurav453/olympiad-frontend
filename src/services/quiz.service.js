@@ -5,8 +5,8 @@ import authHeader from "./auth-header";
 // const API_URL = "http://localhost:8000/api/quiz/v1/";
 const API_URL = "http://localhost:8000/api/quiz/v1/";
 
-const getPreviousAttempts = () => {
-  return axios.get(API_URL + "previousAttempts",
+const getPreviousAttempts = (sort) => {
+  return axios.get(API_URL + "previousAttempts?sort=" + sort,
   {
     headers:authHeader()
   }
@@ -22,6 +22,14 @@ const currentAttempt = () => {
   );
 };
 
+const activeAttempts = () => {
+  return axios.get(API_URL + "activeAttempts",
+  {
+    headers:authHeader(),
+  }
+
+  );
+};
 const getQuestion = (data) => {
   return axios.post(API_URL + "question",
   data,
@@ -59,6 +67,14 @@ const saveRemainingTime = (data) => {
 
   );
 };
+const performance = () => {
+  return axios.get(API_URL + "performance",
+  {
+    headers:authHeader(),
+  }
+
+  );
+};
 
 const quizService = {
   getPreviousAttempts,
@@ -66,7 +82,9 @@ const quizService = {
   getQuestion,
   saveAnswer,
   submitQuiz,
-  saveRemainingTime
+  saveRemainingTime,
+  performance,
+  activeAttempts
   
 };
 

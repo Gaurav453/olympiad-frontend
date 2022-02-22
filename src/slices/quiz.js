@@ -15,9 +15,9 @@ if(token) token = JSON.parse(token);
 
 export const getPreviousAttempts = createAsyncThunk(
   "quiz/previousAttempt",
-  async ({},thunkAPI) => {
+  async ({sort},thunkAPI) => {
     try {
-      const response = await QuizService.getPreviousAttempts();
+      const response = await QuizService.getPreviousAttempts(sort);
       thunkAPI.dispatch(setMessage(response.data.message));
       return response.data;
     } catch (error) {
@@ -47,6 +47,36 @@ export const currentAttempt = createAsyncThunk(
   async ({},thunkAPI) => {
     try {
       const response = await QuizService.currentAttempt();
+      thunkAPI.dispatch(setMessage(response.data.message));
+      return response.data.data;
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.errMessage, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        theme: "dark",
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue();
+    }
+  }
+);
+export const activeAttempts = createAsyncThunk(
+  "quiz/activeAttempts",
+  async ({},thunkAPI) => {
+    try {
+      const response = await QuizService.activeAttempts();
       thunkAPI.dispatch(setMessage(response.data.message));
       return response.data.data;
     } catch (error) {
@@ -167,6 +197,26 @@ export const saveRemainingTime = createAsyncThunk(
   async (data, thunkAPI) => {
     try {
       const response = await QuizService.saveRemainingTime(data);
+      thunkAPI.dispatch(setMessage(response.data.message));
+      return response.data;
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue();
+    }
+  }
+);
+
+export const performance = createAsyncThunk(
+  "quiz/performance",
+  async ({}, thunkAPI) => {
+    try {
+      const response = await QuizService.performance();
       thunkAPI.dispatch(setMessage(response.data.message));
       return response.data;
     } catch (error) {
