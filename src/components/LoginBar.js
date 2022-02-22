@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
 import Modal from 'react-modal';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -246,6 +247,11 @@ useEffect(() => {
             shouldCloseOnOverlayClick={false}
             className="instructions-div forget-modal"
           >
+                                               <div onClick={() => setFotgetPassword(false)}  className="close-modal" >
+
+<FontAwesomeIcon icon={faTimes} />
+</div>
+              
 
             {
               otpSent === false && !otpVerified?
@@ -285,6 +291,10 @@ useEffect(() => {
             shouldCloseOnOverlayClick={false}
             className="instructions-div forget-modal"
           >
+                                   <div onClick={() => setFotgetUsername(false)}  className="close-modal" >
+
+<FontAwesomeIcon icon={faTimes} />
+</div>
                     {
               otpSent === false && !otpVerified?
               <div>

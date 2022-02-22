@@ -8,6 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit } from '@fortawesome/free-solid-svg-icons'
 import Modal from 'react-modal';
 import { Country, State, City }  from 'country-state-city';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
 
 
 
@@ -449,6 +451,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
             shouldCloseOnOverlayClick={false}
             className="instructions-div"
           >
+            
             <h5>Note</h5>
               <p class="note" > Your user name is <span style={{fontWeight:"bold"}} >{userName || "etxt"}</span></p>
               <p class="note" > Please note it down. You have to login with this username later.</p>
@@ -466,6 +469,10 @@ let instruction = [ '1. This test is based on MCQ pattern',
           shouldCloseOnOverlayClick={false}
           className="instructions-div"
           >
+                       <div onClick={() => setIsLoginGuest(false)}  className="close-modal" >
+
+<FontAwesomeIcon icon={faTimes} />
+</div>
           <h5>Login As Guest</h5>
           <div className="box">
         <div className="form" >

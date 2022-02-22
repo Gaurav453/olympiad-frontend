@@ -425,6 +425,7 @@ const authSlice = createSlice({
 
     [login.fulfilled]: (state, action) => {
       state.isLoggedIn = true;
+      state.isGuest = false;
       state.user = action.payload.data.user;
       state.isProfileCompleted = action.payload.data.user.email ? true : false
       localStorage.setItem('user',JSON.stringify(action.payload.data.user));

@@ -3,6 +3,7 @@ import {  useDispatch } from 'react-redux';
 import { genrateOtp , verifyOtp ,register, login ,  loginGuest as lg} from "../slices/auth";
 import {  forgetUserName, forgetPassword as forgetP, getUserName, resetPassword } from "../slices/auth";
 import { Country, State, City }  from 'country-state-city';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { Navigate  ,useNavigate} from "react-router-dom";
 import logo from '../assets/images/Logo009_min2.png';
@@ -10,6 +11,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BounceLoader from "react-spinners/BounceLoader";
 import Modal from 'react-modal';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const override = `
   display: block;
@@ -486,7 +488,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
                   <button  onClick={flag === 0  ? handleSubmit : handleLogin} className="form-button"  >Login</button>
             </div>
             <div style={{margin: "15px 0",textAlign: "center"}} >
-           or
+           <hr></hr>
      </div>
      <div >
            <button  onClick={()=> setuserFlag(0) } className="form-button"  >Create Account</button>
@@ -562,7 +564,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
      </div>
     
      <div style={{margin: "15px 0",textAlign: "center"}} >
-           or
+     <hr></hr>
      </div>
      <div >
            <button  onClick={()=> setuserFlag(1) } className="form-button"  >Login</button>
@@ -587,6 +589,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
 
             <div  class="btnn">
               <button onClick={handleSubmit} > Okay!</button>
+
             </div>
           </Modal>
 
@@ -598,6 +601,10 @@ contentLabel="forget-password"
 shouldCloseOnOverlayClick={false}
 className="instructions-div forget-modal"
 >
+  <div onClick={() => setFotgetPassword(false)}  className="close-modal" >
+
+    <FontAwesomeIcon icon={faTimes} />
+  </div>
 
 {
   otpSent === false && !otpVerified?
@@ -637,6 +644,10 @@ contentLabel="forget-username"
 shouldCloseOnOverlayClick={false}
 className="instructions-div forget-modal"
 >
+<div onClick={() => setFotgetUsername(false)}  className="close-modal" >
+
+<FontAwesomeIcon icon={faTimes} />
+</div>
         {
   otpSent === false && !otpVerified?
   <div>
@@ -685,6 +696,10 @@ className="instructions-div forget-modal"
           shouldCloseOnOverlayClick={false}
           className="instructions-div"
           >
+            <div onClick={() => setIsLoginGuest(false)}  className="close-modal" >
+
+<FontAwesomeIcon icon={faTimes} />
+</div>
           <h5>Login As Guest</h5>
           <div className="box">
         <div className="form" >
