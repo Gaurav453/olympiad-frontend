@@ -421,6 +421,9 @@ const initialState = user
 const authSlice = createSlice({
   name: "auth",
   initialState,
+reducers: {
+        reset: () => initialState
+    },
   extraReducers: {
 
     [login.fulfilled]: (state, action) => {
@@ -484,6 +487,5 @@ const authSlice = createSlice({
     }
   },
 });
-
 const { reducer } = authSlice;
 export default reducer;

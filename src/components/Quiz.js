@@ -39,6 +39,7 @@ const customStyles = {
 
 const Quiz = () => {
     const testDivRef = useRef(null);
+    let timer;
 
     let set = 0;
     let gridArr = []
@@ -70,7 +71,6 @@ const Quiz = () => {
   let [time,setTime] = useState(0);
   const [modalIsOpen, setIsOpen] = React.useState(false);
   const [isSubmitted, setSubmitted] = React.useState(false);
-  let [optionShuffle , setOptionShuffle] = useState({})
   let [option , setOption] = useState([])
 
 
@@ -248,7 +248,7 @@ let handleChange = (entry) => {
   },[]); 
 
   useEffect(() => {
-      if(time > 0){
+      if(time > 0 && !isSubmitted){
         setTimeout(function(){
             setTime(--time)
             if(time % 5 === 0){
@@ -411,8 +411,21 @@ let handleChange = (entry) => {
 
   }
 
-  let handleSave = function(id,bool){
- 
+  let handleSave =async function(id,bool){
+     if(answer.length ===  0) {
+        if(!bool){
+            let temp = grid;
+            if(temp[current-1] ){
+                temp[current-1].answer = temp;
+                setGrid(temp)
+        
+            }
+            setCurrent(typeof id === 'number' ? id : current+1)
+            fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
+          }
+        return;
+         
+     }
       let temp = "";
       for(let a of answer){
           temp += a + ","
@@ -424,7 +437,7 @@ let handleChange = (entry) => {
           question_sno :  current,
       }
       setMainLoader(true);
-      dispatch(saveAnswer(data)).unwrap()
+     await  dispatch(saveAnswer(data)).unwrap()
       .then(res => {
           if(!bool){
             let temp = grid;
@@ -444,7 +457,9 @@ let handleChange = (entry) => {
    
   }
 
-  let handleSubmit =  function(){
+  let handleSubmit = async function(){
+    setSubmitted(true)
+    await handleSave(current,true);
     setMainLoader(true);
     dispatch(submitQuiz({attempt_id : attempt}))
     .unwrap()
@@ -561,7 +576,7 @@ let handleChange = (entry) => {
           <h5>Submit Quiz</h5>
         <p>Do you Want to Submit the quiz?</p>
         <div className="btnn" >
-               <button  onClick={() => {handleSave(25,true);handleSubmit();}} style={{display:'inline-block',marginRight:'10px'}} >Yes</button> 
+               <button  onClick={() => {handleSubmit();}} style={{display:'inline-block',marginRight:'10px'}} >Yes</button> 
                <button  onClick={() => setIsOpen(false)} style={{display:'inline-block',marginRight:'10px'}} >No</button> 
 
         </div>

@@ -16,17 +16,63 @@
   text-decoration: none;
 }
 
+.footer img{
+  max-width: 20px;
+  display: inline-block;
+  margin:0 10px;
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   overflow-x: hidden;
 }
 
+.captcha {
+  display: flex;
+  div,input{
+    display: inline-block;
+  }
+  input{
+    width:48%;
+  }
+  a{
+    color : black !important;
+    font-size: small;
+    font-weight: bold !important;
+    float: right;
+    margin-left: 20px;
+  }
+  a:hover{
+    color : #f0962e !important;
+    text-decoration: underline !important;
+  }
+}
 #app, #app>div{
   min-height: 100vh;
 
 }
 #app>div{
   height: 100vh;
+}
+
+.passed{
+  position: relative;
+  .cer_name{
+    position: absolute;
+    top: 43%;
+    font-weight: 900;
+    left: 10%;
+
+
+  }
+  .cer_sno{
+    position: absolute;
+    font-size: 15px;
+    top: 84%;
+    right: 42%;
+    font-weight: 900;
+
+  }
 }
 
 .instructions{
@@ -203,7 +249,7 @@ ul {
     justify-content: flex-end;
   }
   .form-input{
-    width: 69%;
+    width: 67%;
     margin: 0 10px;
     padding-top: 5px;
     max-width: 17vw;
@@ -598,10 +644,7 @@ th svg{
   .instructions{
     overflow:auto;
   }
-  .second{
-    margin-left:  0 !important;
-    margin-right: 0 !important;
-  }
+
   .table{
     padding:5px !important;
   }
@@ -811,17 +854,33 @@ th svg{
       margin: 0 auto 20px auto;
     }
   }
+  .attempt{
+    margin-bottom:30px;
+    margin-top:30px;
+
+  }
+
   .share a{
     background: #424394;
     padding : 15px 40px;
     color : white;
     border-radius: 30px;
     font-weight: 700;
-  
+      
 
 
 
   }
+  .btnn button{
+    background: #424394;
+    padding : 15px 40px;
+    color : white;
+    border-radius: 30px;
+    font-weight: 700;
+    text-decoration: none;
+    float:right;
+  }
+
 
   .share {
     span{
@@ -1041,7 +1100,20 @@ th svg{
 }
 
 }
+@media screen and (max-width:500px) {
+ .dashboard .second{
+   margin : 0;
+ }
+ .second > div{
+   padding : 0;
+ }
 
+}
+@media screen and (max-width:400px) {
+    .result .name{
+      font-size: 45px;
+    }
+}
 
 
   .instructions-div{

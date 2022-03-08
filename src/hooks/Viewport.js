@@ -19,6 +19,7 @@ const useViewport = () => {
     window.addEventListener("resize", () => {
       handleResize();
     });
+    handleResize();
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleResize);
   }, []); 

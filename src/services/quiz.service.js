@@ -6,6 +6,7 @@ import authHeader from "./auth-header";
 const API_URL = "http://localhost:8000/api/quiz/v1/";
 
 const getPreviousAttempts = (sort) => {
+  console.log(sort);
   return axios.get(API_URL + "previousAttempts?sort=" + sort,
   {
     headers:authHeader()

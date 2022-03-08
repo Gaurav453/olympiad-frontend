@@ -1,7 +1,9 @@
 import { useEffect ,useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getPreviousAttempts ,activeAttempts } from '../slices/quiz'
-import { useNavigate} from "react-router-dom";
+import { activeAttempts } from '../slices/quiz'
+import face from '../assets/images/face.jpg';
+import what from '../assets/images/WhatsApp.svg.png';
+
 
 
 const Footer = () => {
@@ -18,26 +20,18 @@ const Footer = () => {
 
   useEffect(() => {
     previousAttempts()
-  })
+  },[])
 
   let previousAttempts = (v)=>{
     
-    dispatch(getPreviousAttempts({sort:0}))
-    .unwrap()
-    .then((res)=>{
-      console.log(res);
-      setTotal(res.data.attempts.length);
-
-    })
-    .catch(() =>{
-
-    })
 
     dispatch(activeAttempts({}))
     .unwrap()
     .then((res)=>{
       console.log(res);
-      setActive(res);
+      setActive(res.active);
+      setTotal(res.total);
+
 
     })
     .catch(() =>{
@@ -53,14 +47,21 @@ const Footer = () => {
   return (
     <div className="footer" >
       <div className="row" >
-        <div style={{textAlign: 'center'}} className="col-4">
-          Follow us on
+        <div style={{textAlign: 'center'}} className="col-6 col-md-4">
+          <div>
+                                <span>          Follow us on
+</span>
+                                <img  alt="whatsapp" src={what} ></img>
+                                <img  alt="facebook" src={face} ></img>
+
+
+                            </div>
         </div>
-        <div style={{textAlign: 'center'}} className="col-4">
+        <div style={{textAlign: 'center'}} className="col-6 col-md-4">
           Olympiad 
         </div>
-        <div style={{textAlign: 'center'}} className="col-12 col-md-4">
-        Total Attempts are {totalAttempts} &nbsp;&nbsp;<br></br>Current Active  Attempps are {active} &nbsp;&nbsp;
+        <div  style={{textAlign: 'center'}} className="col-12 col-md-4 mt-2 mt-md-0">
+        Total Attempts are {totalAttempts} &nbsp;&nbsp;<br></br>Current Active  Attempts are {active} &nbsp;&nbsp;
           
         </div>
 

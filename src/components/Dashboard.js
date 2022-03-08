@@ -45,7 +45,7 @@ const Dashboard = () => {
   const [language,setLangauge] = useState(false);
   let [loading , setLoading ] = useState(false);
   let [school , setSchool ] = useState(false);
-  let [sort,setSort] = useState(0)
+  let [sort,setSort] = useState(-2)
   let [myperformance , setPerformance ] = useState({
     "city" : -1,
     "state" : -1,
@@ -59,10 +59,63 @@ const Dashboard = () => {
 
 
 
-  let handleSort = (v)=>{
-    if(sort === 1 && v === 1) v=-1
+  let handleSort = (v) => {
+
     setSort(v);
     previousAttempts(v);
+
+
+    // let temp;
+    // if(v === 2){
+    //   temp = attempts.sort((a,b) => {
+    //     if(a.score > b.score){
+    //       return 1;
+    //     }
+    //     else{
+    //       return -1;
+    //     }
+    //   })
+
+    // }
+    // else if(v === -2){
+    //   temp = attempts.sort((a,b) => {
+    //     if(a.score?.percentage > b.score?.percentage){
+    //       return -1;
+    //     }
+    //     else{
+    //       return 1;
+    //     }
+    //   })
+
+
+    // }
+    // else if( v === 1){
+    //   temp = attempts.sort((a,b) => {
+    //     if(new Date(a.created_at) >new Date(b.created_at)){
+    //       return -1;
+    //     }
+    //     else{
+    //       return 1;
+    //     }
+    //   })
+
+    // }
+    // else  if( v === -1){
+    //   temp = attempts.sort((a,b) => {
+    //     if(new Date(a.created_at)  < new Date(b.created_at)){
+    //       return -1;
+    //     }
+    //     else{
+    //       return 1;
+    //     }
+    //   })
+
+    // }
+    // console.log(temp);
+    // setAttempts([]);
+    // setAttempts(temp);
+    
+
 
 
   }
@@ -73,10 +126,9 @@ const Dashboard = () => {
     .unwrap()
     .then((res)=>{
       console.log(res);
-      setPerformance((obj) => {return {
-        ...obj,
-        ...res.data
-      }})
+      let temp = res.data;
+      temp = temp.filter(en => en)
+      console.log("value " ,temp);
       console.log(performance)
 
     })
@@ -86,9 +138,9 @@ const Dashboard = () => {
 
 
   }
-  let previousAttempts = (v)=>{
-    
-    dispatch(getPreviousAttempts({sort:v}))
+  let previousAttempts = (v) => {
+    console.log(sort);
+    dispatch(getPreviousAttempts({sort:v || sort}))
     .unwrap()
     .then((res)=>{
       console.log(res);
@@ -154,8 +206,9 @@ const Dashboard = () => {
 
   }
 
-  let handleResult = (score) =>{
+  let handleResult = (score,certificate_sno) =>{
     localStorage.setItem('score', JSON.stringify(score));
+
     navigate("/result");
 
   }
@@ -204,13 +257,15 @@ const Dashboard = () => {
           <thead>
             <tr>
               <th scope="col">Sno</th>
-              <th onClick={() => handleSort(0)} scope="col">Score
+              <th style={{cursor:'pointer'}} onClick={() => sort === 2 ? handleSort(-2) : handleSort(2) } scope="col">Score
               {
-                sort === 0 ? <FontAwesomeIcon icon={faAngleUp}/>   : <></>
+                sort === -2 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 2 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
               }
+              
+              
               </th>
               <th scope="col">Result</th>
-              <th onClick={() => handleSort(1)} scope="col">Attempt Date
+              <th style={{cursor:'pointer'}}  onClick={() => sort === 1 ? handleSort(-1) : handleSort(1) }scope="col">Attempt Date
               {
                 sort === -1 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 1 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
               }
@@ -227,7 +282,7 @@ const Dashboard = () => {
               <th scope="row">{index+1}</th>
               <td> {element.isCompleted ?  element.score?.percentage +  "%" :  'N/A'} </td>
               <td>      
-                   { element.isCompleted ?            <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element.score)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
+                   { element.isCompleted ?            <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
              :  <button style={{leftMargin : 15 + 'px'}} onClick={() => startQuiz()} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Continue Attempt</button>
                     }
               
@@ -289,7 +344,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     getuserSchool();
-    previousAttempts(0);
+    previousAttempts();
     getPerformance();
 
   },[])

@@ -94,7 +94,7 @@ useEffect(() => {
         dispatch(logout())
         .unwrap()
         .then((res) =>{
-          console.log('logged in',res);
+          console.log('logged out',res);
           return <Navigate to="/" />;
 
   
@@ -106,6 +106,9 @@ useEffect(() => {
       setOtpVerified(false);
       setOtpSent(false);
       setFotgetPassword(true);
+      setPhone("");
+      setUsernames("")
+      setpassword("")
 
     }
 
@@ -113,9 +116,16 @@ useEffect(() => {
       setOtpVerified(false);
       setOtpSent(false);
       setFotgetUsername(true);
+      setPhone("");
+      setUsernames("")
+      setpassword("")
     }
 
     let  otpForgetUserName = () => {  
+      if(phone.length !== 10) {
+        errorMessage("Please enter valid phone number")
+        return;
+      }
       dispatch(forgetUserName({phone}))
       .unwrap()
       .then(res => {
@@ -129,6 +139,10 @@ useEffect(() => {
     }
 
     let  submitForgetUserName = () =>{
+      if(otp.length !== 6) {
+        errorMessage("Please enter valid otp")
+        return;
+      }
       dispatch(getUserName({phone,otp}))
       .unwrap()
       .then(res => {
@@ -144,6 +158,10 @@ useEffect(() => {
     }
 
     let  otpForgetPassword = () => {
+      if(!userName) {
+        errorMessage("Please enter valid username")
+        return;
+      }
       dispatch(forgetP({userName}))
       .unwrap()
       .then(res => {
@@ -155,8 +173,30 @@ useEffect(() => {
       })
 
     }
+    let errorMessage = function(message){
+      toast.error(message, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        theme: "dark",
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+  
+    }
+  
 
     let  submitForgetPassword = () =>{
+      if(otp.length !== 6) {
+        errorMessage("Please enter valid otp")
+        return;
+      }
+      if(!password.length) {
+        errorMessage("Please enter valid password")
+        return;
+      }
       dispatch(resetPassword({userName,otp,password}))
       .unwrap()
       .then(res => {
@@ -200,7 +240,7 @@ useEffect(() => {
               <div>
               <div>
               <span>Username</span>
-              <input  value={userName} onChange={(e) => setuserName(e.target.value)} placeholder="Please enter your username"className="form-input" ></input>
+              <input  value={userName} onChange={(e) => setuserName(e.target.value)} placeholder="Enter Username"className="form-input" ></input>
               <div className="forgot">
                 <span onClick={handlerForgotUserName} >Forgot UserName</span>
 
@@ -211,7 +251,7 @@ useEffect(() => {
           <div>
             <div >
                 <span>Password</span>
-                <input   value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Please enter your Password" className="form-input" ></input>
+                <input   value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
                 <div className="forgot">
                 <span onClick={handlerForgotPassword} >Forgot Password</span>
 
@@ -315,7 +355,7 @@ useEffect(() => {
               <button onClick={submitForgetUserName}> Submit!</button>
             </div>
               </div> : <div>
-              <h5>Associcated Users</h5>
+              <h5>Associated Users</h5>
               {
 
                 usernames.map((entry,index) =>  {

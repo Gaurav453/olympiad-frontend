@@ -11,10 +11,14 @@ const EditProfile = () => {
 
   let user = useSelector(state => state.auth);
   user = user?.user;
+
   const [ schoolName , setSchoolName ] = useState("");
-  const [ schoolCode , setSchoolCode ] = useState(user.school_code);
+  const [ schoolCode , setSchoolCode ] = useState(user?.school_code);
 
   const [ canSave , setCanSave ] = useState(false);
+
+
+  const [ canEdit , setCanEdit ] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -25,15 +29,21 @@ const EditProfile = () => {
     .unwrap()
     .then((res) => {
       if(res.data?.name){
-        setSchoolName(res.data?.name)
+        setSchoolName(res.data?.name);
+        setSchoolCode(res.data?.code);
+      }
+      else{
+        setCanEdit(true);
       }
       
     })
   }
+  
   useEffect(() => {
+    if(!user) return;
     getuserSchool();
 
-  })
+  },[])
   const navigate = useNavigate();
 
   let errorMessage = function(message){
@@ -51,7 +61,8 @@ const EditProfile = () => {
   }
 
   useEffect(() => {
-    setCanSave(true)
+    if(! schoolCode) return
+    if(!user) return;
     dispatch(school({
       code : schoolCode
     }))
@@ -63,12 +74,19 @@ const EditProfile = () => {
       else{
         setSchoolName("")
       }
+      console.log(canSave);
     })
-  },[schoolCode,dispatch])
+  },[schoolCode])
+  if(!user){
+    return <Navigate to="/" />;
+
+  }
+
 
   let handleSubmit  = function(){
-    if(!canSave) {
-      errorMessage("You cannot update your school")
+    if(!canEdit) {
+      errorMessage("You cannot update your school");
+      return;
 
     }
     dispatch(editSchool({code : schoolCode}))
@@ -91,13 +109,8 @@ const EditProfile = () => {
     .catch(err => {
 
     })
-
-
-
-
-
-
   }
+
 
 
 
@@ -127,9 +140,9 @@ const EditProfile = () => {
              <input disabled="disabled" value={user.email}   className="form-input" ></input>
           </div>
           {
-            schoolCode ?  <div>
+            true ?  <div>
             <p>School Code</p> 
-            <input value={schoolCode}   className="form-input" ></input>
+            <input disabled={canEdit ? false : 'disabled'} value={schoolCode}  placeholder="Enter Your school code" onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
             {
               schoolName ? <span style={{fontWeight: 'bold'}} >School Name is {schoolName}</span> : <></>
             }
@@ -140,7 +153,7 @@ const EditProfile = () => {
         
 
           <div style={{marginTop : "10px",textAlign : "center"}} >
-                  <button disabled={canSave ? 'disabled' : ""} onClick={handleSubmit} className="form-button"  >Save</button>
+                  <button onClick={handleSubmit} className="form-button"  >Save</button>
                   <br></br>
             <Link to="/dashboard">Back to Dashboard</Link>
 

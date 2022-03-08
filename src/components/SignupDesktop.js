@@ -9,6 +9,9 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons'
 import Modal from 'react-modal';
 import { Country, State, City }  from 'country-state-city';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import ClientCaptcha from "react-client-captcha";
+
+
 
 
 
@@ -29,16 +32,16 @@ const SignupDesktop = () => {
   const navigate = useNavigate();
 
   let loginGuestObj = {
-    "firstName": "Gaurav",
-    "lastName" : "ak",
-    "phone" : "8787878787",
-    "whats_no":"8787878787",
-    "email" : "g@g.com",
-    "state" : "Delhi",
-    "city" : "Delhi",
-    "country" : "India",
+    "firstName": "",
+    "lastName" : "",
+    "phone" : "",
+    "whats_no":"",
+    "email" : "",
+    "state" : "",
+    "city" : "",
+    "country" : "",
     "userip": "",
-    "language" : "ENGLISH"
+    "language" : ""
 
   }
 
@@ -48,6 +51,11 @@ const SignupDesktop = () => {
   const [ password , setpassword ] = useMergedState("");
   const [ otp , setOtp ] = useMergedState("");
   const [ isSame , setisSame ] = useState(false);
+  const [captcha,setCaptcha] = useState("");
+  const [captchaValue,setCaptchaValue] = useState("");
+
+  const [validateCaptchaValue, setValidateCaptcha] = useState(false);
+
 
 
   let [loading , setLoading ] = useMergedState(false);
@@ -79,6 +87,77 @@ const SignupDesktop = () => {
   const [countryList,setCountryList] = useState(Country.getAllCountries());
   const [stateList,setStateList] = useState([]);
   const [cityList,setCityList] = useState([]);
+
+  const [stateInput , setStateInput] =  useState("");
+  const [cityInput , setCityInput] =  useState("");
+  const [countryInput , setCountryInput] =  useState("");
+
+
+  const [searchedStateList , setSearchedStateList]= useState(State.getStatesOfCountry(country));
+  const [searchedCityList , setSearchedCityList]= useState([]);
+  const [searchedCountryList , setSearchedCountryList]= useState([]);
+
+
+
+  useEffect(() => {
+    setSearchedStateList(stateList)
+
+  },[stateList])
+
+  useEffect(() => {
+    setSearchedCityList(cityList)
+
+  },[cityList])
+  useEffect(() => {
+    setSearchedCountryList(countryList)
+
+  },[countryList]);
+
+  useEffect(() => {
+    if(stateInput.length > 0){
+      let temp = stateList.filter(a => {
+        return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
+  
+      })
+      console.log(temp)
+      setSearchedStateList(temp);
+    }
+    else{
+      setSearchedStateList(stateList)
+    }
+   
+    
+  },[stateInput,stateList])
+
+  useEffect(() => {
+    if(cityInput.length  > 0 ){
+      let temp = cityList.filter(a => {
+        return a.name.substring(0,cityInput.length).toLowerCase() === cityInput.toLowerCase();
+  
+      })
+      setSearchedCityList(temp);
+    }
+    else{
+      setSearchedCityList(cityList);
+
+    }
+
+    
+  },[cityInput,cityList])
+
+  useEffect(() => {
+    if(countryInput.length  > 0 ){
+      let temp = countryList.filter(a => {
+        return a.name.substring(0,countryInput.length).toLowerCase() === countryInput.toLowerCase();
+  
+      })
+      setSearchedCountryList(temp);
+    }
+    else{
+      setSearchedCountryList(countryList);
+
+    }
+  },[countryInput,countryList])
 
 ///State.getStatesOfCountry(country)
 
@@ -128,6 +207,16 @@ let instruction = [ '1. This test is based on MCQ pattern',
   const dispatch = useDispatch();
 
   let emailRegex = /\S+@\S+\.\S+/;
+
+  useEffect(() => {
+    if(captcha.length > 0)
+      {
+        if(captcha === captchaValue){
+          setValidateCaptcha(true);
+          console.log('matched');
+        }
+      }
+  },[captcha,captchaValue])
 
   useEffect(() => {
     let nameRegex = /^[a-z ,.'-]+$/i;
@@ -193,6 +282,17 @@ let instruction = [ '1. This test is based on MCQ pattern',
   }
 
   let isDetailsFilled = function(){
+    if(!validateCaptchaValue) {
+      if(captcha === ""){
+        errorMessage("Please fill captcha first")
+        return;
+      }
+      else{
+        errorMessage("Wrong Captcha Entered!")
+        return;
+      }
+     
+    }
     if(!firstName || !lastName || !phone || firstNameError || lastNameError || phoneError){  
       errorMessage("Please Fill all correct details")
       return;
@@ -222,8 +322,23 @@ let instruction = [ '1. This test is based on MCQ pattern',
     
 
   }
-
+  let openLoginGuest = () => {
+    setCaptcha(""); 
+    setValidateCaptcha(false);
+    setIsLoginGuest(true);
+  }
   let handleLoginGuest = function(){
+    if(!validateCaptchaValue) {
+      if(captcha === ""){
+        errorMessage("Please fill captcha first")
+        return;
+      }
+      else{
+        errorMessage("Wrong Captcha Entered!")
+        return;
+      }
+     
+    }
     let {firstName, lastName,phone,email,whats_no,state,city,country} = loginGuest;
     console.log(isSame);
     if(!firstName || !lastName || !phone || !email || (!whats_no && !isSame) || !state || !city || !country){  
@@ -358,7 +473,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
    
   }
 
-  return (
+  return ( 
     loading ?
     <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
     :
@@ -419,7 +534,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
              <div>
               <span style={{fontSize: "16px" , fontWeight: "bold",marginBottom: "8px",display:"block"}} >Username : {userName}</span>
               <p>Password</p>
-              <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Please enter your Password"className="form-input" ></input>
+              <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
               <p className="error-message"  >{passwordError}</p> 
 
              </div>
@@ -430,14 +545,19 @@ let instruction = [ '1. This test is based on MCQ pattern',
             
 
           </div>
+          <div className="captcha">
+              <ClientCaptcha captchaCode={code => setCaptchaValue(code)} />
+              <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
+         </div>
           <div  >
                   <button  onClick={() => { 
                     isDetailsFilled() ? openModal() : console.log("Er") }} className="form-button"  >Register</button> or 
               <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
-                <span onClick={() => setIsLoginGuest(true)} >Login as guest</span>
+                <span onClick={openLoginGuest} >Login as guest</span>
 
               </div>
-            </div>
+        </div>
+      
             
 
         </div>
@@ -519,8 +639,12 @@ let instruction = [ '1. This test is based on MCQ pattern',
                 {loginGuest.country ? loginGuest.country :"Select Country"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-item" >
+                <input placeholder="Search your Country" onChange={(e) => setCountryInput(e.target.value)}  value={countryInput} class="form-input" ></input>
+
+              </div>
                {
-                 countryList.map(entry => {
+                 searchedCountryList.map(entry => {
                    return <button onClick={() => { handleGuestLoginChange('country',entry.name);setStateList(State.getStatesOfCountry(entry.isoCode))}} key={entry.isoCode} className={country === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name}
 
@@ -537,8 +661,12 @@ let instruction = [ '1. This test is based on MCQ pattern',
                 {loginGuest.state ? loginGuest.state :"Select State"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-item" >
+                  <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
+
+                </div>
                {
-                 stateList.map(entry => {
+                 searchedStateList.map(entry => {
                    return <button onClick={() => { handleGuestLoginChange('state',entry.name);setCityList(City.getCitiesOfState(entry.countryCode,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name + entry.countryCode}
 
@@ -558,8 +686,12 @@ let instruction = [ '1. This test is based on MCQ pattern',
               {loginGuest.city ? loginGuest.city :"Select City"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-item" >
+                <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
+
+              </div>
                {
-                 cityList.map(entry => {
+                 searchedCityList.map(entry => {
                    return <button onClick={() => handleGuestLoginChange('city',entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name}
 
@@ -576,8 +708,8 @@ let instruction = [ '1. This test is based on MCQ pattern',
           </div>
 
           </div> 
-
-          <div style={{marginTop : '20px'}} className="dropdown">
+          <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Language</p>
+          <div className="dropdown">
               <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 { loginGuest.language  ? loginGuest.language : "Select Language" }
               </button>
@@ -590,6 +722,10 @@ let instruction = [ '1. This test is based on MCQ pattern',
         </div>
 
       </div>
+        <div className="captcha">
+            <ClientCaptcha captchaCode={code => setCaptchaValue(code)} />
+            <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
+        </div>
           <div  class="btnn">
             <button onClick={handleLoginGuest} > Register</button>
           </div>

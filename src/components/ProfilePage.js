@@ -37,6 +37,58 @@ const ProfilePage = () => {
 
   const [stateList,setStateList] = useState(State.getStatesOfCountry(country));
   const [cityList,setCityList] = useState([]);
+
+  const [stateInput , setStateInput] =  useState("");
+  const [cityInput , setCityInput] =  useState("");
+
+  const [searchedStateList , setSearchedStateList]= useState(State.getStatesOfCountry(country));
+  const [searchedCityList , setSearchedCityList]= useState([]);
+
+
+  useEffect(() => {
+    setSearchedStateList(stateList)
+    console.log(searchedStateList);
+
+  },[stateList])
+
+  useEffect(() => {
+    setSearchedCityList(cityList)
+
+  },[cityList])
+
+  useEffect(() => {
+    if(stateInput.length > 0){
+      let temp = stateList.filter(a => {
+        return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
+  
+      })
+      console.log(temp)
+      setSearchedStateList(temp);
+    }
+    else{
+      setSearchedStateList(stateList)
+    }
+   
+    
+  },[stateInput,stateList])
+
+  useEffect(() => {
+    if(cityInput.length  > 0 ){
+      let temp = cityList.filter(a => {
+        return a.name.substring(0,cityInput.length).toLowerCase() === cityInput.toLowerCase();
+  
+      })
+      setSearchedCityList(temp);
+    }
+    else{
+      setSearchedCityList(cityList);
+
+    }
+
+    
+  },[cityInput,cityList])
+
+
   
 
 
@@ -192,8 +244,12 @@ const ProfilePage = () => {
                 {state ? state :"Select State"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <div class="dropdown-item" >
+                  <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
+
+                </div>
                {
-                 stateList.map(entry => {
+                 searchedStateList.map(entry => {
                    return <button onClick={() => { setState(entry.name);setCityList(City.getCitiesOfState(country,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name}
 
@@ -210,8 +266,14 @@ const ProfilePage = () => {
               {city ? city :"Select City"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+
+              <div class="dropdown-item" >
+                <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
+
+              </div>
+
                {
-                 cityList.map(entry => {
+                 searchedCityList.map(entry => {
                    return <button onClick={() => setCity(entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name}
 

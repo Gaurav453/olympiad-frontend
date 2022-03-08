@@ -12,6 +12,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import BounceLoader from "react-spinners/BounceLoader";
 import Modal from 'react-modal';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
+import ClientCaptcha from "react-client-captcha";
+
+
 
 const override = `
   display: block;
@@ -25,16 +29,16 @@ const SignupMobile = () => {
   let navigate = useNavigate();
 
   let loginGuestObj = {
-    "firstName": "Gaurav",
-    "lastName" : "ak",
-    "phone" : "8787878787",
-    "whats_no":"8787878787",
-    "email" : "g@g.com",
-    "state" : "Delhi",
-    "city" : "Delhi",
-    "country" : "India",
+    "firstName": "",
+    "lastName" : "",
+    "phone" : "",
+    "whats_no":"",
+    "email" : "",
+    "state" : "",
+    "city" : "",
+    "country" : "",
     "userip": "",
-    "language" : "ENGLISH"
+    "language" : ""
 
   }
   const [ firstName , setfirstName ] = useState("");
@@ -52,6 +56,9 @@ const SignupMobile = () => {
   const [loginGuest,setLoginGuest] = useState(loginGuestObj);
   const [isLoginGuest,setIsLoginGuest] = useState(false);
   const [ isSame , setisSame ] = useState(false);
+  const [captcha,setCaptcha] = useState("");
+  const [validateCaptchaValue, setValidateCaptcha] = useState(false);
+
 
 
 
@@ -81,6 +88,80 @@ const SignupMobile = () => {
   const [flag , setuserFlag ] = useState(1);
 
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [stateInput , setStateInput] =  useState("");
+  const [cityInput , setCityInput] =  useState("");
+  const [countryInput , setCountryInput] =  useState("");
+
+
+  const [searchedStateList , setSearchedStateList]= useState(State.getStatesOfCountry(country));
+  const [searchedCityList , setSearchedCityList]= useState([]);
+  const [searchedCountryList , setSearchedCountryList]= useState([]);
+
+  const [captchaValue,setCaptchaValue] = useState("");
+
+
+
+
+  useEffect(() => {
+    setSearchedStateList(stateList)
+
+  },[stateList])
+
+  useEffect(() => {
+    setSearchedCityList(cityList)
+
+  },[cityList])
+  useEffect(() => {
+    setSearchedCountryList(countryList)
+
+  },[countryList]);
+
+  useEffect(() => {
+    if(stateInput.length > 0){
+      let temp = stateList.filter(a => {
+        return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
+  
+      })
+      console.log(temp)
+      setSearchedStateList(temp);
+    }
+    else{
+      setSearchedStateList(stateList)
+    }
+   
+    
+  },[stateInput,stateList])
+
+  useEffect(() => {
+    if(cityInput.length  > 0 ){
+      let temp = cityList.filter(a => {
+        return a.name.substring(0,cityInput.length).toLowerCase() === cityInput.toLowerCase();
+  
+      })
+      setSearchedCityList(temp);
+    }
+    else{
+      setSearchedCityList(cityList);
+
+    }
+
+    
+  },[cityInput,cityList])
+
+  useEffect(() => {
+    if(countryInput.length  > 0 ){
+      let temp = countryList.filter(a => {
+        return a.name.substring(0,countryInput.length).toLowerCase() === countryInput.toLowerCase();
+  
+      })
+      setSearchedCountryList(temp);
+    }
+    else{
+      setSearchedCountryList(countryList);
+
+    }
+  },[countryInput,countryList])
+
 
   function openModal() {
     setIsOpen(true);
@@ -109,6 +190,19 @@ const SignupMobile = () => {
   
   let emailRegex = /\S+@\S+\.\S+/;
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if(captcha.length > 0)
+      {
+        if(captcha === captchaValue){
+          setValidateCaptcha(true);
+          console.log('matched');
+        }
+      }
+  },[captcha,captchaValue])
+
+
+
 
 
   useEffect(() => {
@@ -145,6 +239,18 @@ const SignupMobile = () => {
 
   let handleSubmit  = function(){
     closeModal();
+
+    if(!validateCaptchaValue) {
+      if(captcha === ""){
+        errorMessage("Please fill captcha first")
+        return;
+      }
+      else{
+        errorMessage("Wrong Captcha Entered!")
+        return;
+      }
+     
+    }
 
     if(!firstName || !lastName || !phone || firstNameError || lastNameError || phoneError){  
       errorMessage("Please Fill all correct details")
@@ -196,6 +302,8 @@ const SignupMobile = () => {
     setOtpVerified(false);
     setOtpSent(false);
     setFotgetPassword(true);
+    setUsernames("")
+    setpassword("")
 
   }
 
@@ -203,9 +311,15 @@ const SignupMobile = () => {
     setOtpVerified(false);
     setOtpSent(false);
     setFotgetUsername(true);
+    setUsernames("");
+    setpassword("");
   }
 
   let  otpForgetUserName = () => {  
+    if(phone.length !== 10) {
+      errorMessage("Please enter valid phone number")
+      return;
+    }
     dispatch(forgetUserName({phone}))
     .unwrap()
     .then(res => {
@@ -219,6 +333,10 @@ const SignupMobile = () => {
   }
 
   let  submitForgetUserName = () =>{
+    if(otp.length !== 6) {
+      errorMessage("Please enter valid otp")
+      return;
+    }
     dispatch(getUserName({phone,otp}))
     .unwrap()
     .then(res => {
@@ -234,6 +352,10 @@ const SignupMobile = () => {
   }
 
   let  otpForgetPassword = () => {
+    if(!userName) {
+      errorMessage("Please enter valid username")
+      return;
+    }
     dispatch(forgetP({userName}))
     .unwrap()
     .then(res => {
@@ -247,6 +369,14 @@ const SignupMobile = () => {
   }
 
   let  submitForgetPassword = () =>{
+    if(otp.length !== 6) {
+      errorMessage("Please enter valid otp")
+      return;
+    }
+    if(!password.length) {
+      errorMessage("Please enter valid password")
+      return;
+    }
     dispatch(resetPassword({userName,otp,password}))
     .unwrap()
     .then(res => {
@@ -314,11 +444,22 @@ let instruction = [ '1. This test is based on MCQ pattern',
     .then(() =>{
       console.log('otp sent successfully');
       setIsOtpGenrated(true);
-      setLoading(true);
+      setLoading(false);
 
     })
   }
   let handleLoginGuest = function(){
+    if(!validateCaptchaValue) {
+      if(captcha === ""){
+        errorMessage("Please fill captcha first")
+        return;
+      }
+      else{
+        errorMessage("Wrong Captcha Entered!")
+        return;
+      }
+     
+    }
     let {firstName, lastName,phone,email,whats_no,state,city,country} = loginGuest;
     console.log(isSame);
     if(!firstName || !lastName || !phone || !email || (!whats_no && !isSame) || !state || !city || !country){  
@@ -420,6 +561,11 @@ let instruction = [ '1. This test is based on MCQ pattern',
     
 
   }
+  let openLoginGuest = () => {
+    setCaptcha(""); 
+    setValidateCaptcha(false);
+    setIsLoginGuest(true);
+  }
   let handleLogin = () => {
     if(!userName || userName.length !== 10 || !password ){
       errorMessage("Please enter a valid email and password");
@@ -464,7 +610,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
         <div className="form" >
           <div>
              <p>User Name</p> 
-             <input  onChange={(e) => setuserName(e.target.value)} placeholder="Please enter your username"className="form-input" ></input>
+             <input value={userName}  onChange={(e) => setuserName(e.target.value)} placeholder="Enter Username"className="form-input" ></input>
                <p className="error-message"  >{firstNameError}</p> 
                <div className="forgot">
                <span onClick={handlerForgotUserName} >Forgot UserName</span>
@@ -475,7 +621,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
         
           <div> 
              <p>Password</p>
-             <input disabled={isOtpVerified} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Please enter your Password" className="form-input" ></input>
+             <input value={password} disabled={isOtpVerified} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
              <p className="error-message"  >{passwordError}</p> 
              <div className="forgot">
              <span onClick={handlerForgotPassword} >Forgot Password</span>
@@ -491,7 +637,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
            <hr></hr>
      </div>
      <div >
-           <button  onClick={()=> setuserFlag(0) } className="form-button"  >Create Account</button>
+           <button  onClick={()=> {setuserFlag(0);}  } className="form-button"  >Create Account</button>
      </div>
 
         </div>
@@ -531,7 +677,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
                : shouldGenrateOtp && !isOtpVerified ? 
                
               <div className="col otpDiv">
-               <button onClick={ handleGenrateOtp} className="form-button" > Generate OTP</button>
+               <button onClick={ handleGenrateOtp} className="form-button" >Generate OTP</button>
              </div>
                : <></>
       }
@@ -544,7 +690,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
              <div>
               <span>Username : {userName}</span>
               <p>Password</p>
-              <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Please enter your Password"className="form-input" ></input>
+              <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
               <p className="error-message"  >{passwordError}</p> 
 
              </div>
@@ -555,13 +701,21 @@ let instruction = [ '1. This test is based on MCQ pattern',
             
 
         </div>
+        <div className="captcha">
+              <ClientCaptcha captchaCode={code => setCaptchaValue(code)} />
+              <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
+
+
+
+         </div>
    <div >
-           <button onClick={openModal} className="form-button"  >Register</button>
+           <button onClick={handleSubmit} className="form-button"  >Register</button>
            <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
-                <span onClick={() => setIsLoginGuest(true)} >Login as guest</span>
+                <span onClick={openLoginGuest} >Login as guest</span>
 
               </div>
      </div>
+     
     
      <div style={{margin: "15px 0",textAlign: "center"}} >
      <hr></hr>
@@ -668,7 +822,7 @@ className="instructions-div forget-modal"
   <button onClick={submitForgetUserName}> Submit!</button>
 </div>
   </div> : <div>
-  <h5>Associcated Users</h5>
+  <h5>Associated Users</h5>
   {
 
     usernames.map((entry,index) =>  {
@@ -746,8 +900,12 @@ className="instructions-div forget-modal"
                 {loginGuest.country ? loginGuest.country :"Select Country"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-item" >
+                <input placeholder="Search your Country" onChange={(e) => setCountryInput(e.target.value)}  value={countryInput} class="form-input" ></input>
+
+              </div>
                {
-                 countryList.map(entry => {
+                 searchedCountryList.map(entry => {
                    return <button onClick={() => { handleGuestLoginChange('country',entry.name);setStateList(State.getStatesOfCountry(entry.isoCode))}} key={entry.isoCode} className={country === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name}
 
@@ -764,8 +922,12 @@ className="instructions-div forget-modal"
                 {loginGuest.state ? loginGuest.state :"Select State"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-item" >
+                  <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
+
+                </div>
                {
-                 stateList.map(entry => {
+                 searchedStateList.map(entry => {
                    return <button onClick={() => { handleGuestLoginChange('state',entry.name);setCityList(City.getCitiesOfState(entry.countryCode,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name + entry.countryCode}
 
@@ -785,8 +947,12 @@ className="instructions-div forget-modal"
               {loginGuest.city ? loginGuest.city :"Select City"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div class="dropdown-item" >
+                <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
+
+              </div>
                {
-                 cityList.map(entry => {
+                 searchedCityList.map(entry => {
                    return <button onClick={() => handleGuestLoginChange('city',entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name}
 
@@ -803,8 +969,9 @@ className="instructions-div forget-modal"
           </div>
 
           </div> 
-
-          <div style={{marginTop : '20px'}} className="dropdown">
+          <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Language</p>
+          
+          <div  className="dropdown">
               <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 { loginGuest.language  ? loginGuest.language : "Select Language" }
               </button>
@@ -817,6 +984,13 @@ className="instructions-div forget-modal"
         </div>
 
       </div>
+      <div className="captcha">
+              <ClientCaptcha captchaCode={code => setCaptchaValue(code)} />
+              <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
+
+
+
+         </div>
           <div  class="btnn">
             <button onClick={handleLoginGuest} > Register</button>
           </div>
