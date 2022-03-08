@@ -416,7 +416,7 @@ let handleChange = (entry) => {
         if(!bool){
             let temp = grid;
             if(temp[current-1] ){
-                temp[current-1].answer = temp;
+                temp[current-1].answer = null;
                 setGrid(temp)
         
             }
