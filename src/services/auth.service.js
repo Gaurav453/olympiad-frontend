@@ -1,8 +1,8 @@
 import authHeader from "./auth-header";
 import axios from "axios";
 
-// const API_URL = "http://localhost:8000/api/";
-const API_URL = "http://localhost:8000/api/";
+// const API_URL = "https://equanimityolympiad.in/api/";
+const API_URL = "https://equanimityolympiad.in/api/";
 
 
 const register = (token,data) => {

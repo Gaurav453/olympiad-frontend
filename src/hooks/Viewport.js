@@ -16,9 +16,7 @@ const useViewport = () => {
     }
     // Add event listener
     // Call handler right away so state gets updated with initial window size
-    window.addEventListener("resize", () => {
-      handleResize();
-    });
+
     handleResize();
     // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleResize);

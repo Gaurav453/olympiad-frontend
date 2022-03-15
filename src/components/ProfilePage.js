@@ -239,7 +239,7 @@ const ProfilePage = () => {
 
           <div className="userLocation">
           <div className="drop-downs">
-            <div className="dropdown">
+            <div style={{marginBottom: "10px"}} className="dropdown">
               <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {state ? state :"Select State"} 
               </button>

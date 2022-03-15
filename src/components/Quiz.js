@@ -68,7 +68,7 @@ const Quiz = () => {
   const [current , setCurrent ] = useState(1);
   const [question , setQuestion ] = useState(false);
   const [answer , setAnswer ] = useState([]);
-  let [time,setTime] = useState(0);
+  const [initialTime , setITime] = useState(0);
   const [modalIsOpen, setIsOpen] = React.useState(false);
   const [isSubmitted, setSubmitted] = React.useState(false);
   let [option , setOption] = useState([])
@@ -115,7 +115,7 @@ let initialize = () => {
           makeGrid(res);
           setAttempt(res.id)
           setCurrent(res.lastque_sno)
-          setTime(res.time_left);
+          setITime(res.time_left);
         }
         else{
             
@@ -247,20 +247,7 @@ let handleChange = (entry) => {
     initialize();
   },[]); 
 
-  useEffect(() => {
-      if(time > 0 && !isSubmitted){
-        setTimeout(function(){
-            setTime(--time)
-            if(time % 5 === 0){
-                saveRemaining();
-            }
-        },1000)
-      }
-      if(time === 1){
-        handleSubmit();
-      }
 
-  },[time])
 
   if(!user){
     return <Navigate to="/" />;
@@ -273,7 +260,7 @@ let handleChange = (entry) => {
 
 
 
- var saveRemaining = function(){
+ var saveRemaining = function(time){
     dispatch(saveRemainingTime({time_left : time-1, attempt_id : attempt}))
  }
 
@@ -475,6 +462,23 @@ let handleChange = (entry) => {
   }
 
   let Timer =  function(){
+  let [time,setTime] = useState(initialTime);
+
+    useEffect(() => {
+        if(time > 0 && !isSubmitted){
+          setTimeout(function(){
+              setTime(--time)
+              setITime(time);
+              if(time % 5 === 0){
+                  saveRemaining(time);
+              }
+          },1000)
+        }
+        if(time === 1){
+          handleSubmit();
+        }
+  
+    },[time])
     let tempTime =  time;
     let hours = Math.floor(tempTime / 3600);
     tempTime %= 3600;
@@ -490,6 +494,18 @@ let handleChange = (entry) => {
 
   const Buttons = function(){
    return <div className="row gapx-1 buttons" >
+
+        {
+            current < 25 ? 
+            <div className="saveBut col-lg-3 col-md-3 col-sm-3  col-6" >
+            <div class="bottom" >
+            
+                <button onClick={handleSave} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
+                    Save & Next
+                </button>
+            </div>
+            </div> : <></>
+        }
         <div className="reviewBut col-lg-3 col-md-3 col-sm-3  col-6" >
             <div class="bottom" >
                 <button onClick={handleReview} className=" text-white px-2 py-2 bg-review rounded-lg shadow-sm font-bold" >
@@ -506,17 +522,7 @@ let handleChange = (entry) => {
             </button>
         </div>
         </div>
-        {
-            current < 25 ? 
-            <div className="saveBut col-lg-3 col-md-3 col-sm-3  col-6" >
-            <div class="bottom" >
-            
-                <button onClick={handleSave} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
-                    Save & Next
-                </button>
-            </div>
-            </div> : <></>
-        }
+
      
         <div className="submitBut col-lg-3 col-md-3 col-sm-3  col-6" >
         <div class="bottom" >
@@ -533,17 +539,19 @@ let handleChange = (entry) => {
   
 
   return (
-    mainLoader ?
-    <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
-    : 
+    
     <div id="quiz" className="quiz">
         <div style={{justifyContent: 'space-between'}} className="row" >
             <div className="quiz-logo" >
                 <img alt="logo" src={logo} />
             </div>
             <Timer />
-        </div>
-            <div className="row" >
+        </div>{
+
+    mainLoader ?
+    <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
+    :  <div>
+        <div className="row" >
             <div className="col-lg-9 col-md-8 col-12" >
                 <div className="row" >
                 {
@@ -574,14 +582,16 @@ let handleChange = (entry) => {
         className="instructions-div"
       >
           <h5>Submit Quiz</h5>
-        <p>Do you Want to Submit the quiz?</p>
+        <p>Do you want to Submit the quiz?</p>
         <div className="btnn" >
                <button  onClick={() => {handleSubmit();}} style={{display:'inline-block',marginRight:'10px'}} >Yes</button> 
                <button  onClick={() => setIsOpen(false)} style={{display:'inline-block',marginRight:'10px'}} >No</button> 
 
         </div>
       </Modal>
-    </div>
+        </div>
+        </div>
+}
         
     </div>
    

@@ -57,7 +57,7 @@ const Result = (props) => {
                 <div className="col logo-result" >
                     <div>
                         <img alt="logo" src={logo} ></img>
-                        <div className="text" >Thank You For Attempting The Olympiad!</div>
+                        <div className="text" >Thank You For Attempting Olympiad!</div>
                 
                     </div>
                     </div>
@@ -113,7 +113,7 @@ const Result = (props) => {
                             <div className="fourth" >
                             <span>{score.unAnswered}</span>
                             </div>
-                            <p>unanswered</p>
+                            <p>Unanswered</p>
                         </div>
 
 

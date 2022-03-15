@@ -1,7 +1,7 @@
 import { useEffect ,useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { activeAttempts } from '../slices/quiz'
-import face from '../assets/images/face.jpg';
+import face from '../assets/images/face.png';
 import what from '../assets/images/WhatsApp.svg.png';
 
 
@@ -47,8 +47,8 @@ const Footer = () => {
   return (
     <div className="footer" >
       <div className="row" >
-        <div style={{textAlign: 'center'}} className="col-6 col-md-4">
-          <div>
+        <div style={{textAlign: 'center'}} className="col-12 col-md-6">
+          <div style={{marginLeft:"19px"}} >
                                 <span>          Follow us on
 </span>
                                 <img  alt="whatsapp" src={what} ></img>
@@ -57,10 +57,8 @@ const Footer = () => {
 
                             </div>
         </div>
-        <div style={{textAlign: 'center'}} className="col-6 col-md-4">
-          Olympiad 
-        </div>
-        <div  style={{textAlign: 'center'}} className="col-12 col-md-4 mt-2 mt-md-0">
+
+        <div  style={{textAlign: 'center'}} className="col-12 col-md-6 mt-2 mt-md-0">
         Total Attempts are {totalAttempts} &nbsp;&nbsp;<br></br>Current Active  Attempts are {active} &nbsp;&nbsp;
           
         </div>

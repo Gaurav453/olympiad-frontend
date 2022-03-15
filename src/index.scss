@@ -632,6 +632,12 @@ img{
   font-weight: bold;
   margin-top:30px;
 
+  .row div {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
 }
 .dashboard{
@@ -1044,6 +1050,10 @@ th svg{
   }
   .question{
     min-width: unset !important;
+  }
+  .passed{
+    display: flex;
+    flex-direction: column;
   }
 
 }

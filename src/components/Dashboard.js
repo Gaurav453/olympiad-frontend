@@ -63,61 +63,6 @@ const Dashboard = () => {
 
     setSort(v);
     previousAttempts(v);
-
-
-    // let temp;
-    // if(v === 2){
-    //   temp = attempts.sort((a,b) => {
-    //     if(a.score > b.score){
-    //       return 1;
-    //     }
-    //     else{
-    //       return -1;
-    //     }
-    //   })
-
-    // }
-    // else if(v === -2){
-    //   temp = attempts.sort((a,b) => {
-    //     if(a.score?.percentage > b.score?.percentage){
-    //       return -1;
-    //     }
-    //     else{
-    //       return 1;
-    //     }
-    //   })
-
-
-    // }
-    // else if( v === 1){
-    //   temp = attempts.sort((a,b) => {
-    //     if(new Date(a.created_at) >new Date(b.created_at)){
-    //       return -1;
-    //     }
-    //     else{
-    //       return 1;
-    //     }
-    //   })
-
-    // }
-    // else  if( v === -1){
-    //   temp = attempts.sort((a,b) => {
-    //     if(new Date(a.created_at)  < new Date(b.created_at)){
-    //       return -1;
-    //     }
-    //     else{
-    //       return 1;
-    //     }
-    //   })
-
-    // }
-    // console.log(temp);
-    // setAttempts([]);
-    // setAttempts(temp);
-    
-
-
-
   }
 
  let getPerformance = ()=>{
@@ -224,7 +169,7 @@ const Dashboard = () => {
       </div>
       <div className="row top">
         <div className="col-12">
-          <h4>Welcome to Olympiad {user.first_name}</h4>
+          <h4>Welcome {user.first_name}</h4>
         </div>
         <div className="col-12">
         <div className=" drop-downs startQuiz" >
@@ -256,7 +201,7 @@ const Dashboard = () => {
           <table >
           <thead>
             <tr>
-              <th scope="col">Sno</th>
+              <th scope="col">S.No</th>
               <th style={{cursor:'pointer'}} onClick={() => sort === 2 ? handleSort(-2) : handleSort(2) } scope="col">Score
               {
                 sort === -2 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 2 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
