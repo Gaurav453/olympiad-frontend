@@ -10,6 +10,8 @@ import Modal from 'react-modal';
 import { Country, State, City }  from 'country-state-city';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import ClientCaptcha from "react-client-captcha";
+import {saveProfile ,school } from '../slices/auth'
+
 
 
 
@@ -41,7 +43,19 @@ const SignupDesktop = () => {
     "city" : "",
     "country" : "",
     "userip": "",
-    "language" : ""
+    "language" : "",
+    "isSchool" : false,
+    "class" : "",
+    "school" : "",
+  
+
+  }
+  let loginGuestErrObj = {
+    "firstName": false,
+    "lastName" : false,
+    "phone" : false,
+    "whats_no":false,
+    "email" : false,
 
   }
 
@@ -53,6 +67,10 @@ const SignupDesktop = () => {
   const [ isSame , setisSame ] = useState(false);
   const [captcha,setCaptcha] = useState("");
   const [captchaValue,setCaptchaValue] = useState("");
+  const [canRegister,setCanRegister] = useState(1);
+  let [schoolName , setSchoolName] = useState("");
+  let [schoolCode , setSchoolCode] = useState("");
+
 
   const [validateCaptchaValue, setValidateCaptcha] = useState(false);
 
@@ -77,6 +95,9 @@ const SignupDesktop = () => {
   const [modalIsOpenIns, setModalIsOpenIns] = useState(false);
 
   const [loginGuest,setLoginGuest] = useState(loginGuestObj);
+  const [loginGuestErr,setLoginGuestErr] = useState(loginGuestErrObj);
+
+  
   const [isLoginGuest,setIsLoginGuest] = useState(false);
 
 
@@ -98,6 +119,138 @@ const SignupDesktop = () => {
   const [searchedCountryList , setSearchedCountryList]= useState([]);
 
 
+  useEffect( () =>{
+    const start = 2 * 60  // minutes
+    const end = 17 * 60 // minutes
+    var now = new Date();
+    var currentTime = now.getHours() * 60 + now.getMinutes(); // Minutes since Midnight
+    console.log(currentTime < start , currentTime > end);
+    if(currentTime < start || currentTime > end){
+      console.log('done')
+      setCanRegister(1);
+     }
+     else{
+      setCanRegister(1);
+     }
+     
+  },[])
+
+  useEffect(() => {
+    if(!schoolCode) return;
+    dispatch(school({
+      code : schoolCode
+    }))
+    .unwrap()
+    .then(res => {
+      if(res.data?.name){
+        setSchoolName(res.data?.name)
+      }
+      else{
+        setSchoolName("")
+      }
+    })
+  },[schoolCode])
+  useEffect(() => {
+    let emailRegex = /\S+@\S+\.\S+/;
+    let nameRegex = /^[a-z ,.'-]+$/i;
+
+    if(loginGuest.firstName && !nameRegex.test(loginGuest.firstName)){
+
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          firstName : "Please Enter a valid first Name"
+        }
+      })
+      
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          firstName : false
+        }
+      })
+    }
+
+    if(loginGuest.lastName && !nameRegex.test(loginGuest.lastName)){
+
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          lastName : "Please Enter a valid last Name"
+        }
+      })
+      
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          lastName : false
+        }
+      })
+    }
+    if(loginGuest.email && !emailRegex.test(loginGuest.email)){
+
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          email : "Please Enter a valid email"
+        }
+      })
+      
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          email : false
+        }
+      })
+    }
+
+    if(loginGuest.phone &&loginGuest.phone.length !== 10){
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          phone : "Please Enter a valid phone"
+        }
+      })
+
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          phone : false
+        }
+      })
+    }
+
+    if(loginGuest.whats_no && loginGuest.whats_no.length !== 10){
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          whats_no : "Please Enter a valid whats phone"
+        }
+      })
+
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          whats_no : false
+        }
+      })
+    }
+    console.log(loginGuestErr)
+
+
+
+
+  },[loginGuest])
 
   useEffect(() => {
     setSearchedStateList(stateList)
@@ -339,22 +492,14 @@ let instruction = [ '1. This test is based on MCQ pattern',
       }
      
     }
-    let {firstName, lastName,phone,email,whats_no,state,city,country} = loginGuest;
+    let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language } = loginGuest;
     console.log(isSame);
-    if(!firstName || !lastName || !phone || !email || (!whats_no && !isSame) || !state || !city || !country){  
-      errorMessage("Please Fill all correct details")
+    if(!state || !city || !country || !loginGuest.class || !language  ){  
+      errorMessage("Please Fill all  details")
       return;
 
     }
-    if(phone.length !== 10 ||( whats_no.length >0 && whats_no.length !==10 )){
-      errorMessage("Please enter valid phone no")
-      return;
 
-    }
-    if(!emailRegex.test(email)){
-      errorMessage("Please enter valid email")
-      return;
-    }
     if(isSame) {
       handleGuestLoginChange('whats_no',phone)
     }
@@ -449,15 +594,26 @@ let instruction = [ '1. This test is based on MCQ pattern',
     let  obj = {};
     obj[key] = value
     setLoginGuest(pre => {
-      return {
+    return {
         ...pre,
         ...obj
       }
     })
+    // console.log(loginGuest);
   }
 
+
   let navigateQuiz = () =>{
-    dispatch(lg(loginGuest))
+    let data = loginGuest;
+    if(!data.isSchool) {
+      data.category = "Individual"
+    }
+    else{
+      data.category = "School"
+      data.school_code = schoolCode;
+
+    }
+    dispatch(lg(data))
     .unwrap()
     .then((res => {
       localStorage.setItem('language',loginGuest.language);
@@ -472,97 +628,101 @@ let instruction = [ '1. This test is based on MCQ pattern',
     })
    
   }
-
+  console.log(canRegister)
   return ( 
     loading ?
     <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
     :
     <div style={{height: '100%'}} className="signup-desktop">
+    { 
+      canRegister ?  <div className="box">
+      <div className="main-heading">
+        <h1>Sign Up</h1>
+        <h3>for a better tommorow</h3>
+      </div>
+      <div className="form" >
+        <div>
+           <p>First Name</p> 
+           <input value={firstName} disabled={isOtpGenrated ? "disabled" : ""} onChange={(e) => setfirstName(e.target.value)} placeholder="Please enter your First Name"className="form-input" ></input>
+             <p className="error-message"  >{firstNameError}</p> 
 
-      <div className="box">
-        <div className="main-heading">
-          <h1>Sign Up</h1>
-          <h3>for a better tommorow</h3>
         </div>
-        <div className="form" >
-          <div>
-             <p>First Name</p> 
-             <input value={firstName} disabled={isOtpGenrated ? "disabled" : ""} onChange={(e) => setfirstName(e.target.value)} placeholder="Please enter your First Name"className="form-input" ></input>
-               <p className="error-message"  >{firstNameError}</p> 
+        <div>
+           <p>Last Name</p>
+           <input  value={lastName} disabled={isOtpGenrated ? "disabled" : ""}  onChange={(e) => setlastName(e.target.value)}  placeholder="Please enter your Last Name"className="form-input" ></input>
+           <p className="error-message"  >{lastNameError}</p> 
+        </div>
+        <div className="row" >
+          <div  className="col" >
+            <p>Phone Number</p>
+            <input  value={phone} disabled={isOtpGenrated ? "disabled" : ""}  onChange={(e) => setphone(e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" >
+
+
+            </input>{
+                  isOtpGenrated ? 
+                  <FontAwesomeIcon onClick={() =>  setIsOtpGenrated(false)} className="edit"  icon={faEdit} /> : <></>
+            }
+          
+
+            <p className="error-message"  >{phoneError}</p> 
 
           </div>
-          <div>
-             <p>Last Name</p>
-             <input  value={lastName} disabled={isOtpGenrated ? "disabled" : ""}  onChange={(e) => setlastName(e.target.value)}  placeholder="Please enter your Last Name"className="form-input" ></input>
-             <p className="error-message"  >{lastNameError}</p> 
-          </div>
-          <div className="row" >
-            <div  className="col" >
-              <p>Phone Number</p>
-              <input  value={phone} disabled={isOtpGenrated ? "disabled" : ""}  onChange={(e) => setphone(e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" >
-
-
-              </input>{
-                    isOtpGenrated ? 
-                    <FontAwesomeIcon onClick={() =>  setIsOtpGenrated(false)} className="edit"  icon={faEdit} /> : <></>
-              }
-            
-
-              <p className="error-message"  >{phoneError}</p> 
+          {
+            isOtpGenrated  ? 
+            <div className="col-12 otpDiv">
+              <input value={otp} onChange={(e) => setOtp(e.target.value)}  placeholder="Enter Otp"className="form-input" ></input> 
+              <button onClick={handleOtpSubmit} className="form-button" >Verify OTP </button>
 
             </div>
-            {
-              isOtpGenrated  ? 
-              <div className="col-12 otpDiv">
-                <input value={otp} onChange={(e) => setOtp(e.target.value)}  placeholder="Enter Otp"className="form-input" ></input> 
-                <button onClick={handleOtpSubmit} className="form-button" >Verify OTP </button>
-
-              </div>
-               : shouldGenrateOtp && !isOtpVerified ? 
-               
-              <div className="col-12 otpDiv">
-               <button onClick={ handleGenrateOtp} className="form-button" > Generate OTP</button>
-             </div>
-               : <></>
-            }
-           
-           
-          </div>
-          <div>
-            {
-             isOtpVerified ?  
-             <div>
-              <span style={{fontSize: "16px" , fontWeight: "bold",marginBottom: "8px",display:"block"}} >Username : {userName}</span>
-              <p>Password</p>
-              <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
-              <p className="error-message"  >{passwordError}</p> 
-
-             </div>
-
-            : <></>
-
-            }
-            
-
-          </div>
-          <div className="captcha">
-              <ClientCaptcha captchaCode={code => setCaptchaValue(code)} />
-              <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
-         </div>
-          <div  >
-                  <button  onClick={() => { 
-                    isDetailsFilled() ? openModal() : console.log("Er") }} className="form-button"  >Register</button> or 
-              <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
-                <span onClick={openLoginGuest} >Login as guest</span>
-
-              </div>
+             : shouldGenrateOtp && !isOtpVerified ? 
+             
+            <div className="col-12 otpDiv">
+             <button onClick={ handleGenrateOtp} className="form-button" > Generate OTP</button>
+           </div>
+             : <></>
+          }
+         
+         
         </div>
-      
-            
+        <div>
+          {
+           isOtpVerified ?  
+           <div>
+            <span style={{fontSize: "16px" , fontWeight: "bold",marginBottom: "8px",display:"block"}} >Username : {userName}</span>
+            <p>Password</p>
+            <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
+            <p className="error-message"  >{passwordError}</p> 
+
+           </div>
+
+          : <></>
+
+          }
+          
 
         </div>
+        <div className="captcha">
+            <ClientCaptcha captchaCode={code => setCaptchaValue(code)} />
+            <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
+       </div>
+        <div  >
+                <button  onClick={() => { 
+                  isDetailsFilled() ? openModal() : console.log("Er") }} className="form-button"  >Register</button> or 
+            <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
+              <span onClick={openLoginGuest} >Login as guest</span>
+
+            </div>
+      </div>
+    
+          
 
       </div>
+
+    </div> : <div className="endTime">
+                You can Only Register between 11 AM and 5 Pm
+    </div>
+    }
+     
             <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
@@ -599,15 +759,19 @@ let instruction = [ '1. This test is based on MCQ pattern',
           <div>
              <p>First Name</p> 
              <input value={loginGuest.firstName} onChange={(e) => handleGuestLoginChange("firstName",e.target.value)} placeholder="Please enter your First Name"className="form-input" ></input>
+             <p className="error-message"  >{loginGuestErr.firstName}</p> 
 
           </div>
           <div>
              <p>Last Name</p>
              <input  value={loginGuest.lastName}  onChange={(e) => handleGuestLoginChange("lastName",e.target.value)}  placeholder="Please enter your Last Name"className="form-input" ></input>
+             <p className="error-message"  >{loginGuestErr.lastName}</p> 
+
           </div>
           <div>
               <p>Phone Number</p>
              <input  value={loginGuest.phone}  onChange={(e) => handleGuestLoginChange("phone",e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" ></input>
+             <p className="error-message"  >{loginGuestErr.phone}</p> 
 
           </div>
           <div  style={{display:'flex',margin:"10px 0"}} >
@@ -623,15 +787,54 @@ let instruction = [ '1. This test is based on MCQ pattern',
             <div>
             <p>WhatsApp Number</p>
             <input value={loginGuest.whats_no}   onChange={(e) => handleGuestLoginChange("whats_no",e.target.value)}  placeholder="Please enter your WhatsApp Phone Number"className="form-input" ></input>
+            <p className="error-message"  >{loginGuestErr.whats_no}</p> 
+
           </div> : <></>
           }
           <div>
              <p>Email</p> 
              <input  value={loginGuest.email}  onChange={(e) => handleGuestLoginChange("email",e.target.value)} placeholder="Please enter your Email"className="form-input" ></input>
-          </div>
-   
+            <p className="error-message"  >{loginGuestErr.email}</p> 
 
- <div className="userLocation">
+          </div>
+          <div style={{margin:"20px 0"}} className="drop-downs">
+          <div  style={{display:'flex',margin:"20px 0"}} >
+            <div>
+              <input onClick={() => handleGuestLoginChange("isSchool",!loginGuest.isSchool)} type="checkbox" />
+            </div>
+            <div style={{marginLeft:20}}  >
+              <span  >Check if You are a school Student</span>
+            </div>
+          </div>
+            {
+              loginGuest.isSchool ? 
+              <div className="dropdown">
+              <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                { loginGuest.class ? loginGuest.class  :  "Enter Class"}
+              </button>
+              <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <button onClick={() => handleGuestLoginChange("class","6th")} className={loginGuest.class === "6th" ? 'dropdown-item active' : 'dropdown-item'}>6th</button>
+                <button onClick={() => handleGuestLoginChange("class","7th")} className={loginGuest.class === "7th" ? 'dropdown-item active' : 'dropdown-item'}>7th</button>
+                <button onClick={() => handleGuestLoginChange("class","8th")} className={loginGuest.class === "8th" ? 'dropdown-item active' : 'dropdown-item'}>8th</button>
+                <button onClick={() => handleGuestLoginChange("class","9th")} className={loginGuest.class === "9th" ? 'dropdown-item active' : 'dropdown-item'}>9th</button>
+                <button onClick={() => handleGuestLoginChange("class","10th")} className={loginGuest.class === "10th" ? 'dropdown-item active' : 'dropdown-item'}>10th</button>
+                <button onClick={() => handleGuestLoginChange("class","11th")} className={loginGuest.class === "11th" ? 'dropdown-item active' : 'dropdown-item'}>11th</button>
+                <button onClick={() => handleGuestLoginChange("class","12th")} className={loginGuest.class === "12th" ? 'dropdown-item active' : 'dropdown-item'}>12th</button>
+              </div>
+            </div> : <></>
+            }
+       
+          </div>
+          {
+            loginGuest.isSchool ? 
+            <div class="school_code" >
+            <p>School Code</p>
+            <input placeholder="Enter Your School Code"  onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
+            <span>{schoolName}</span>
+          </div> : <></>
+          }
+
+ <div style={{margin:"20px 0"}} className="userLocation">
           <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Country state and city</p>
           <div className="drop-downs">
           <div style={{marginRight : "10px"}} className="dropdown">
@@ -668,7 +871,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
                {
                  searchedStateList.map(entry => {
                    return <button onClick={() => { handleGuestLoginChange('state',entry.name);setCityList(City.getCitiesOfState(entry.countryCode,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
-                     {entry.name + entry.countryCode}
+                     {entry.name}
 
                      </button>
 
@@ -709,7 +912,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
 
           </div> 
           <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Language</p>
-          <div className="dropdown">
+          <div  className="dropdown">
               <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 { loginGuest.language  ? loginGuest.language : "Select Language" }
               </button>

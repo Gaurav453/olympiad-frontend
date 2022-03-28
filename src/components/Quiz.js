@@ -61,7 +61,7 @@ const Quiz = () => {
   let user = useSelector(state => state.auth);
   user = user?.user;
   const dispatch = useDispatch();
-  const navigae = useNavigate('/result')
+  const navigae = useNavigate()
 
   const [attempt,setAttempt] =  useState(0);
   const [grid,setGrid] =  useState([]);
@@ -177,6 +177,7 @@ let fetchQuestion = (attempt,current) => {
   })
   .catch(err =>{ 
       setMainLoader(false)
+      navigae('/dashboard')
   })
 }
 
@@ -328,7 +329,7 @@ let handleChange = (entry) => {
   let Option = function(){
 
     return option.map(element => {
-        return <div className="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+        return <div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <div key={element.index} onClick={() => selectOption(element)} className={optionClass(element)}>
            <div className="a-img">
                 <img alt="answer" src={`${process.env.PUBLIC_URL}/eng/${question.qq.qid}${String.fromCharCode(element.index+96)}.jpg`} ></img>
@@ -372,6 +373,7 @@ let handleChange = (entry) => {
   }
 
   let handleReview = function(){
+    handleSave(undefined,undefined);
     let temp = grid;
     if(temp[current-1] ){
         temp[current-1].isReviewd = !grid[current-1].isReviewd;
@@ -398,7 +400,7 @@ let handleChange = (entry) => {
 
   }
 
-  let handleSave =async function(id,bool){
+  let handleSave =async function(id,bool,reviewed){
      if(answer.length ===  0) {
         if(!bool){
             let temp = grid;
@@ -429,6 +431,9 @@ let handleChange = (entry) => {
           if(!bool){
             let temp = grid;
             if(temp[current-1] ){
+                if(reviewed)
+                    temp[current-1].isReviewd = false;
+                    
                 temp[current-1].answer = temp;
                 setGrid(temp)
         
@@ -466,13 +471,13 @@ let handleChange = (entry) => {
 
     useEffect(() => {
         if(time > 0 && !isSubmitted){
-          setTimeout(function(){
-              setTime(--time)
-              setITime(time);
-              if(time % 5 === 0){
-                  saveRemaining(time);
-              }
-          },1000)
+        //   setTimeout(function(){
+        //       setTime(--time)
+        //       setITime(time);
+        //       if(time % 5 === 0){
+        //           saveRemaining(time);
+        //       }
+        //   },1000)
         }
         if(time === 1){
           handleSubmit();
@@ -500,7 +505,7 @@ let handleChange = (entry) => {
             <div className="saveBut col-lg-3 col-md-3 col-sm-3  col-6" >
             <div class="bottom" >
             
-                <button onClick={handleSave} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
+                <button onClick={() =>handleSave(undefined,undefined,true)} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
                     Save & Next
                 </button>
             </div>

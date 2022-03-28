@@ -20,9 +20,7 @@ export const genrateOtp = createAsyncThunk(
     try {
       const response = await AuthService.genrateOtp(phone);
       thunkAPI.dispatch(setMessage(response.data.message));
-      return response.data;
-    } catch (error) {
-      toast.error(error.response.data.errMessage, {
+      toast.success(response.data.StatusMsg, {
         position: "bottom-center",
         autoClose: 2000,
         hideProgressBar: true,
@@ -32,6 +30,9 @@ export const genrateOtp = createAsyncThunk(
         draggable: true,
         progress: undefined,
         });
+      return response.data;
+    } catch (error) {
+      
       const message =
         (error.response &&
           error.response.data &&
@@ -49,6 +50,16 @@ export const verifyOtp = createAsyncThunk(
     try {
       const response = await AuthService.verifyOtp(dataObj);
       thunkAPI.dispatch(setMessage(response.data.message));
+      toast.success(response.data.StatusMsg, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        theme: "dark",
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
       return response.data;
     } catch (error) {
       toast.error(error.response.data.errMessage, {

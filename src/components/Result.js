@@ -3,7 +3,8 @@ import logo from '../assets/images/Logo009_min2.png';
 import what from '../assets/images/WhatsApp.svg.png';
 import {useSelector ,useDispatch } from 'react-redux';
 
-import { saveAs } from 'file-saver'
+import { customMessage } from '../slices/quiz'
+
 
 import { Link } from "react-router-dom";
 
@@ -15,21 +16,33 @@ import imag from '../assets/images/try_again.jpg';
 
 const Result = (props) => {
     let score = localStorage.getItem('score');
+    score=JSON.parse(score)
     console.log(score);
-    let guest = localStorage.getItem('guest');
-    // if(guest === 'true'){
-    //     localStorage.clear();
-    // }
+
 
     let user = useSelector(state => state.auth);
     let state = useSelector(state => state.auth);
+
+    let [message , setMessage] = useState("")
+    const dispatch = useDispatch();
     user = user?.user;
     console.log(user)
-    score = JSON.parse(score);
     let link = score.certificate_link;
-    score = score.score
     localStorage.removeItem('language')
 
+    useEffect(() => {
+        console.log(score.id);
+        dispatch(customMessage({attempt_id : score.id}))
+        .unwrap()
+        .then(res => {
+            if(res){
+                setMessage(res.data.text);
+            }
+            else{
+                
+            }
+        })
+    },[])
 
     const download = href => {
         console.log(href);
@@ -53,6 +66,7 @@ const Result = (props) => {
       };
     return(
         <div className="result">
+       
             <div className="row" >
                 <div className="col logo-result" >
                     <div>
@@ -60,20 +74,24 @@ const Result = (props) => {
                         <div className="text" >Thank You For Attempting Olympiad!</div>
                 
                     </div>
-                    </div>
+                </div>
+                <div className="col-12 answerKey">
+            Hi {user.first_name}   {user.last_name}, {message} 
+        </div>
+               
 
             </div>
             <div style={{alignItems: 'center'}}  className="row" > 
-               
+             
                 <div className="col-xs-12 col-sm-12 col-md-12 col-lg-7 " >
                     <div className="name" >
-                        {user.first_name}   {user.last_name} 
+                        {/* {user.first_name}   {user.last_name} */}
                     </div>
                     <div className="score row" >
-                        <div className="col-xs-12 col-sm-12 col-md-4 col-lg-5" >
+                        <div className="col-xs-12 col-sm-12 col-md-4 col-lg-4" >
                             <div className="circle">
                                 <div className="first" >
-                                    <span>{score.percentage}</span>
+                                    <span>{score.score}</span>
                                     
                                 </div>
                                 <p style={{fontSize:32+'px'}} >Score</p>
@@ -85,12 +103,26 @@ const Result = (props) => {
                             <div className="circle">
 
                                 <div className="second" >
-                                <span>{score.correct}</span>
+                                <span>{score.easy_correct+score.medium_correct + score.difficult_correct}</span>
 
 
 
                                 </div>
                                 <p>Correct</p>
+                            </div>
+
+
+                        </div>
+                        <div className="col-xs-12 col-sm-12 col-md-2 col-lg-2" >
+                            <div className="circle">
+
+                                <div className="second fifth" >
+                                <span>{score.partial_correct}</span>
+
+
+
+                                </div>
+                                <p>Partial Correct</p>
                             </div>
 
 
@@ -169,6 +201,11 @@ const Result = (props) => {
 
             </div>
 
+     
+        <div className=" answerKey">
+                Answer key will be released on 7th September 2022
+                </div>
+               
             
         </div>
     )

@@ -242,6 +242,37 @@ export const performance = createAsyncThunk(
   }
 );
 
+export const customMessage = createAsyncThunk(
+  "quiz/customMessage",
+  async ({attempt_id}, thunkAPI) => {
+    try {
+      const response = await QuizService.customMessage(attempt_id);
+      thunkAPI.dispatch(setMessage(response.data.message));
+      return response.data;
+    } catch (error) {
+      toast.error(error.response.data.errMessage, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        theme: "dark",
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue();
+    }
+  }
+);
+
+
 
 
 

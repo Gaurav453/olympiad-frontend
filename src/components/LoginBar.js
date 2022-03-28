@@ -147,10 +147,20 @@ useEffect(() => {
       .unwrap()
       .then(res => {
         console.log(res);
-        setOtpVerified(true);
+      
+        console.log(res);
+        let usernames =  [];
+
+        for(let user of res.data){
+          console.log(user)
+          usernames.push( user.username)
+        }
+
+        setUsernames(usernames);
         setpassword("");
         setuserName("");
-        setUsernames(res.data.map(element => element.username))
+        setOtpVerified(true);
+
       })
       .catch(err => {
         console.log(err);
@@ -357,13 +367,13 @@ useEffect(() => {
               </div> : <div>
               <h5>Associated Users</h5>
               {
-
+                // {usernames}
                 usernames.map((entry,index) =>  {
                   return <li  key={index} >{entry}</li>;
                 })
                 
               }
-              <h6 style={{ fontWeight:"bold",marginTop: "20px" }}>  Please note this usernames</h6>
+              <h6 style={{ fontWeight:"bold",marginTop: "20px" }}>  Please note these usernames</h6>
               <div class="btnn" style={{textAlign: "center"}} >
               <button onClick={() => setFotgetUsername(false)}> Noted!</button>
 

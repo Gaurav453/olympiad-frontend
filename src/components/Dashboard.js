@@ -2,7 +2,7 @@ import React , { useEffect,useState } from "react";
 import {useSelector ,useDispatch } from 'react-redux';
 import { Navigate,Link } from "react-router-dom";
 import { getPreviousAttempts ,performance } from '../slices/quiz'
-import { userSchool } from '../slices/auth'
+import { userSchool,logout } from '../slices/auth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { faAngleUp} from '@fortawesome/free-solid-svg-icons'
@@ -31,6 +31,10 @@ const Dashboard = () => {
 
   function openModal() {
     setIsOpen(true);
+  }
+  let guest = localStorage.getItem('guest');
+  if(guest == 'true'){
+    dispatch(logout())
   }
 
 
@@ -72,7 +76,12 @@ const Dashboard = () => {
     .then((res)=>{
       console.log(res);
       let temp = res.data;
-      temp = temp.filter(en => en)
+      setPerformance(pre => {
+        return {...pre,
+        ...temp
+      }
+
+      })
       console.log("value " ,temp);
       console.log(performance)
 
@@ -154,7 +163,7 @@ const Dashboard = () => {
   let handleResult = (score,certificate_sno) =>{
     localStorage.setItem('score', JSON.stringify(score));
 
-    navigate("/result");
+    navigate("/result",{state : score});
 
   }
   const Layout = function (){
@@ -225,7 +234,7 @@ const Dashboard = () => {
 
               return    <tr key={index}  >
               <th scope="row">{index+1}</th>
-              <td> {element.isCompleted ?  element.score?.percentage +  "%" :  'N/A'} </td>
+              <td> {element.isCompleted ?  element.score +  "%" :  'N/A'} </td>
               <td>      
                    { element.isCompleted ?            <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
              :  <button style={{leftMargin : 15 + 'px'}} onClick={() => startQuiz()} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Continue Attempt</button>
@@ -252,23 +261,23 @@ const Dashboard = () => {
           {
             myperformance.state !== -1 ||  myperformance.city !== -1 || myperformance.total !== -1 || (myperformance.school !== -1 && school) ?
             <div className="performance">
-            <h5>Your Perdfomance</h5>
+            <h5>Your Performance</h5>
 
               {
                 myperformance.city !== -1 ?
-                <li>You are in top {myperformance.city} in your city</li>  : <></>
+                <li>You are in top {myperformance.city}% in your city</li>  : <></>
               }
               {
                 myperformance.state !== -1 ?
-                <li>You are in top {myperformance.state} in your state</li>  : <></>
+                <li>You are in top {myperformance.state}% in your state</li>  : <></>
               }
               {
                 myperformance.total !== -1 ?
-                <li>You are in top {myperformance.total} in your total</li>  : <></>
+                <li>You are in top {myperformance.total}% Overall</li>  : <></>
               }
               {
                 myperformance.school !== -1 && school ?
-                <li>You are in top {myperformance.school} in your school</li>  : <></>
+                <li>You are in top {myperformance.school}% in your school</li>  : <></>
               }
 
             </div>

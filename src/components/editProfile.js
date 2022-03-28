@@ -17,6 +17,8 @@ const EditProfile = () => {
 
   const [ canSave , setCanSave ] = useState(false);
 
+  const [isSchoolStudent , setIsSchool] = useState(false);
+
 
   const [ canEdit , setCanEdit ] = useState(false);
 
@@ -38,10 +40,17 @@ const EditProfile = () => {
       
     })
   }
-  
+ 
   useEffect(() => {
     if(!user) return;
     getuserSchool();
+    console.log(localStorage.getItem('user'));
+    let category = JSON.parse(localStorage.getItem('user') || "")?.category;
+    console.log(category);
+    if(category === 'School'){
+      setIsSchool(true);                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+    }
 
   },[])
   const navigate = useNavigate();
@@ -59,7 +68,12 @@ const EditProfile = () => {
       });
 
   }
+  let guest = localStorage.getItem('guest');
 
+  if(guest === 'true'){
+    navigate('/')
+  }
+  
   useEffect(() => {
     if(! schoolCode) return
     if(!user) return;
@@ -140,7 +154,7 @@ const EditProfile = () => {
              <input disabled="disabled" value={user.email}   className="form-input" ></input>
           </div>
           {
-            true ?  <div>
+            isSchoolStudent ?  <div>
             <p>School Code</p> 
             <input disabled={canEdit ? false : 'disabled'} value={schoolCode}  placeholder="Enter Your school code" onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
             {

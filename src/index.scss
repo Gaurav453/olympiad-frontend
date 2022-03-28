@@ -22,6 +22,11 @@
   margin:0 10px;
 }
 
+input [type=text]{
+  -webkit-appearance: none;
+
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   overflow-x: hidden;
@@ -722,7 +727,7 @@ th svg{
 
 
 .result {
-  padding: 40px 16px;
+  padding: 10px 16px;
   .logo-result{
     text-align: center;
     img{
@@ -825,9 +830,16 @@ th svg{
     align-items: center;
   }
   .name{
-    font-size: 60px;
+    font-size: 40px;
     font-weight: 900;
     color:black;
+  }
+  .answerKey{
+    font-size: 30px;
+    font-weight: 900;
+    margin-top : 50px;
+    text-align: center;
+
   }
   .break{
     width: 100%;
@@ -1121,7 +1133,7 @@ th svg{
 }
 @media screen and (max-width:400px) {
     .result .name{
-      font-size: 45px;
+      font-size: 35px;
     }
 }
 
@@ -1139,6 +1151,8 @@ th svg{
     padding: 20px;
     margin-right: -50%;
     transform: translate(-50%, -50%);
+    max-height: 97vh;
+    overflow: auto;
     h5{
       text-align: center;
       font-size: 2.25em;

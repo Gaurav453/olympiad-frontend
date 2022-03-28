@@ -2,10 +2,12 @@ import axios from "axios";
 import authHeader from "./auth-header";
 //http://localhost:8000
 
+const API_URL = "http://localhost:8000/api/quiz/v1/";
 // const API_URL = "https://equanimityolympiad.in/api/quiz/v1/";
-const API_URL = "https://equanimityolympiad.in/api/quiz/v1/";
 
 const getPreviousAttempts = (sort) => {
+  if(!authHeader().key) return false;
+
   console.log(sort);
   return axios.get(API_URL + "previousAttempts?sort=" + sort,
   {
@@ -15,6 +17,8 @@ const getPreviousAttempts = (sort) => {
   );
 };
 const currentAttempt = () => {
+  if(!authHeader().key) return false;
+
   return axios.get(API_URL + "currentAttempt",
   {
     headers:authHeader(),
@@ -24,6 +28,8 @@ const currentAttempt = () => {
 };
 
 const activeAttempts = () => {
+  if(!authHeader().key) return false;
+
   return axios.get(API_URL + "activeAttempts",
   {
     headers:authHeader(),
@@ -32,6 +38,8 @@ const activeAttempts = () => {
   );
 };
 const getQuestion = (data) => {
+  if(!authHeader().key) return false;
+
   return axios.post(API_URL + "question",
   data,
   {
@@ -41,6 +49,8 @@ const getQuestion = (data) => {
   );
 };
 const saveAnswer = (data) => {
+  if(!authHeader().key) return false;
+
   return axios.post(API_URL + "saveAnswer",
   data,
   {
@@ -50,6 +60,8 @@ const saveAnswer = (data) => {
   );
 };
 const submitQuiz = (data) => {
+  if(!authHeader().key) return false;
+
   return axios.post(API_URL + "submitQuiz",
   data,
   {
@@ -69,7 +81,20 @@ const saveRemainingTime = (data) => {
   );
 };
 const performance = () => {
+  if(!authHeader().key) return false;
+
   return axios.get(API_URL + "performance",
+  {
+    headers:authHeader(),
+  }
+
+  );
+};
+
+const customMessage = (attempt_id) => {
+  if(!authHeader().key) return false;
+
+  return axios.get(API_URL + "customMessage/" +attempt_id,
   {
     headers:authHeader(),
   }
@@ -85,7 +110,8 @@ const quizService = {
   submitQuiz,
   saveRemainingTime,
   performance,
-  activeAttempts
+  activeAttempts,
+  customMessage
   
 };
 
