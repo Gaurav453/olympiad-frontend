@@ -6,9 +6,12 @@ import { Navigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Country, State, City }  from 'country-state-city';
+import Modal from 'react-modal';
+
 
 
 const ProfilePage = () => {
+  
 
   let user = useSelector(state => state.auth);
   user = user?.user;
@@ -19,11 +22,28 @@ const ProfilePage = () => {
   const [ isSame , setisSame ] = useState(false);
 
   const [ category , setCategory ] = useState("");
+  const [modalIsOpen, setIsOpen] = useState(true);
   const [ clas , setClas ] = useState("");
   const [ schoolCode , seschoolCode ] = useState("");
   const [ schoolName , setSchoolName ] = useState("");
 
   const [ referrer , sereferrer ] = useState("");
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+  const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+      padding : "20px",
+      borderRadius : "15px"
+    },
+  };
 
 
   const [loading , setLoading ] = useState(false);
@@ -348,6 +368,24 @@ const ProfilePage = () => {
         </div>
 
       </div>
+
+      <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            style={customStyles}
+            contentLabel="instructions"
+            shouldCloseOnOverlayClick={false}
+            className="instructions-div"
+          >
+            
+            <h5>Note</h5>
+              <p class="note" > Your user name is <span style={{fontWeight:"bold"}} >{user.username }</span></p>
+              <p class="note" > Please note it down. You have to login with this username later.</p>
+
+            <div  class="btnn">
+              <button onClick={closeModal} > Okay!</button>
+            </div>
+          </Modal>
 
     </div>
   );

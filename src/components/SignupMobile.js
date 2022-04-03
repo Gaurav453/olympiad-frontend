@@ -86,7 +86,7 @@ const SignupMobile = () => {
 
   const [loading , setLoading ] = useState(false);
   const [isOtpGenrated , setIsOtpGenrated ] = useState(false);
-  const [isOtpVerified , setIsOtpVerified ] = useState(false);
+  const [isOtpVerified , setIsOtpVerified ] = useState(true);
   const [shouldGenrateOtp , setshouldGenrateOtp ] = useState(false);
 
 
@@ -404,44 +404,27 @@ const SignupMobile = () => {
       return;
 
     }
-
-    if(!isOtpGenrated && !isOtpVerified){
-      errorMessage("Please Generate OTP first")
-      return;
-
+    let dataObj = {
+      phone,
+      password,
+      first_name : firstName,
+      last_name : lastName,
     }
-    else if (isOtpGenrated && !isOtpVerified){
-      errorMessage("Please Verify otp")
-      console.log('Please verify otp')
-      return;
+    dispatch(register({dataObj}))
+    .unwrap()
+    .then(() =>{
+      console.log('success')
+      setLoading(false)
+      return <Navigate to="/profile" />;
 
-    }
-    else if(isOtpVerified && (!password || passwordError)){
-      errorMessage("Please Enter Password")
-      return;
-    }
-    else if(isOtpVerified){
-      setLoading(true);
-      let dataObj = {
-        phone,
-        password,
-        first_name : firstName,
-        last_name : lastName,
-      }
-      dispatch(register({verifyOtpToken,dataObj}))
-      .unwrap()
-      .then(() =>{
-        console.log('success')
-        setLoading(false)
-        return <Navigate to="/profile" />;
+    })
+    .catch((err) =>{
+      setLoading(false);
+      closeModal();
 
-      })
-      .catch((err) =>{
-        setLoading(false);
-        closeModal();
+    })
 
-      })
-    }
+   
 
   }
 
@@ -463,15 +446,36 @@ const SignupMobile = () => {
   }
 
   let  otpForgetUserName = () => {  
+      
     if(phone.length !== 10) {
       errorMessage("Please enter valid phone number")
       return;
     }
+    setLoading(true);
     dispatch(forgetUserName({phone}))
     .unwrap()
+
     .then(res => {
       console.log(res);
-      setOtpSent(true);
+      let usernames =  [];
+
+      for(let user of res.data){
+        console.log(user)
+        usernames.push( user.username)
+      }
+      if(usernames.length === 0){
+        setFotgetUsername(false);
+        errorMessage("No User found");
+
+      }
+
+      setUsernames(usernames);
+      setpassword("");
+      setuserName("");
+      setOtpVerified(true);
+      setLoading(false);
+
+      
     })
     .catch(err => {
       console.log(err);
@@ -661,20 +665,20 @@ let instruction = [ '1. This test is based on MCQ pattern',
    
   }
   
-  useEffect(() => {
-    if(phone.length === 10) {
-      setshouldGenrateOtp(true)
-    }
-    else{
-      setshouldGenrateOtp(false)
+  // useEffect(() => {
+  //   if(phone.length === 10) {
+  //     setshouldGenrateOtp(true)
+  //   }
+  //   else{
+  //     setshouldGenrateOtp(false)
 
-    }
-    setIsOtpGenrated(false);
-    setIsOtpVerified(false);
+  //   }
+  //   setIsOtpGenrated(false);
+  //   setIsOtpVerified(false);
 
 
 
-  },[phone,firstName,lastName])
+  // },[phone,firstName,lastName])
   let handleOtpSubmit  = function(){
 
     if(!phone){
@@ -770,10 +774,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
              <p>Password</p>
              <input value={password} disabled={isOtpVerified} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
              <p className="error-message"  >{passwordError}</p> 
-             <div className="forgot">
-             <span onClick={handlerForgotPassword} >Forgot Password</span>
-
-           </div>
+        
 
 
           </div>
@@ -835,7 +836,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
             {
              isOtpVerified ?  
              <div>
-              <span>Username : {userName}</span>
+              {/* <span>Username : {userName}</span> */}
               <p>Password</p>
               <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
               <p className="error-message"  >{passwordError}</p> 
@@ -959,7 +960,7 @@ className="instructions-div forget-modal"
   <span class="note" > Phone : &nbsp; </span>
   <input placeholder="Please enter your phone no" style={{display: 'inline-block',width: '75%'}} value={phone} onChange={(e) => setphone(e.target.value)}  type="text" className="form-input"></input>
   <div  class="btnn">
-  <button onClick={otpForgetUserName} >Sent otp!</button>
+  <button onClick={otpForgetUserName} >Submit!</button>
 </div>
   </div> : otpSent && !otpVerified  ? 
   <div>

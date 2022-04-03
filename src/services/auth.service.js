@@ -5,18 +5,12 @@ import axios from "axios";
 const API_URL = "https://equanimityolympiad.in/api/";
 
 
-const register = (token,data) => {
+const register = (data) => {
   return axios.post(API_URL + "signup/v1/register", {
  
     ...data,
  
-  },
-  {
-    headers:{
-      token : token,
-    }
   }
-
   );
 };
 

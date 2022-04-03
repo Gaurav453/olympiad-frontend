@@ -122,15 +122,36 @@ useEffect(() => {
     }
 
     let  otpForgetUserName = () => {  
+      
       if(phone.length !== 10) {
         errorMessage("Please enter valid phone number")
         return;
       }
+      setLoading(true);
       dispatch(forgetUserName({phone}))
       .unwrap()
+
       .then(res => {
         console.log(res);
-        setOtpSent(true);
+        let usernames =  [];
+
+        for(let user of res.data){
+          console.log(user)
+          usernames.push( user.username)
+        }
+        if(usernames.length === 0){
+          setFotgetUsername(false);
+          errorMessage("No User found");
+
+        }
+
+        setUsernames(usernames);
+        setpassword("");
+        setuserName("");
+        setOtpVerified(true);
+        setLoading(false);
+
+        
       })
       .catch(err => {
         console.log(err);
@@ -262,10 +283,7 @@ useEffect(() => {
             <div >
                 <span>Password</span>
                 <input   value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
-                <div className="forgot">
-                <span onClick={handlerForgotPassword} >Forgot Password</span>
 
-              </div>
             </div>
         
           </div>
@@ -353,7 +371,7 @@ useEffect(() => {
               <span class="note" > Phone : &nbsp; </span>
               <input placeholder="Please enter your phone no" style={{display: 'inline-block',width: '75%'}} value={phone} onChange={(e) => setPhone(e.target.value)}  type="text" className="form-input"></input>
               <div  class="btnn">
-              <button onClick={otpForgetUserName} >Sent otp!</button>
+              <button onClick={otpForgetUserName} >Submit</button>
             </div>
               </div> : otpSent && !otpVerified  ? 
               <div>

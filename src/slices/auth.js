@@ -85,9 +85,9 @@ export const verifyOtp = createAsyncThunk(
 );
 export const register = createAsyncThunk(
   "auth/register",
-  async ({verifyOtpToken,dataObj}, thunkAPI) => {
+  async ({dataObj}, thunkAPI) => {
     try {
-      const response = await AuthService.register(verifyOtpToken,dataObj);
+      const response = await AuthService.register(dataObj);
       thunkAPI.dispatch(setMessage(response.data.message));
       return response.data;
     } catch (error) {

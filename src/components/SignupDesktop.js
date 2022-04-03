@@ -79,7 +79,7 @@ const SignupDesktop = () => {
 
   let [loading , setLoading ] = useMergedState(false);
   const [isOtpGenrated , setIsOtpGenrated ] = useMergedState(false);
-  const [isOtpVerified , setIsOtpVerified ] = useMergedState(false);
+  const [isOtpVerified , setIsOtpVerified ] = useMergedState(true);
   const [shouldGenrateOtp , setshouldGenrateOtp ] = useMergedState(false);
 
 
@@ -403,20 +403,20 @@ let instruction = [ '1. This test is based on MCQ pattern',
 
   },[firstName,lastName,phone,password])
 
-  useEffect(() => {
-    if(phone.length === 10) {
-      setshouldGenrateOtp(true)
-    }
-    else{
-      setshouldGenrateOtp(false)
+  // useEffect(() => {
+  //   if(phone.length === 10) {
+  //     setshouldGenrateOtp(true)
+  //   }
+  //   else{
+  //     setshouldGenrateOtp(false)
 
-    }
-    setIsOtpGenrated(false);
-    setIsOtpVerified(false);
+  //   }
+  //   setIsOtpGenrated(false);
+  //   setIsOtpVerified(false);
 
 
 
-  },[phone,firstName,lastName])
+  // },[phone,firstName,lastName])
 
  
   let handleGenrateOtp = function(){
@@ -513,7 +513,6 @@ let instruction = [ '1. This test is based on MCQ pattern',
 
   let handleSubmit  = function(){
 
-    closeModal();
 
       setLoading(true);
 
@@ -523,16 +522,16 @@ let instruction = [ '1. This test is based on MCQ pattern',
         first_name : firstName,
         last_name : lastName,
       }
-      dispatch(register({verifyOtpToken,dataObj}))
+      dispatch(register({dataObj}))
       .unwrap()
-      .then(() =>{
-      setLoading(false);
-
-        console.log('success')
+      .then((res) =>{
+        setuserName(res.data.username)
+        setLoading(false);
+        setIsOpen(true);
+          console.log('success')
       })
       .catch(() =>{
         setLoading(false);
-        closeModal();
   
       })
 
@@ -688,7 +687,6 @@ let instruction = [ '1. This test is based on MCQ pattern',
           {
            isOtpVerified ?  
            <div>
-            <span style={{fontSize: "16px" , fontWeight: "bold",marginBottom: "8px",display:"block"}} >Username : {userName}</span>
             <p>Password</p>
             <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
             <p className="error-message"  >{passwordError}</p> 
@@ -707,7 +705,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
        </div>
         <div  >
                 <button  onClick={() => { 
-                  isDetailsFilled() ? openModal() : console.log("Er") }} className="form-button"  >Register</button> or 
+                  isDetailsFilled() ? handleSubmit() : console.log("Er") }} className="form-button"  >Register</button> or 
             <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
               <span onClick={openLoginGuest} >Login as guest</span>
 
@@ -737,7 +735,7 @@ let instruction = [ '1. This test is based on MCQ pattern',
               <p class="note" > Please note it down. You have to login with this username later.</p>
 
             <div  class="btnn">
-              <button onClick={handleSubmit} > Okay!</button>
+              <button onClick={closeModal} > Okay!</button>
             </div>
           </Modal>
 
