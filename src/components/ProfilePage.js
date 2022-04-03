@@ -34,6 +34,8 @@ const ProfilePage = () => {
   const [country,setCountry] = useState('IN');
   const [state,setState] = useState('');
   const [city,setCity] = useState('');
+  const [father,setFather] = useState('');
+
 
   const [stateList,setStateList] = useState(State.getStatesOfCountry(country));
   const [cityList,setCityList] = useState([]);
@@ -154,7 +156,7 @@ const ProfilePage = () => {
 
 
   let handleSubmit  = function(){
-    if(!state ||  !city || !whatsapp || !email || (category === 'School' && ( clas === ""))){
+    if(!father || !state ||  !city || !whatsapp || !email || (category === 'School' && ( clas === ""))){
       errorMessage("Please enter all required information");
 
       return;
@@ -175,7 +177,8 @@ const ProfilePage = () => {
        "state" : state,
        "city" : city,
        "country" : 'India',
-       "category" : category
+       "category" : category,
+       "father" : father
     }
     dispatch(saveProfile(data))
     .unwrap()
@@ -236,7 +239,11 @@ const ProfilePage = () => {
             <p className="error-message"  >{whatsappError}</p> 
           </div> : <></>
           }
+          <div>
+             <p>Father's  Name</p> 
+             <input onChange={(e) => setFather(e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
 
+          </div>
           <div className="userLocation">
           <div className="drop-downs">
             <div style={{marginBottom: "10px"}} className="dropdown">

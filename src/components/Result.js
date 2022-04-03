@@ -202,7 +202,7 @@ const Result = (props) => {
             </div>
 
      
-        <div className=" answerKey">
+        <div className="answerKey">
                 Answer key will be released on 7th September 2022
                 </div>
                

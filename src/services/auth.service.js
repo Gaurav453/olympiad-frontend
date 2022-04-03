@@ -1,8 +1,8 @@
 import authHeader from "./auth-header";
 import axios from "axios";
 
-const API_URL = "http://localhost:8000/api/";
-// const API_URL = "https://equanimityolympiad.in/api/";
+// const API_URL = "http://localhost:8000/api/";
+const API_URL = "https://equanimityolympiad.in/api/";
 
 
 const register = (token,data) => {
@@ -84,8 +84,6 @@ const editSchool = (code) => {
 
 
 const getUserName = (phone,otp) => {
-  if(!authHeader().key) return false;
-
   return axios
     .post(API_URL + "auth/v1/getUsername", {
      otp,

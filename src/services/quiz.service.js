@@ -2,8 +2,8 @@ import axios from "axios";
 import authHeader from "./auth-header";
 //http://localhost:8000
 
-const API_URL = "http://localhost:8000/api/quiz/v1/";
-// const API_URL = "https://equanimityolympiad.in/api/quiz/v1/";
+// const API_URL = "http://localhost:8000/api/quiz/v1/";
+const API_URL = "https://equanimityolympiad.in/api/quiz/v1/";
 
 const getPreviousAttempts = (sort) => {
   if(!authHeader().key) return false;

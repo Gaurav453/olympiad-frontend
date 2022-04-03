@@ -125,6 +125,7 @@ let initialize = () => {
 }
 
 let fetchQuestion = (attempt,current) => {
+ 
     if(!localStorage.getItem('language')) return;
     console.log(attempt)
     let data = {
@@ -223,7 +224,7 @@ let gridElementClass = function(element){
 }
 let handleChange = (entry) => {
       if(answer.length !== 0){
-          handleSave(entry.id);
+          handleSave(entry.id,false,false,true);
       }
       else{
           setCurrent(entry.id);
@@ -373,22 +374,8 @@ let handleChange = (entry) => {
   }
 
   let handleReview = function(){
-    handleSave(undefined,undefined);
-    let temp = grid;
-    if(temp[current-1] ){
-        temp[current-1].isReviewd = !grid[current-1].isReviewd;
-        setGrid(temp)
-
-    }
-    if(current < 25 ){
-        setCurrent(current+1)
-    fetchQuestion(attempt,current+1);
-    }
-    else{
-        setCurrent(current-1)
-    fetchQuestion(attempt,current-1);
-    }
-    
+    handleSave(undefined,false,true);
+ 
     
 
   }
@@ -400,17 +387,40 @@ let handleChange = (entry) => {
 
   }
 
-  let handleSave =async function(id,bool,reviewed){
+  let handleSave =async function(id,bool,reviewed,sameReviewed){
      if(answer.length ===  0) {
         if(!bool){
             let temp = grid;
             if(temp[current-1] ){
                 temp[current-1].answer = null;
+                if(reviewed){
+                    temp[current-1].isReviewd = true;
+
+                }
+                else{
+                    if(sameReviewed){
+
+                    }
+                    else{
+                        temp[current-1].isReviewd = false;
+
+                    }
+
+                }
                 setGrid(temp)
         
             }
-            setCurrent(typeof id === 'number' ? id : current+1)
-            fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
+            if(current  >= 25){
+                setCurrent(typeof id === 'number' ? id: 24)
+                fetchQuestion(attempt,typeof id === 'number' ? id: 24);
+            }
+            else{
+                setCurrent(typeof id === 'number' ? id : current+1)
+                fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
+                
+            }
+        
+         
           }
         return;
          
@@ -431,15 +441,34 @@ let handleChange = (entry) => {
           if(!bool){
             let temp = grid;
             if(temp[current-1] ){
-                if(reviewed)
-                    temp[current-1].isReviewd = false;
-                    
+                if(reviewed){
+                    temp[current-1].isReviewd = true;
+
+                }
+                else{
+                    if(sameReviewed){
+
+                    }
+                    else{
+                        temp[current-1].isReviewd = false;
+
+                    }
+
+                }
                 temp[current-1].answer = temp;
                 setGrid(temp)
         
             }
-            setCurrent(typeof id === 'number' ? id : current+1)
-            fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
+            if(current  >= 25){
+                setCurrent(typeof id === 'number' ? id: 24)
+                fetchQuestion(attempt,typeof id === 'number' ? id: 24);
+            }
+            else{
+                setCurrent(typeof id === 'number' ? id : current+1)
+                fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
+                
+            }
+        
           }
       
       })
@@ -471,13 +500,13 @@ let handleChange = (entry) => {
 
     useEffect(() => {
         if(time > 0 && !isSubmitted){
-        //   setTimeout(function(){
-        //       setTime(--time)
-        //       setITime(time);
-        //       if(time % 5 === 0){
-        //           saveRemaining(time);
-        //       }
-        //   },1000)
+          setTimeout(function(){
+              setTime(--time)
+              setITime(time);
+              if(time % 5 === 0){
+                  saveRemaining(time);
+              }
+          },1000)
         }
         if(time === 1){
           handleSubmit();
@@ -505,7 +534,7 @@ let handleChange = (entry) => {
             <div className="saveBut col-lg-3 col-md-3 col-sm-3  col-6" >
             <div class="bottom" >
             
-                <button onClick={() =>handleSave(undefined,undefined,true)} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
+                <button onClick={() =>handleSave(undefined,undefined,false)} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
                     Save & Next
                 </button>
             </div>

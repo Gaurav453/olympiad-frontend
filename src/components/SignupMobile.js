@@ -118,16 +118,16 @@ const SignupMobile = () => {
 
 
   useEffect( () =>{
-    const start = 11 * 60  // minutes
-    const end = 17 * 60 // minutes
+    const start = 2 * 60  // minutes
+    const end = 5 * 60 // minutes
     var now = new Date();
     var currentTime = now.getHours() * 60 + now.getMinutes(); // Minutes since Midnight
     
     if(currentTime < start || currentTime > end){
-      setCanRegister(0);
+      setCanRegister(1);
      }
      else{
-      setCanRegister(1);
+      setCanRegister(0);
      }
      
   },[])
@@ -607,9 +607,9 @@ let instruction = [ '1. This test is based on MCQ pattern',
       }
      
     }
-    let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language } = loginGuest;
+    let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language ,father} = loginGuest;
     console.log(isSame);
-    if(!state || !city || !country || !loginGuest.class || !language  ){  
+    if(!state || !city || !country || (isSchool &&!loginGuest.class) || !language  || !father){  
       errorMessage("Please Fill all  details")
       return;
 
@@ -1045,6 +1045,11 @@ className="instructions-div forget-modal"
              <p>Email</p> 
              <input  value={loginGuest.email}  onChange={(e) => handleGuestLoginChange("email",e.target.value)} placeholder="Please enter your Email"className="form-input" ></input>
             <p className="error-message"  >{loginGuestErr.email}</p> 
+
+          </div>
+          <div>
+             <p>Father's  Name</p> 
+             <input  value={loginGuest.father} onChange={(e) => handleGuestLoginChange("father",e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
 
           </div>
           <div style={{margin:"20px 0"}} className="drop-downs">
