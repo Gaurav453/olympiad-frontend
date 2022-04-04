@@ -223,14 +223,8 @@ let gridElementClass = function(element){
 
 }
 let handleChange = (entry) => {
-      if(answer.length !== 0){
-          handleSave(entry.id,false,false,true);
-      }
-      else{
-          setCurrent(entry.id);
-          fetchQuestion(attempt,entry.id);
-         
-      }
+        handleSave(entry.id,false,false,true);
+    
       try{
       testDivRef.current.scrollIntoView(); 
 
@@ -261,9 +255,14 @@ let handleChange = (entry) => {
       navigae('/dashboard')
 
 
-
  var saveRemaining = function(time){
-    dispatch(saveRemainingTime({time_left : time-1, attempt_id : attempt}))
+    dispatch(saveRemainingTime({time_left : time-1, attempt_id : attempt})).unwrap()
+    .then(res => {
+        setTimeout(() => {
+            called = 0
+
+        },5000)
+    })
  }
 
 
@@ -333,11 +332,11 @@ let handleChange = (entry) => {
         return <div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <div key={element.index} onClick={() => selectOption(element)} className={optionClass(element)}>
            <div className="a-img">
-                <img alt="answer" src={`${process.env.PUBLIC_URL}/eng/${question.qq.qid}${String.fromCharCode(element.index+96)}.jpg`} ></img>
+                <img alt="answer" src={element.url} ></img>
            </div>
            <div className="a-text">
                 {element.text}
-           </div>
+           </div>   
 
         </div>
         </div>
@@ -355,7 +354,7 @@ let handleChange = (entry) => {
                         <div ref={testDivRef} className="question" >
             <div className="q" >
             <div className="q-img" >
-                <img alt="question" src={`${process.env.PUBLIC_URL}/eng/${question.qq.qid}q.jpg`} ></img>
+                <img alt="question" src={question.qq.qurl} ></img>
             </div>
             <div className="q-text" >
             <div dangerouslySetInnerHTML={{__html: question.qq.q}} />
@@ -388,7 +387,7 @@ let handleChange = (entry) => {
   }
 
   let handleSave =async function(id,bool,reviewed,sameReviewed){
-     if(answer.length ===  0) {
+     if(false && answer.length ===  0) {
         if(!bool){
             let temp = grid;
             if(temp[current-1] ){
@@ -411,8 +410,8 @@ let handleChange = (entry) => {
         
             }
             if(current  >= 25){
-                setCurrent(typeof id === 'number' ? id: 24)
-                fetchQuestion(attempt,typeof id === 'number' ? id: 24);
+                setCurrent(typeof id === 'number' ? id: 25)
+                fetchQuestion(attempt,typeof id === 'number' ? id: 25);
             }
             else{
                 setCurrent(typeof id === 'number' ? id : current+1)
@@ -455,13 +454,13 @@ let handleChange = (entry) => {
                     }
 
                 }
-                temp[current-1].answer = temp;
+                temp[current-1].answer = answer.length === 0 ? false : temp;
                 setGrid(temp)
         
             }
             if(current  >= 25){
-                setCurrent(typeof id === 'number' ? id: 24)
-                fetchQuestion(attempt,typeof id === 'number' ? id: 24);
+                setCurrent(typeof id === 'number' ? id: 25)
+                fetchQuestion(attempt,typeof id === 'number' ? id: 25);
             }
             else{
                 setCurrent(typeof id === 'number' ? id : current+1)
@@ -494,7 +493,7 @@ let handleChange = (entry) => {
     })
 
   }
-
+  let called = 0;
   let Timer =  function(){
   let [time,setTime] = useState(initialTime);
 
@@ -503,7 +502,8 @@ let handleChange = (entry) => {
           setTimeout(function(){
               setTime(--time)
               setITime(time);
-              if(time % 5 === 0){
+              if(time % 5 === 0 && called === 0){
+                  called = 1
                   saveRemaining(time);
               }
           },1000)
