@@ -156,6 +156,13 @@ const Dashboard = () => {
 
     console.log('start quiz');
     localStorage.setItem('language',language);
+
+  }
+
+  let continueQuiz = function() {
+
+    console.log('start quiz');
+    localStorage.setItem('language',language);
     navigate('/quiz')
 
   }
@@ -219,6 +226,7 @@ const Dashboard = () => {
               
               </th>
               <th scope="col">Result</th>
+              <th scope="col">Language</th>
               <th style={{cursor:'pointer'}}  onClick={() => sort === 1 ? handleSort(-1) : handleSort(1) }scope="col">Attempt Date
               {
                 sort === -1 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 1 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
@@ -237,10 +245,11 @@ const Dashboard = () => {
               <td> {element.isCompleted ?  element.score +  "%" :  'N/A'} </td>
               <td>      
                    { element.isCompleted ?            <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
-             :  <button style={{leftMargin : 15 + 'px'}} onClick={() => startQuiz()} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Continue Attempt</button>
+             :  <button style={{leftMargin : 15 + 'px'}} onClick={() => continueQuiz()} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Continue Attempt</button>
                     }
               
               </td>
+              <td>{element.language}</td>
               <td>{element.created_at}</td>
             </tr>
               

@@ -120,20 +120,20 @@ const SignupDesktop = () => {
   const [searchedCountryList , setSearchedCountryList]= useState([]);
 
 
-  useEffect( () =>{
-    const start = 2 * 60  // minutes
-    const end = 5 * 60 // minutes
-    var now = new Date();
-    var currentTime = now.getHours() * 60 + now.getMinutes(); // Minutes since Midnight
+  // useEffect( () =>{
+  //   const start = 2 * 60  // minutes
+  //   const end = 5 * 60 // minutes
+  //   var now = new Date();
+  //   var currentTime = now.getHours() * 60 + now.getMinutes(); // Minutes since Midnight
     
-    if(currentTime < start || currentTime > end){
-      setCanRegister(1);
-     }
-     else{
-      setCanRegister(0);
-     }
+  //   if(currentTime < start || currentTime > end){
+  //     setCanRegister(1);
+  //    }
+  //    else{
+  //     setCanRegister(0);
+  //    }
      
-  },[])
+  // },[])
 
   useEffect(() => {
     if(!schoolCode) return;
