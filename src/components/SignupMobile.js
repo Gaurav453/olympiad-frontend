@@ -579,13 +579,17 @@ let instruction = [ '1. This test is based on MCQ pattern',
 
 '4. Questions : 25',
 
-'5. Marking Scheme : +4 for every right answer & -1 for every wrong answer',
+'5. Marking Scheme: ',
+
+'Q. No. 1-10: +3 for every right answer',
+'Q. No. 11-20: +4 for every right answer',
+'Q. No. 21-25: +6 for every right answer',
 
  "6. Passing percentage : 40%",
 
-  "7. After completion of test, you will be redirected to an additional bonus round - 'Spin the wheel' to improve your score",
-  "8. There will be no negative marking for the Bonus round",
-  "9.  Instant result and certificate after submission of test"]
+  "7. For every wrong answer 1/4th marks will be deducted",
+  "8. Partial marking will be given for each correct option marked",
+  "9. Instant result and certificate after submission of test"]
 
 
 
