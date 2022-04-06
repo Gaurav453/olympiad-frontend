@@ -572,19 +572,23 @@ const SignupMobile = () => {
   let englishInstruction = [ '1. This test is based on MCQ pattern',
 
   '2. There can be more than one correct option (even for a single fill in the blanks)',
-  
+
   
   '3. Time duration : 15 minutes',
   
   '4. Questions : 25',
   
-  '5. Marking Scheme : +4 for every right answer & -1 for every wrong answer',
+  '5. Marking Scheme: ',
+
+  'Q. No. 1-10: +3 for every right answer',
+  'Q. No. 11-20: +4 for every right answer',
+  'Q. No. 21-25: +6 for every right answer',
   
    "6. Passing percentage : 40%",
   
-    "7. After completion of test, you will be redirected to an additional bonus round - 'Spin the wheel' to improve your score",
-    "8. There will be no negative marking for the Bonus round",
-    "9.  Instant result and certificate after submission of test"]
+    "7. For every wrong answer 1/4th marks will be deducted",
+    "8. Partial marking will be given for each correct option marked",
+    "9. Instant result and certificate after submission of test"]
   
     let hindiInstuction = ["1. यह परीक्षा बाहुल्य चयन प्रश्नों (MCQ's) पर आधारित है।",
     `2.  दिए गए विकल्पों में से एक से अधिक विकल्प भी सही हो सकते हैं। ( यहाँ तक कि रिक्त स्थान की एकाकी  पूर्ति के लिए भी)`,
