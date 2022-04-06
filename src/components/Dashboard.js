@@ -340,7 +340,11 @@ const Dashboard = () => {
   
   '4. Questions : 25',
   
-  '5. Marking Scheme : +4 for every right answer & -1 for every wrong answer',
+  '5. Marking Scheme: ',
+
+  'Q. No. 1-10: +3 for every right answer',
+  'Q. No. 11-20: +4 for every right answer',
+  'Q. No. 21-25: +6 for every right answer',
   
    "6. Passing percentage : 40%",
   
