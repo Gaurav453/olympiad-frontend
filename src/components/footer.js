@@ -51,8 +51,8 @@ const Footer = () => {
           <div style={{marginLeft:"19px"}} >
                                 <span>          Follow us on
 </span>
-                                <img  alt="whatsapp" src={what} ></img>
-                                <img  alt="facebook" src={face} ></img>
+                                <a href='https://www.facebook.com/humanityolympiad' target='_blank'><img  alt="whatsapp" src={what} ></img></a>
+                                <a href='https://www.facebook.com/humanityolympiad' target='_blank'><img  alt="facebook" src={face} ></img></a>
 
 
                             </div>
