@@ -314,7 +314,7 @@ const SignupDesktop = () => {
 
 ///State.getStatesOfCountry(country)
 
-let instruction = [ '1. This test is based on MCQ pattern',
+let englishInstruction = [ '1. This test is based on MCQ pattern',
 
 '2. There can be more than one correct option (even for a single fill in the blanks)',
 
@@ -331,6 +331,22 @@ let instruction = [ '1. This test is based on MCQ pattern',
   "8. There will be no negative marking for the Bonus round",
   "9.  Instant result and certificate after submission of test"]
 
+  let hindiInstuction = [
+    
+    "1. यह परीक्षा बाहुल्य चयन प्रश्नों (MCQ's) पर आधारित है।",
+  `2.  दिए गए विकल्पों में से एक से अधिक विकल्प भी सही हो सकते हैं। ( यहाँ तक कि रिक्त स्थान की एकाकी  पूर्ति के लिए भी)`,
+  '3. समय सीमा - 15 मिनट है।',
+  '4. कुल प्रश्न - 25 हैं।',
+  `5. अंक आबंटन प्रक्रिया:- 
+प्रश्न  1 - 10 : +3 अंक प्रत्येक सही उत्तर के लिये
+प्रश्न  11 - 20 : +4 अंक प्रत्येक सही उत्तर के लिये
+प्रश्न  21 - 25 : +6 अंक प्रत्येक सही उत्तर के लिये`,
+  `6. पासिंग प्रतिशत - 40% है।`,
+`7. प्रत्येक गलत उत्तर के लिये 1/4th  अंक काटा जाएगा।`,
+`8. हर सही उत्तर के लिए Partial अंक भी दिए जायेंगे`,
+`9. इस परीक्षा को सबमिट करते ही, आपको तत्काल अपना परीक्षा परिणाम और प्रमाण पत्र प्राप्त हो जाएगा ।` ]
+
+let instruction = []
 
   function openModal() {
     setIsOpen(true);
@@ -946,13 +962,20 @@ let instruction = [ '1. This test is based on MCQ pattern',
         className="instructions-div"
         >
         <h5>Instructions</h5>
-        {
-            instruction.map((element,index) =>{
+        { 
+       
+           loginGuest.language === 'ENGLISH' ?  englishInstruction.map((element,index) =>{
                 return <div key={index} >
                     <p>
                         {element}
                     </p>
                 </div>
+            }) :  hindiInstuction.map((element,index) =>{
+              return <div key={index} >
+                  <p>
+                      {element}
+                  </p>
+              </div>
             })
         }
         <div class="btnn">
