@@ -881,7 +881,8 @@ th svg{
 
   }
 
-  .share a{
+  .share .atb {
+    a {
     background: #424394;
     padding : 15px 40px;
     color : white;
@@ -892,6 +893,7 @@ th svg{
 
 
   }
+}
   .btnn button{
     background: #424394;
     padding : 15px 40px;

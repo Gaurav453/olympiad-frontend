@@ -160,14 +160,14 @@ const Result = (props) => {
                         <div style={{marginBottom:"15px"}} className="col-xs-12 col-sm-12 col-md-6 col-lg-6 now d-flex justify-content-center" >
                             <div>
                                 <span>Share On:</span>
-                                <a href="https://www.facebook.com/humanityolympiad" target="_blank"><img  alt="whatsapp" src={what} ></img></a>
-                                <a href="https://www.facebook.com/humanityolympiad" target="_blank"><img  alt="facebook" src={face} ></img></a>
+                                <a className="share-link" href="https://www.facebook.com/humanityolympiad" target="_blank"><img  alt="whatsapp" src={what} ></img></a>
+                                <a className="share-link" href="https://www.facebook.com/humanityolympiad" target="_blank"><img  alt="facebook" src={face} ></img></a>
 
 
                             </div>
                            
                         </div>
-                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6 attempt d-flex justify-content-center" >
+                        <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6 attempt d-flex justify-content-center atb" >
                         <Link to={state.isGuest ? '/' : "/dashboard"}> Attempt Again </Link>
 
                         </div>
