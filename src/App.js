@@ -11,6 +11,8 @@ import Profile from "./components/Profile";
 import Dashboard from "./components/Dashboard";
 import Quiz from "./components/Quiz";
 import Result from "./components/Result";
+import UniversityRegistration from "./components/UniversityRegistration";
+
 import EditProfile from "./components/editProfile";
 
 
@@ -38,6 +40,8 @@ const App = () => {
             <Route exact path="/dashboard" element={<Dashboard />} />
             <Route exact path="/quiz" element={<Quiz />} />
             <Route exact path="/result" element={<Result />} />
+            <Route exact path="/universityRegistration" element={<UniversityRegistration />} />
+
 
 
 

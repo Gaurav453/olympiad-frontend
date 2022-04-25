@@ -1,8 +1,8 @@
 import authHeader from "./auth-header";
 import axios from "axios";
 
-// const API_URL = "http://localhost:8000/api/";
-const API_URL = "https://equanimityolympiad.in/api/";
+const API_URL = "http://localhost:8000/api/";
+// const API_URL = "https://equanimityolympiad.in/api/";
 
 
 const register = (data) => {
@@ -102,6 +102,11 @@ const resetPassword = (username,otp,password) => {
 };
 
 
+const university = (data) => {
+  return axios
+    .post(API_URL + "signup/v1/universityRegistration", data)
+};
+
 const logout = () => {
   localStorage.removeItem("user");
   localStorage.clear();
@@ -121,6 +126,7 @@ const authService = {
   school,
   userSchool,
   editSchool,
+  university
 };
 
 export default authService;

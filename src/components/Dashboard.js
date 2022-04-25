@@ -21,6 +21,14 @@ const override = `
   border-color: #f0962e;
   margin-top: 50%
 `;
+const overrideSecond = `
+  display: block;
+  margin: 0 auto;
+  border-color: #f0962e;
+  margin-top: 15%;
+  margin-bottom: 25%;
+
+`;
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -48,6 +56,8 @@ const Dashboard = () => {
   const [completed,setCompleted] = useState(false);
   const [language,setLangauge] = useState(false);
   let [loading , setLoading ] = useState(false);
+  let [secondLoader , setsecondLoader ] = useState(false);
+
   let [school , setSchool ] = useState(false);
   let [sort,setSort] = useState(-2)
   let [myperformance , setPerformance ] = useState({
@@ -99,7 +109,9 @@ const Dashboard = () => {
     .then((res)=>{
       console.log(res);
       setAttempts(res.data.attempts);
-      setCompleted(res.data.allCompleted)
+      setCompleted(res.data.allCompleted);
+      setLoading(false);
+
 
     })
     .catch(() =>{
@@ -176,7 +188,7 @@ const Dashboard = () => {
   const Layout = function (){
   
     return    loading ?
-    <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
+    <BounceLoader color="#f0962e" loading={true} css={overrideSecond} size={100} />
     : <div className="dashboard" >
       <div className="row">
         <div className="col">
@@ -213,53 +225,59 @@ const Dashboard = () => {
 
           <div className="table">
           <h5>Previous Attempts</h5>
-
-          <table >
-          <thead>
-            <tr>
-              <th scope="col">S.No</th>
-              <th style={{cursor:'pointer'}} onClick={() => sort === 2 ? handleSort(-2) : handleSort(2) } scope="col">Score
-              {
-                sort === -2 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 2 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
-              }
-              
-              
-              </th>
-              <th scope="col">Result</th>
-              <th scope="col">Language</th>
-              <th style={{cursor:'pointer'}}  onClick={() => sort === 1 ? handleSort(-1) : handleSort(1) }scope="col">Attempt Date
-              {
-                sort === -1 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 1 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
-              }
-              
-              
-              </th>
-            </tr>
-          </thead>
-          <tbody>
           {
-            attempts.map((element,index) => {
+            secondLoader ?
+            <BounceLoader color="#f0962e" loading={true} css={overrideSecond} size={100} />
 
-              return    <tr key={index}  >
-              <th scope="row">{index+1}</th>
-              <td> {element.isCompleted ?  element.score +  "%" :  'N/A'} </td>
-              <td>      
-                   { element.isCompleted ?            <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
-             :  <button style={{leftMargin : 15 + 'px'}} onClick={() => continueQuiz()} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Continue Attempt</button>
-                    }
-              
-              </td>
-              <td>{element.language}</td>
-              <td>{element.created_at}</td>
-            </tr>
-              
-
-            })
+            :     <table >
+            <thead>
+              <tr>
+                <th scope="col">S.No</th>
+                <th style={{cursor:'pointer'}} onClick={() => sort === 2 ? handleSort(-2) : handleSort(2) } scope="col">Score
+                {
+                  sort === -2 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 2 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
+                }
+                
+                
+                </th>
+                <th scope="col">Result</th>
+                <th scope="col">Language</th>
+                <th style={{cursor:'pointer'}}  onClick={() => sort === 1 ? handleSort(-1) : handleSort(1) }scope="col">Attempt Date
+                {
+                  sort === -1 ? <FontAwesomeIcon icon={faAngleUp}/> : sort === 1 ? <FontAwesomeIcon icon={faAngleDown}/>  : <></>
+                }
+                
+                
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+            {
+              attempts.map((element,index) => {
+  
+                return    <tr key={index}  >
+                <th scope="row">{index+1}</th>
+                <td> {element.isCompleted ?  element.score +  "%" :  'N/A'} </td>
+                <td>      
+                     { element.isCompleted ?            <button style={{leftMargin : 15 + 'px'}} onClick={() => handleResult(element)} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Check Result</button>
+               :  <button style={{leftMargin : 15 + 'px'}} onClick={() => continueQuiz()} className="bg-main text-white px-4 py-1 rounded-lg check-result" >Continue Attempt</button>
+                      }
+                
+                </td>
+                <td>{element.language}</td>
+                <td>{element.created_at}</td>
+              </tr>
+                
+  
+              })
+            }
+           
+      
+            </tbody>
+          </table>
           }
-         
-    
-          </tbody>
-        </table>
+
+     
           </div>
           </div>
          
@@ -306,6 +324,7 @@ const Dashboard = () => {
 
 
   useEffect(() => {
+    setLoading(true)
     getuserSchool();
     previousAttempts();
     getPerformance();

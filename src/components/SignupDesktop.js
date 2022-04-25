@@ -725,11 +725,8 @@ let instruction = []
        </div>
         <div  >
                 <button  onClick={() => { 
-                  isDetailsFilled() ? handleSubmit() : console.log("Er") }} className="form-button"  >Register</button> or 
-            <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
-              <span onClick={openLoginGuest} >Login as guest</span>
-
-            </div>
+                  isDetailsFilled() ? handleSubmit() : console.log("Er") }} className="form-button"  >Register</button>
+            
       </div>
     
           
@@ -993,3 +990,8 @@ let instruction = []
 };
 
 export default SignupDesktop;
+
+// <div style={{display : 'none',marginLeft : '10px'}} className="forgot">
+//               <span onClick={openLoginGuest} >Login as guest</span>
+
+//             </div>

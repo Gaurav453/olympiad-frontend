@@ -386,15 +386,21 @@ const SignupMobile = () => {
   },[firstName,lastName,phone,password])
 
   let handleSubmit  = function(){
+    setLoading(true);
+
     closeModal();
 
     if(!validateCaptchaValue) {
       if(captcha === ""){
         errorMessage("Please fill captcha first")
+        setLoading(false);
+
         return;
       }
       else{
         errorMessage("Wrong Captcha Entered!")
+        setLoading(false);
+
         return;
       }
      
@@ -402,6 +408,8 @@ const SignupMobile = () => {
 
     if(!firstName || !lastName || !phone || firstNameError || lastNameError || phoneError){  
       errorMessage("Please Fill all correct details")
+      setLoading(false);
+
       return;
 
     }
@@ -788,7 +796,7 @@ const SignupMobile = () => {
         
           <div> 
              <p>Password</p>
-             <input value={password} disabled={isOtpVerified} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
+             <input value={password}  type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
              <p className="error-message"  >{passwordError}</p> 
         
 
@@ -802,7 +810,9 @@ const SignupMobile = () => {
      </div>
      <div >
            <button  onClick={()=> {setuserFlag(0);}  } className="form-button"  >Create Account</button>
-     </div>
+    </div>
+
+     <h5 style={{color:'grey',textAlign: "center"}} >If attempting the Olympiad for the first time please create an account first.</h5>
 
         </div>
 
@@ -874,10 +884,10 @@ const SignupMobile = () => {
          </div>
    <div >
            <button onClick={handleSubmit} className="form-button"  >Register</button>
-           <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
+           {/* <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
                 <span onClick={openLoginGuest} >Login as guest</span>
 
-              </div>
+              </div> */}
      </div>
      
     

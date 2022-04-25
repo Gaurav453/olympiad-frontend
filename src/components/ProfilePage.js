@@ -216,6 +216,20 @@ const ProfilePage = () => {
 
   }
 
+  let successMessage =  (message) =>{
+    toast.success(message, {
+      position: "bottom-center",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      theme: "dark",
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+
+
+  }
 
 
   return (
@@ -382,7 +396,12 @@ const ProfilePage = () => {
               <p class="note" > Your user name is <span style={{fontWeight:"bold"}} >{user.username }</span></p>
               <p class="note" > Please note it down. You have to login with this username later.</p>
 
+              <div  class="btnn">
+
+              <button style={{padding : '5px 41px'}} onClick={() => {navigator.clipboard.writeText(user.username );successMessage("Username Copied to clipboard")}} > Copy to Clipboard!</button>
+</div>
             <div  class="btnn">
+
               <button onClick={closeModal} > Okay!</button>
             </div>
           </Modal>

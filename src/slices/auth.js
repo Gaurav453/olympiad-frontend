@@ -112,7 +112,36 @@ export const register = createAsyncThunk(
     }
   }
 );
-
+export const university = createAsyncThunk(
+  "auth/university",
+  async (data, thunkAPI) => {
+    console.log(data);
+    try {
+      const response = await AuthService.university(data);
+      thunkAPI.dispatch(setMessage(response.data.message));
+      return response.data;
+    } catch (error) {
+      toast.error(error.response.data.errMessage, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        theme: "dark",
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      thunkAPI.dispatch(setMessage(message));
+      return thunkAPI.rejectWithValue();
+    }
+  }
+);
 export const saveProfile = createAsyncThunk(
   "auth/saveProfile",
   async (data, thunkAPI) => {

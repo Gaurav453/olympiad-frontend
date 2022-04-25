@@ -265,7 +265,7 @@ useEffect(() => {
 
         </div>
         {
-            isHome ?    
+            isHome === true ?    
         <div className="col ">
             <div className="form" >
               <div>
@@ -291,7 +291,7 @@ useEffect(() => {
                     <button disabled={loading}  onClick={handleLogin} className="form-button"  >Login</button>
                 </div>
             </div>
-        </div> : 
+        </div> : isHome == false ?
 
         <div  className="col" style={{textAlign: 'end'}}>
           <div className="profileIcon" > 
@@ -303,7 +303,7 @@ useEffect(() => {
           </div>
         <button onClick={handleLogout} className="form-button"  >Logout</button>
             
-        </div>
+        </div> : <></>
 
         }
 
