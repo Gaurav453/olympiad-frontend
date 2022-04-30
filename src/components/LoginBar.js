@@ -291,7 +291,7 @@ useEffect(() => {
                     <button disabled={loading}  onClick={handleLogin} className="form-button"  >Login</button>
                 </div>
             </div>
-        </div> : isHome == false ?
+        </div> : isHome === "false" ?
 
         <div  className="col" style={{textAlign: 'end'}}>
           <div className="profileIcon" > 

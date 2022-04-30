@@ -180,9 +180,8 @@ const ProfilePage = () => {
       if(!data[key] && dataError[key] === "" ){
         errorMessage("Please enter all required information");
       }
-
-
-
+      return;
+      
     }
 
     setLoading(true);
@@ -192,6 +191,10 @@ const ProfilePage = () => {
     .unwrap()
     .then(() => {
       console.log('navigate to dashbaord')
+      successMessage("University Saved Successfully")
+      setData(formData);
+      window.location.reload(false);
+
       
     })
     .catch(() => {
@@ -255,7 +258,7 @@ const ProfilePage = () => {
         <div className="form" >
           <div>
              <p>Institute Name</p> 
-             <input onChange={(e) => formInputHandler("name", e.target.value)} placeholder="Please enter  Institute Name"className="form-input" ></input>
+             <input   onChange={(e) => formInputHandler("name", e.target.value)} placeholder="Please enter  Institute Name"className="form-input" ></input>
                <p className="error-message"  >{}</p> 
 
           </div>

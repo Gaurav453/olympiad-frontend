@@ -192,7 +192,7 @@ const Dashboard = () => {
     : <div className="dashboard" >
       <div className="row">
         <div className="col">
-          <LoginBar login={false} />
+          <LoginBar isHome={"false"} />
         </div>
       </div>
       <div className="row top">
