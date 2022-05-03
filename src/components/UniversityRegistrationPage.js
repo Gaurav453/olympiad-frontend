@@ -321,7 +321,7 @@ const ProfilePage = () => {
                  data.state ? 
                  <div className="dropdown">
                  <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                 {data.city ? data.city :"Select City"} 
+                 {data.city ? data.city :"Select District"} 
                  </button>
                  <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
    
@@ -441,7 +441,7 @@ const ProfilePage = () => {
           >
             
             <h5>Note</h5>
-              <p class="note" > Thank you registering your institute of 8th International Humanity Olympiad. Please check the institute’s email id for a mail confirming the same. You shall also receive the school’s unique code to be shared with the students in it.</p>
+              <p class="note" > Thank you for registering your esteemed Institution for the 8th International Humanity Olympiad. Please ensure that you have received the confirmation email from IHO with the unique Olympiad code.</p>
      
             <div  class="btnn">
 
