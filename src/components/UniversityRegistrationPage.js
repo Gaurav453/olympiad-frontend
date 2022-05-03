@@ -8,7 +8,21 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Country, State, City }  from 'country-state-city';
 import Modal from 'react-modal';
 
-
+import BounceLoader from "react-spinners/BounceLoader";
+const override = `
+position: relative;
+width: 100px;
+height: 100px;
+display: block;
+margin: 0 auto;
+border-color: #f0962e;
+/* margin-top: 15%; */
+/* margin-bottom: 27%; */
+margin-left: auto;
+margin-right: auto;
+margin: auto;
+margin-top: 15%;
+`;
 
 const ProfilePage = () => {
   
@@ -42,7 +56,6 @@ const ProfilePage = () => {
     "board" : "",
     "affiliation_number" : "",
     "strength" : "",
-    "code" : ""
 
   }
 
@@ -60,7 +73,6 @@ const ProfilePage = () => {
     "board" : "",
     "affiliation_number" : "",
     "strength" : "",
-    "code" : ""
 
   }
 
@@ -71,6 +83,8 @@ const ProfilePage = () => {
 
 
   const [loading , setLoading ] = useState(false);
+  const [isOpen , setIsOpen ] = useState(false);
+
 
   
   const [stateList,setStateList] = useState(State.getStatesOfCountry('IN'));
@@ -174,31 +188,37 @@ const ProfilePage = () => {
 
 
   let handleSubmit  = function(){
+    setLoading(true);
 
     for(let key in data){
 
       if(!data[key] && dataError[key] === "" ){
         errorMessage("Please enter all required information");
+        setLoading(false);
+
+        return;
+
       }
-      return;
       
     }
 
-    setLoading(true);
 
 
     dispatch(university(data))
     .unwrap()
     .then(() => {
-      console.log('navigate to dashbaord')
-      successMessage("University Saved Successfully")
       setData(formData);
-      window.location.reload(false);
+      setLoading(false);
+      setIsOpen(true);
 
       
     })
     .catch(() => {
-      'some error occured'
+      console.log('some error occured');
+      errorMessage('some error occurred');
+      setLoading(false);
+
+
     })
 
 
@@ -237,6 +257,12 @@ const ProfilePage = () => {
     console.log(data);
     
   }
+  let closeModal = () => {
+
+    setIsOpen(false);
+    window.location.reload(false);
+
+  }
 
 
   return (
@@ -247,164 +273,181 @@ const ProfilePage = () => {
 
         </div>
         <h5>
-        International Humanity Olympiad
+        8th International Humanity Olympiad
         </h5>
 
       </div>
-      <div className="box">
+      <div  style={{minHeight:'70vh'}} className="box">
         <div className="main-heading">
           <h1>Institute Registration Portal</h1>
+          <h6 style={{color:'gray'}} >The institution form registration is to be filled only by the institution in-charge or coordinator.
+           (Not for students)</h6>
         </div>
-        <div className="form" >
-          <div>
-             <p>Institute Name</p> 
-             <input   onChange={(e) => formInputHandler("name", e.target.value)} placeholder="Please enter  Institute Name"className="form-input" ></input>
-               <p className="error-message"  >{}</p> 
-
-          </div>
-
-          <div className="userLocation">
-          <div className="drop-downs">
-            <div style={{marginBottom: "10px"}} className="dropdown">
-              <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {data.state ? data.state :"Select State"} 
-              </button>
-              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <div class="dropdown-item" >
-                  <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
-
-                </div>
-               {
-                 searchedStateList.map(entry => {
-                   return <button onClick={() => { formInputHandler("state",entry.name);setCityList(City.getCitiesOfState('IN',entry.isoCode)) }} key={entry.isoCode} className={data.state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
-                     {entry.name}
-
-                     </button>
-
-                 })
-               }
-              </div>
-            </div>
-            {
-              data.state ? 
-              <div className="dropdown">
-              <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {data.city ? data.city :"Select City"} 
-              </button>
-              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-
-              <div class="dropdown-item" >
-                <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
-
-              </div>
-
-               {
-                 searchedCityList.map(entry => {
-                   return <button onClick={() => formInputHandler("city",entry.name)} key={entry.name} className={data.city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
-                     {entry.name}
-
-                     </button>
-
-                 })
-               }
-              </div>
-               
-            </div>  : <></>
-            }
-     
-       
-          </div>
-
-          </div>
-
-          <div>
-             <p>Institute Address</p> 
-             <input onChange={(e) => formInputHandler("address", e.target.value)} placeholder="Please enter  Institute Address"className="form-input" ></input>
-               <p className="error-message"  >{}</p> 
-
-          </div>
-
-          <div className="drop-downs">
-            <div className="dropdown">
-              <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {data.type ? data.type :"Category"} 
-              </button>
-              <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <button onClick={() => formInputHandler("type","School")} className={data.type  === "School" ? 'dropdown-item active' : 'dropdown-item'}>School</button>
-                <button onClick={() => formInputHandler("type","College")} className={data.type  === "College" ? 'dropdown-item active' : 'dropdown-item'}>College</button>
-                <button onClick={() => formInputHandler("type","Coaching Center")} className={data.type  === "Coaching Center" ? 'dropdown-item active' : 'dropdown-item'}>Coaching Center</button>
-              </div>
-            </div>
-            
-       
-          </div>
-         
-      
-     
-          <div>
-             <p>Principal  Name</p> 
-             <input onChange={(e) => formInputHandler("principle_name", e.target.value)} placeholder="Please enter Principal Name"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p>Institute Administration Phone No.</p> 
-             <input onChange={(e) => formInputHandler("phone_no", e.target.value)} placeholder="Phone Number"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p>Institute Email Id</p> 
-             <input onChange={(e) => formInputHandler("email", e.target.value)} placeholder="Email Id"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p>Institute Coordinator Name</p> 
-             <input onChange={(e) => formInputHandler("coordinator_name", e.target.value)} placeholder="Institute Coordinator Name"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p>Institute Coordinator Phone Number</p> 
-             <input onChange={(e) => formInputHandler("coordinator_phone_no", e.target.value)} placeholder="Institute Coordinator Phone Number"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p>Education Board</p> 
-             <input onChange={(e) => formInputHandler("board", e.target.value)} placeholder="Education Board"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p>Institute Affiliation Number</p> 
-             <input onChange={(e) => formInputHandler("affiliation_number", e.target.value)} placeholder="Affiliation Number"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p>Total strength(5th -12th Class/ College Student)</p> 
-             <input onChange={(e) => formInputHandler("strength", e.target.value)} placeholder="Total strength"className="form-input" ></input>
-
-          </div>
-
-          <div>
-             <p> Institute code( Volunteer will provide)</p> 
-             <input onChange={(e) => formInputHandler("code", e.target.value)} placeholder="Institute code"className="form-input" ></input>
-             <p className="error-message"  >{dataError.code}</p> 
-
-          </div>
-    
-        
+        { 
+           loading ?             
+           <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
+           : 
+           <div className="form" >
+             <div>
+                <p>Institute Name</p> 
+                <input   onChange={(e) => formInputHandler("name", e.target.value)} placeholder="Please enter  Institute Name"className="form-input" ></input>
+                  <p className="error-message"  >{}</p> 
    
-          <div >
-                  <button onClick={handleSubmit} className="form-button"  >Submit</button>
-            </div>
-
-        </div>
-
+             </div>
+   
+             <div className="userLocation">
+             <div className="drop-downs">
+               <div style={{marginBottom: "10px"}} className="dropdown">
+                 <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   {data.state ? data.state :"Select State"} 
+                 </button>
+                 <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                   <div class="dropdown-item" >
+                     <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
+   
+                   </div>
+                  {
+                    searchedStateList.map(entry => {
+                      return <button onClick={() => { formInputHandler("state",entry.name);setCityList(City.getCitiesOfState('IN',entry.isoCode)) }} key={entry.isoCode} className={data.state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                        {entry.name}
+   
+                        </button>
+   
+                    })
+                  }
+                 </div>
+               </div>
+               {
+                 data.state ? 
+                 <div className="dropdown">
+                 <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                 {data.city ? data.city :"Select City"} 
+                 </button>
+                 <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+   
+                 <div class="dropdown-item" >
+                   <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
+   
+                 </div>
+   
+                  {
+                    searchedCityList.map(entry => {
+                      return <button onClick={() => formInputHandler("city",entry.name)} key={entry.name} className={data.city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                        {entry.name}
+   
+                        </button>
+   
+                    })
+                  }
+                 </div>
+                  
+               </div>  : <></>
+               }
+        
+          
+             </div>
+   
+             </div>
+   
+             <div>
+                <p>Institute Address</p> 
+                <input onChange={(e) => formInputHandler("address", e.target.value)} placeholder="Please enter  Institute Address"className="form-input" ></input>
+                  <p className="error-message"  >{}</p> 
+   
+             </div>
+   
+             <div className="drop-downs">
+               <div className="dropdown">
+                 <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   {data.type ? data.type :"Category"} 
+                 </button>
+                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                   <button onClick={() => formInputHandler("type","School")} className={data.type  === "School" ? 'dropdown-item active' : 'dropdown-item'}>School</button>
+                   <button onClick={() => formInputHandler("type","College")} className={data.type  === "College" ? 'dropdown-item active' : 'dropdown-item'}>College</button>
+                   <button onClick={() => formInputHandler("type","Coaching Center")} className={data.type  === "Coaching Center" ? 'dropdown-item active' : 'dropdown-item'}>Coaching Center</button>
+                 </div>
+               </div>
+               
+          
+             </div>
+            
+         
+        
+             <div>
+                <p>Principal  Name</p> 
+                <input onChange={(e) => formInputHandler("principle_name", e.target.value)} placeholder="Please enter Principal Name"className="form-input" ></input>
+   
+             </div>
+   
+             <div>
+                <p>Institute Administration Phone No.</p> 
+                <input type="text" inputMode="tel" onChange={(e) => formInputHandler("phone_no", e.target.value)} placeholder="Phone Number"className="form-input" ></input>
+   
+             </div>
+   
+             <div>
+                <p>Institute Email Id</p> 
+                <input onChange={(e) => formInputHandler("email", e.target.value)} placeholder="Email Id"className="form-input" ></input>
+   
+             </div>
+   
+             <div>
+                <p>Institute Coordinator Name</p> 
+                <input onChange={(e) => formInputHandler("coordinator_name", e.target.value)} placeholder="Institute Coordinator Name"className="form-input" ></input>
+   
+             </div>
+   
+             <div>
+                <p>Institute Coordinator Phone Number</p> 
+                <input type="text" inputMode="tel" onChange={(e) => formInputHandler("coordinator_phone_no", e.target.value)} placeholder="Institute Coordinator Phone Number"className="form-input" ></input>
+   
+             </div>
+   
+             <div>
+                <p>Education Board</p> 
+                <input onChange={(e) => formInputHandler("board", e.target.value)} placeholder="Education Board"className="form-input" ></input>
+   
+             </div>
+   
+             <div>
+                <p>Institute Affiliation Number</p> 
+                <input onChange={(e) => formInputHandler("affiliation_number", e.target.value)} placeholder="Affiliation Number"className="form-input" ></input>
+   
+             </div>
+   
+             <div>
+                <p>Total strength(5th -12th Class/ College Student)</p> 
+                <input  type="text" inputMode="numeric" onChange={(e) => formInputHandler("strength", e.target.value)} placeholder="Total strength"className="form-input" ></input>
+   
+             </div>
+   
+             <div >
+                     <button onClick={handleSubmit} className="form-button"  >Submit</button>
+               </div>
+   
+           </div>
+   
+        }
+       
       </div>
+
+      <Modal
+            isOpen={isOpen}
+            onRequestClose={closeModal}
+            style={customStyles}
+            contentLabel="instructions"
+            shouldCloseOnOverlayClick={false}
+            className="instructions-div"
+          >
+            
+            <h5>Note</h5>
+              <p class="note" > Thank you registering your institute of 8th International Humanity Olympiad. Please check the institute’s email id for a mail confirming the same. You shall also receive the school’s unique code to be shared with the students in it.</p>
+     
+            <div  class="btnn">
+
+              <button onClick={closeModal} > Okay!</button>
+            </div>
+      </Modal>
 
  
 

@@ -404,7 +404,7 @@ const ProfilePage = () => {
 
               <button onClick={closeModal} > Okay!</button>
             </div>
-          </Modal>
+      </Modal>
 
     </div>
   );
