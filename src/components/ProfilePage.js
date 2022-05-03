@@ -298,6 +298,7 @@ const ProfilePage = () => {
 
                  })
                }
+               
               </div>
             </div>
             {
@@ -322,6 +323,8 @@ const ProfilePage = () => {
 
                  })
                }
+                <button onClick={() => setCity("city","Other")} key={"Other"} className={city === "Other" ? 'dropdown-item active' : 'dropdown-item' }>  Other </button>
+
               </div>
                
             </div>  : <></>
