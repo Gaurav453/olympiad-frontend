@@ -288,11 +288,30 @@ const ProfilePage = () => {
            <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
            : 
            <div className="form" >
+              <div className="drop-downs">
+               <div className="dropdown">
+                 <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                   {data.type ? data.type :"Category"} 
+                 </button>
+                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                   <button onClick={() => formInputHandler("type","School")} className={data.type  === "School" ? 'dropdown-item active' : 'dropdown-item'}>School</button>
+                   <button onClick={() => formInputHandler("type","College")} className={data.type  === "College" ? 'dropdown-item active' : 'dropdown-item'}>College</button>
+                   <button onClick={() => formInputHandler("type","Coaching Center")} className={data.type  === "Coaching Center" ? 'dropdown-item active' : 'dropdown-item'}>Coaching Center</button>
+                 </div>
+               </div>
+             </div>
+
              <div>
                 <p>Institute Name</p> 
                 <input   onChange={(e) => formInputHandler("name", e.target.value)} placeholder="Please enter  Institute Name"className="form-input" ></input>
                   <p className="error-message"  >{}</p> 
    
+             </div>
+
+             <div>
+                <p>Institute Address</p> 
+                <input onChange={(e) => formInputHandler("address", e.target.value)} placeholder="Please enter  Institute Address"className="form-input" ></input>
+                  <p className="error-message"  >{}</p> 
              </div>
    
              <div className="userLocation">
@@ -304,7 +323,6 @@ const ProfilePage = () => {
                  <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                    <div class="dropdown-item" >
                      <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
-   
                    </div>
                   {
                     searchedStateList.map(entry => {
@@ -350,47 +368,30 @@ const ProfilePage = () => {
              </div>
    
              </div>
-   
+
              <div>
-                <p>Institute Address</p> 
-                <input onChange={(e) => formInputHandler("address", e.target.value)} placeholder="Please enter  Institute Address"className="form-input" ></input>
-                  <p className="error-message"  >{}</p> 
-   
+                <p>Education Board</p> 
+                <input onChange={(e) => formInputHandler("board", e.target.value)} placeholder="Education Board"className="form-input" ></input>
              </div>
-   
-             <div className="drop-downs">
-               <div className="dropdown">
-                 <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   {data.type ? data.type :"Category"} 
-                 </button>
-                 <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                   <button onClick={() => formInputHandler("type","School")} className={data.type  === "School" ? 'dropdown-item active' : 'dropdown-item'}>School</button>
-                   <button onClick={() => formInputHandler("type","College")} className={data.type  === "College" ? 'dropdown-item active' : 'dropdown-item'}>College</button>
-                   <button onClick={() => formInputHandler("type","Coaching Center")} className={data.type  === "Coaching Center" ? 'dropdown-item active' : 'dropdown-item'}>Coaching Center</button>
-                 </div>
-               </div>
-               
-          
-             </div>
-            
-         
-        
-             <div>
-                <p>Principal  Name</p> 
-                <input onChange={(e) => formInputHandler("principle_name", e.target.value)} placeholder="Please enter Principal Name"className="form-input" ></input>
-   
-             </div>
-   
+
              <div>
                 <p>Institute Administration Phone No.</p> 
                 <input type="text" inputMode="tel" onChange={(e) => formInputHandler("phone_no", e.target.value)} placeholder="Phone Number"className="form-input" ></input>
-   
              </div>
-   
+
              <div>
                 <p>Institute Email Id</p> 
                 <input onChange={(e) => formInputHandler("email", e.target.value)} placeholder="Email Id"className="form-input" ></input>
-   
+             </div>
+
+             <div>
+                <p>Institute Affiliation Number</p> 
+                <input onChange={(e) => formInputHandler("affiliation_number", e.target.value)} placeholder="Affiliation Number"className="form-input" ></input>
+             </div>
+  
+             <div>
+                <p>Principal  Name</p> 
+                <input onChange={(e) => formInputHandler("principle_name", e.target.value)} placeholder="Please enter Principal Name"className="form-input" ></input>
              </div>
    
              <div>
@@ -402,18 +403,6 @@ const ProfilePage = () => {
              <div>
                 <p>Institute Coordinator Phone Number</p> 
                 <input type="text" inputMode="tel" onChange={(e) => formInputHandler("coordinator_phone_no", e.target.value)} placeholder="Institute Coordinator Phone Number"className="form-input" ></input>
-   
-             </div>
-   
-             <div>
-                <p>Education Board</p> 
-                <input onChange={(e) => formInputHandler("board", e.target.value)} placeholder="Education Board"className="form-input" ></input>
-   
-             </div>
-   
-             <div>
-                <p>Institute Affiliation Number</p> 
-                <input onChange={(e) => formInputHandler("affiliation_number", e.target.value)} placeholder="Affiliation Number"className="form-input" ></input>
    
              </div>
    
