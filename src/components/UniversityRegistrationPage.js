@@ -357,6 +357,8 @@ const ProfilePage = () => {
    
                     })
                   }
+                  <button onClick={() => formInputHandler("city","Other")} key={"Other"} className={data.city === "Other" ? 'dropdown-item active' : 'dropdown-item' }>  Other </button>
+
                  </div>
                   
                </div>  : <></>
