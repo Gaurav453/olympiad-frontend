@@ -151,6 +151,16 @@ const SignupDesktop = () => {
     })
   },[schoolCode])
   useEffect(() => {
+    if(loginGuest.email){
+      setLoginGuestErr(pre => {
+        return {
+          ...pre ,
+          email : pre.email.trim(),
+  
+        }
+      })
+    }
+   
     let emailRegex = /\S+@\S+\.\S+/;
     let nameRegex = /^[a-z ,.'-]+$/i;
 
@@ -514,7 +524,7 @@ let instruction = []
     }
     let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language ,father} = loginGuest;
     console.log(isSame);
-    if(!state || !city || !country || (isSchool &&!loginGuest.class) || !language  || !father){  
+    if(!state || !city || !country || (isSchool && (!loginGuest.class  || !father )) || !language ){  
       errorMessage("Please Fill all  details")
       return;
 
@@ -726,6 +736,10 @@ let instruction = []
         <div  >
                 <button  onClick={() => { 
                   isDetailsFilled() ? handleSubmit() : console.log("Er") }} className="form-button"  >Register</button>
+                  <div style={{display : 'none',marginLeft : '10px'}} className="forgot">
+              <span onClick={openLoginGuest} >Login as guest</span>
+
+            </div>
             
       </div>
     
@@ -812,11 +826,8 @@ let instruction = []
             <p className="error-message"  >{loginGuestErr.email}</p> 
 
           </div>
-          <div>
-             <p>Father's  Name</p> 
-             <input  value={loginGuest.father} onChange={(e) => handleGuestLoginChange("father",e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
-
-          </div>
+         
+          
           <div style={{margin:"20px 0"}} className="drop-downs">
           <div  style={{display:'flex',margin:"20px 0"}} >
             <div>
@@ -828,6 +839,13 @@ let instruction = []
           </div>
             {
               loginGuest.isSchool ? 
+                <div>
+                <div>
+                 <p>Father's  Name</p> 
+                 <input  value={loginGuest.father} onChange={(e) => handleGuestLoginChange("father",e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
+    
+              </div>
+    
               <div className="dropdown">
               <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 { loginGuest.class ? loginGuest.class  :  "Enter Class"}
@@ -841,6 +859,7 @@ let instruction = []
                 <button onClick={() => handleGuestLoginChange("class","11th")} className={loginGuest.class === "11th" ? 'dropdown-item active' : 'dropdown-item'}>11th</button>
                 <button onClick={() => handleGuestLoginChange("class","12th")} className={loginGuest.class === "12th" ? 'dropdown-item active' : 'dropdown-item'}>12th</button>
               </div>
+            </div>
             </div> : <></>
             }
        

@@ -148,6 +148,16 @@ const SignupMobile = () => {
     })
   },[schoolCode])
   useEffect(() => {
+
+    if(loginGuest.email){
+      setLoginGuestErr(pre => {
+        return {
+          ...pre ,
+          email : pre.email.trim(),
+  
+        }
+      })
+    }
     let emailRegex = /\S+@\S+\.\S+/;
     let nameRegex = /^[a-z ,.'-]+$/i;
 
@@ -637,7 +647,7 @@ const SignupMobile = () => {
     }
     let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language ,father} = loginGuest;
     console.log(isSame);
-    if(!state || !city || !country || (isSchool &&!loginGuest.class) || !language  || !father){  
+    if(!state || !city || !country || (isSchool && (!loginGuest.class  || !father )) || !language ){  
       errorMessage("Please Fill all  details")
       return;
 
@@ -1074,11 +1084,10 @@ className="instructions-div forget-modal"
             <p className="error-message"  >{loginGuestErr.email}</p> 
 
           </div>
-          <div>
-             <p>Father's  Name</p> 
-             <input  value={loginGuest.father} onChange={(e) => handleGuestLoginChange("father",e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
+          {
+         
 
-          </div>
+          }
           <div style={{margin:"20px 0"}} className="drop-downs">
           <div  style={{display:'flex',margin:"20px 0"}} >
             <div>
@@ -1090,6 +1099,12 @@ className="instructions-div forget-modal"
           </div>
             {
               loginGuest.isSchool ? 
+              <div>
+                 <div>
+             <p>Father's  Name</p> 
+             <input  value={loginGuest.father} onChange={(e) => handleGuestLoginChange("father",e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
+
+          </div>
               <div className="dropdown">
               <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 { loginGuest.class ? loginGuest.class  :  "Enter Class"}
@@ -1103,6 +1118,7 @@ className="instructions-div forget-modal"
                 <button onClick={() => handleGuestLoginChange("class","11th")} className={loginGuest.class === "11th" ? 'dropdown-item active' : 'dropdown-item'}>11th</button>
                 <button onClick={() => handleGuestLoginChange("class","12th")} className={loginGuest.class === "12th" ? 'dropdown-item active' : 'dropdown-item'}>12th</button>
               </div>
+            </div>
             </div> : <></>
             }
        

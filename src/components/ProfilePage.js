@@ -133,6 +133,7 @@ const ProfilePage = () => {
   }
 
   useEffect(() => {
+    setEmail(email.trim());
     let emailRegex = /\S+@\S+\.\S+/;
     if(email !== "" && !emailRegex.test(email)){
       serEmailError("Please enter a valid email");
@@ -176,7 +177,7 @@ const ProfilePage = () => {
 
 
   let handleSubmit  = function(){
-    if(!father || !state ||  !city || !whatsapp || !email || (category === 'School' && ( clas === ""))){
+    if( !state ||  !city || !whatsapp || !email || (category === 'School' && ( clas === "" || !father))){
       errorMessage("Please enter all required information");
 
       return;
@@ -273,11 +274,7 @@ const ProfilePage = () => {
             <p className="error-message"  >{whatsappError}</p> 
           </div> : <></>
           }
-          <div>
-             <p>Father's  Name</p> 
-             <input onChange={(e) => setFather(e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
-
-          </div>
+        
           <div className="userLocation">
           <div className="drop-downs">
             <div style={{marginBottom: "10px"}} className="dropdown">
@@ -365,6 +362,14 @@ const ProfilePage = () => {
             }
        
           </div>
+          {
+            category == 'School' ?   <div>
+            <p>Father's  Name</p> 
+            <input onChange={(e) => setFather(e.target.value)} placeholder="Please enter your Father's Name"className="form-input" ></input>
+
+         </div> : <></>
+            
+          }
           {
             category === 'School' ? 
             <div class="school_code" >

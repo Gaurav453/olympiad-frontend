@@ -328,8 +328,10 @@ let handleChange = (entry) => {
 }
   let Option = function(){
 
-    return option.map(element => {
+    return option.map((element,i) => {
         return <div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                <p style={{textAlign: "center"}} > <strong>{String.fromCharCode(65 + i)}</strong></p>
+                
                 <div key={element.index} onClick={() => selectOption(element)} className={optionClass(element)}>
            <div className="a-img">
                 <img alt="answer" src={element.url} ></img>
@@ -356,8 +358,9 @@ let handleChange = (entry) => {
             <div className="q-img" >
                 <img alt="question" src={question.qq.qurl} ></img>
             </div>
-            <div className="q-text" >
-            <div dangerouslySetInnerHTML={{__html: question.qq.q}} />
+            <div  className="q-text" >
+            <span><strong>{current} . </strong></span>
+            <div style={{display: "inline-block",maxWidth:'96%'}} dangerouslySetInnerHTML={{__html: question.qq.q}} />
             </div>
             </div>
            
