@@ -20,6 +20,8 @@ const ProfilePage = () => {
   const [ phone , setPhone ] = useState(user.phone_no);
 
   const [ isSame , setisSame ] = useState(false);
+  const [ isResident , setisResident ] = useState(true);
+
 
   const [ category , setCategory ] = useState("");
   const [modalIsOpen, setIsOpen] = useState(true);
@@ -56,13 +58,16 @@ const ProfilePage = () => {
   const [city,setCity] = useState('');
   const [father,setFather] = useState('');
 
+  const [countryList,setCountryList] =useState(Country.getAllCountries());
 
   const [stateList,setStateList] = useState(State.getStatesOfCountry(country));
   const [cityList,setCityList] = useState([]);
 
+  const [countryInput , setCountryInput] =  useState("");
   const [stateInput , setStateInput] =  useState("");
   const [cityInput , setCityInput] =  useState("");
-
+  
+  const [searchedCountryList , setSearchedCountryList]= useState(Country.getAllCountries());
   const [searchedStateList , setSearchedStateList]= useState(State.getStatesOfCountry(country));
   const [searchedCityList , setSearchedCityList]= useState([]);
 
@@ -77,6 +82,11 @@ const ProfilePage = () => {
     setSearchedCityList(cityList)
 
   },[cityList])
+
+  useEffect(() => {
+    setSearchedCountryList(countryList)
+
+  },[countryList])
 
   useEffect(() => {
     if(stateInput.length > 0){
@@ -109,6 +119,22 @@ const ProfilePage = () => {
 
     
   },[cityInput,cityList])
+
+  useEffect(() => {
+    if(countryInput.length  > 0 ){
+      let temp = countryList.filter(a => {
+        return a.name.substring(0,countryInput.length).toLowerCase() === countryInput.toLowerCase();
+  
+      })
+      setSearchedCountryList(temp);
+    }
+    else{
+      setSearchedCountryList(countryList);
+
+    }
+
+    
+  },[countryInput,countryList])
 
 
   
@@ -177,7 +203,7 @@ const ProfilePage = () => {
 
 
   let handleSubmit  = function(){
-    if( !state ||  !city || !whatsapp || !email || (category === 'School' && ( clas === "" || !father))){
+    if( !state ||  !city || !whatsapp || !email || (category === 'School' && ( clas === "" || !father)) || (!isResident && ( clas === "" || !father))){
       errorMessage("Please enter all required information");
 
       return;
@@ -266,7 +292,8 @@ const ProfilePage = () => {
             <div style={{marginLeft:20}}  >
               <span  >Check if WhatsApp  number is same as above</span>
             </div>
-          </div>{
+          </div>
+          {
             !isSame ? 
             <div>
             <p>WhatsApp Number</p>
@@ -274,64 +301,88 @@ const ProfilePage = () => {
             <p className="error-message"  >{whatsappError}</p> 
           </div> : <></>
           }
-        
-          <div className="userLocation">
-          <div className="drop-downs">
+              <div  style={{display:'flex'}} >
+
+          </div>
+             <div className="userLocation">
+            <div className="drop-downs">
             <div style={{marginBottom: "10px"}} className="dropdown">
-              <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {state ? state :"Select State"} 
+              <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {country ? Country.getCountryByCode(country).name :"Select Country"} 
               </button>
               <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <div class="dropdown-item" >
-                  <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
+              <div class="dropdown-item" >
+                <input placeholder="Search your Country" onChange={(e) => setCountryInput(e.target.value)}  value={countryInput} class="form-input" ></input>
 
-                </div>
+              </div>
                {
-                 searchedStateList.map(entry => {
-                   return <button onClick={() => { setState(entry.name);setCityList(City.getCitiesOfState(country,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                 searchedCountryList.map(entry => {
+                   return <button onClick={() => { setCountry(entry.isoCode);setStateList(State.getStatesOfCountry(entry.isoCode))}} key={entry.isoCode} className={country === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
                      {entry.name}
 
                      </button>
 
                  })
                }
-               
               </div>
             </div>
-            {
-              state ? 
-              <div className="dropdown">
-              <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {city ? city :"Select City"} 
-              </button>
-              <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div style={{marginBottom: "10px"}} className="dropdown">
+                <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {state ? state :"Select State"} 
+                </button>
+                <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <div class="dropdown-item" >
+                    <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
+  
+                  </div>
+                 {
+                   searchedStateList.map(entry => {
+                     return <button onClick={() => { setState(entry.name);setCityList(City.getCitiesOfState(country,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                       {entry.name}
+  
+                       </button>
+  
+                   })
+                 }
+                  <button onClick={() => setCity("city","Other")} key={"Other"} className={city === "Other" ? 'dropdown-item active' : 'dropdown-item' }>  Other </button>
 
-              <div class="dropdown-item" >
-                <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
-
+                 
+                </div>
               </div>
-
-               {
-                 searchedCityList.map(entry => {
-                   return <button onClick={() => setCity(entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
-                     {entry.name}
-
-                     </button>
-
-                 })
-               }
-                <button onClick={() => setCity("city","Other")} key={"Other"} className={city === "Other" ? 'dropdown-item active' : 'dropdown-item' }>  Other </button>
-
-              </div>
-               
-            </div>  : <></>
-            }
-     
+              {
+                state ? 
+                <div className="dropdown">
+                <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {city ? city :"Select City"} 
+                </button>
+                <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+  
+                <div class="dropdown-item" >
+                  <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
+  
+                </div>
+  
+                 {
+                   searchedCityList.map(entry => {
+                     return <button onClick={() => setCity(entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                       {entry.name}
+  
+                       </button>
+  
+                   })
+                 }
+                  <button onClick={() => setCity("city","Other")} key={"Other"} className={city === "Other" ? 'dropdown-item active' : 'dropdown-item' }>  Other </button>
+  
+                </div>
+                 
+              </div>  : <></>
+              }
        
-          </div>
-
-          </div>
-        
+         
+            </div>
+  
+            </div> 
+      
           <div className="drop-downs">
             <div className="dropdown">
               <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
