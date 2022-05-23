@@ -5,12 +5,13 @@ import { Navigate,Link ,useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit } from '@fortawesome/free-solid-svg-icons'
+import { faEdit ,faEye } from '@fortawesome/free-solid-svg-icons'
 import Modal from 'react-modal';
 import { Country, State, City }  from 'country-state-city';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import ClientCaptcha from "react-client-captcha";
 import {saveProfile ,school } from '../slices/auth'
+
 
 
 
@@ -118,6 +119,7 @@ const SignupDesktop = () => {
   const [searchedStateList , setSearchedStateList]= useState(State.getStatesOfCountry(country));
   const [searchedCityList , setSearchedCityList]= useState([]);
   const [searchedCountryList , setSearchedCountryList]= useState([]);
+  const [showPassword , setShowPassword ] = useState(false);
 
 
   // useEffect( () =>{
@@ -716,9 +718,11 @@ let instruction = []
         <div>
           {
            isOtpVerified ?  
-           <div>
+           <div className = "password-input">
             <p>Password</p>
-            <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
+            <input value={password} type={showPassword ? 'text' : 'password' } onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
+            <FontAwesomeIcon  onClick={() => setShowPassword(!showPassword)} className = "eye" icon={faEye} />
+            
             <p className="error-message"  >{passwordError}</p> 
 
            </div>

@@ -8,7 +8,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
 import Modal from 'react-modal';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes,faEye } from '@fortawesome/free-solid-svg-icons';
+
+
 
 
 
@@ -28,6 +30,8 @@ const LoginBar = ({isHome}) => {
   const [phone , setPhone] = useState("");
   const [otp , setOtp] = useState("");
   const [usernames , setUsernames] = useState([]);
+  const [showPassword , setShowPassword ] = useState(false);
+
 
   let user = useSelector(state => state.auth);
   user = user.user;
@@ -280,11 +284,13 @@ useEffect(() => {
          
                 </div>
           <div>
-            <div >
-                <span>Password</span>
-                <input   value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
+          <div className = "password-input">
+            <p>Password</p>
+            <input value={password} type={showPassword ? 'text' : 'password' } onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
+            <FontAwesomeIcon  onClick={() => setShowPassword(!showPassword)} className = "eye" icon={faEye} />
+            
 
-            </div>
+          </div>
         
           </div>
                 <div >

@@ -307,6 +307,7 @@ const ProfilePage = () => {
              <div className="userLocation">
             <div className="drop-downs">
             <div style={{marginBottom: "10px"}} className="dropdown">
+              <p>Country</p>
               <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {country ? Country.getCountryByCode(country).name :"Select Country"} 
               </button>
@@ -327,6 +328,8 @@ const ProfilePage = () => {
               </div>
             </div>
               <div style={{marginBottom: "10px"}} className="dropdown">
+              <p>State</p>
+
                 <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   {state ? state :"Select State"} 
                 </button>
@@ -352,6 +355,8 @@ const ProfilePage = () => {
               {
                 state ? 
                 <div className="dropdown">
+              <p>City</p>
+
                 <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {city ? city :"Select City"} 
                 </button>
@@ -385,8 +390,10 @@ const ProfilePage = () => {
       
           <div className="drop-downs">
             <div className="dropdown">
+            <p>Category</p>
+
               <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {category ? category :"Category"} 
+                {category ? category :"Select Category"} 
               </button>
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <button onClick={() => setCategory("School")} className={category === "School" ? 'dropdown-item active' : 'dropdown-item'}>School</button>
@@ -401,6 +408,7 @@ const ProfilePage = () => {
                 { clas ? clas  :  "Enter Class"}
               </button>
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <button onClick={() => setClas("5th")} className={clas === "5th" ? 'dropdown-item active' : 'dropdown-item'}>5th</button>
                 <button onClick={() => setClas("6th")} className={clas === "6th" ? 'dropdown-item active' : 'dropdown-item'}>6th</button>
                 <button onClick={() => setClas("7th")} className={clas === "7th" ? 'dropdown-item active' : 'dropdown-item'}>7th</button>
                 <button onClick={() => setClas("8th")} className={clas === "8th" ? 'dropdown-item active' : 'dropdown-item'}>8th</button>
@@ -422,10 +430,10 @@ const ProfilePage = () => {
             
           }
           {
-            category === 'School' ? 
+            category === 'School' || category === 'College' ? 
             <div class="school_code" >
-            <p>School Code</p>
-            <input  onChange={(e) => seschoolCode(e.target.value)} className="form-input" ></input>
+            <p>{category} Code</p>
+            <input placeholder = {"Please enter your " + category + " Code"} onChange={(e) => seschoolCode(e.target.value)} className="form-input" ></input>
             <span>{schoolName}</span>
           </div> : <></>
           }

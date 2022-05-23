@@ -1206,3 +1206,12 @@ a:hover {
 .mobile-logo img {
     max-width: 100px;
 }
+
+.password-input {
+    position : relative;
+    .eye{
+            right: 4%;
+            position: absolute;
+            bottom: 20%;
+    }
+}

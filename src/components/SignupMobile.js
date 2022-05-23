@@ -11,8 +11,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BounceLoader from "react-spinners/BounceLoader";
 import Modal from 'react-modal';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { loadCaptchaEnginge, LoadCanvasTemplate, validateCaptcha } from 'react-simple-captcha';
+import { faTimes,faEye} from '@fortawesome/free-solid-svg-icons';
 import ClientCaptcha from "react-client-captcha";
 import {saveProfile ,school } from '../slices/auth'
 
@@ -114,6 +113,8 @@ const SignupMobile = () => {
   const [searchedCountryList , setSearchedCountryList]= useState([]);
 
   const [captchaValue,setCaptchaValue] = useState("");
+  const [showPassword , setShowPassword ] = useState(false);
+
 
 
 
@@ -804,12 +805,11 @@ const SignupMobile = () => {
 
           </div>
         
-          <div> 
-             <p>Password</p>
-             <input value={password}  type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password" className="form-input" ></input>
-             <p className="error-message"  >{passwordError}</p> 
-        
-
+          <div className = "password-input">
+            <p>Password</p>
+            <input value={password} type={showPassword ? 'text' : 'password' } onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
+            <FontAwesomeIcon  onClick={() => setShowPassword(!showPassword)} className = "eye" icon={faEye} />
+            
 
           </div>
           <div >
@@ -871,13 +871,14 @@ const SignupMobile = () => {
    <div>
             {
              isOtpVerified ?  
-             <div>
-              {/* <span>Username : {userName}</span> */}
-              <p>Password</p>
-              <input value={password} type="password" onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
-              <p className="error-message"  >{passwordError}</p> 
-
-             </div>
+             <div className = "password-input">
+             <p>Password</p>
+             <input value={password} type={showPassword ? 'text' : 'password' } onChange={(e) => setpassword(e.target.value)} placeholder=" Enter Password"className="form-input" ></input>
+             <FontAwesomeIcon  onClick={() => setShowPassword(!showPassword)} className = "eye" icon={faEye} />
+             
+             <p className="error-message"  >{passwordError}</p> 
+ 
+           </div>
 
             : <></>
 
@@ -1136,6 +1137,7 @@ className="instructions-div forget-modal"
           <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Country state and city</p>
           <div className="drop-downs">
           <div style={{marginRight : "10px"}} className="dropdown">
+            <p>Country</p>
               <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {loginGuest.country ? loginGuest.country :"Select Country"} 
               </button>

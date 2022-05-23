@@ -290,8 +290,9 @@ const ProfilePage = () => {
            <div className="form" >
               <div className="drop-downs">
                <div className="dropdown">
+                  <p>Category</p>
                  <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                   {data.type ? data.type :"Category"} 
+                   {data.type ? data.type :"Select category"} 
                  </button>
                  <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                    <button onClick={() => formInputHandler("type","School")} className={data.type  === "School" ? 'dropdown-item active' : 'dropdown-item'}>School</button>
@@ -317,6 +318,7 @@ const ProfilePage = () => {
              <div className="userLocation">
              <div className="drop-downs">
                <div style={{marginBottom: "10px"}} className="dropdown">
+                 <p>State</p>
                  <button className="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                    {data.state ? data.state :"Select State"} 
                  </button>
@@ -338,6 +340,7 @@ const ProfilePage = () => {
                {
                  data.state ? 
                  <div className="dropdown">
+                 <p>City</p>
                  <button className="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                  {data.city ? data.city :"Select District"} 
                  </button>
