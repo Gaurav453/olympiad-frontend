@@ -871,8 +871,8 @@ let instruction = []
           {
             loginGuest.isSchool ? 
             <div class="school_code" >
-            <p>School Code</p>
-            <input placeholder="Enter Your School Code"  onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
+            <p>School Olympiad Code</p>
+            <input placeholder="Enter Your School Olympiad Code"  onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
             <span>{schoolName}</span>
           </div> : <></>
           }

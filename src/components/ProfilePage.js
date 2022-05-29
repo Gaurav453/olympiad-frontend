@@ -432,8 +432,8 @@ const ProfilePage = () => {
           {
             category === 'School' || category === 'College' ? 
             <div class="school_code" >
-            <p>{category} Code</p>
-            <input placeholder = {"Please enter your " + category + " Code"} onChange={(e) => seschoolCode(e.target.value)} className="form-input" ></input>
+            <p>{category} Olympiad Code</p>
+            <input placeholder = {"Please enter your " + category + " Olympiad Code"} onChange={(e) => seschoolCode(e.target.value)} className="form-input" ></input>
             <span>{schoolName}</span>
           </div> : <></>
           }
