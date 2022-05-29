@@ -155,8 +155,8 @@ const EditProfile = () => {
           </div>
           {
             isSchoolStudent ?  <div>
-            <p>School Code</p> 
-            <input disabled={canEdit ? false : 'disabled'} value={schoolCode}  placeholder="Enter Your school code" onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
+            <p>School Olympiad Code</p> 
+            <input disabled={canEdit ? false : 'disabled'} value={schoolCode}  placeholder="Enter Your School Olympiad Code" onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
             {
               schoolName ? <span style={{fontWeight: 'bold'}} >School Name is {schoolName}</span> : <></>
             }
