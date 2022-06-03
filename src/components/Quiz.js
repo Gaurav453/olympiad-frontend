@@ -9,6 +9,8 @@ import logo from '../assets/images/Logo009_min2.png';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+import { useTimer } from 'react-timer-hook';
+
 const customStyles = {
     content: {
       top: '50%',
@@ -73,6 +75,18 @@ const Quiz = () => {
   const [isSubmitted, setSubmitted] = React.useState(false);
   let [option , setOption] = useState([])
 
+  const {
+    seconds,
+    minutes,
+    hours,
+    days,
+    isRunning,
+    start,
+    pause,
+    resume,
+    restart,
+  } = useTimer({  expiryTimestamp : new Date(), onExpire: () => handleSubmit() });
+
 
 
   const [loading , setLoading ] = useState(false);
@@ -83,6 +97,17 @@ const Quiz = () => {
   function closeModal() {
     setIsOpen(false);
   }
+  
+  useEffect(() =>{
+      if(loading && isRunning){
+          pause();
+
+      }
+      else if(!isRunning){
+          start();
+      }
+
+  },[loading])
 
 
   let makeGrid = (attempt) => {
@@ -105,6 +130,7 @@ const Quiz = () => {
   setGrid(gridArr)
 
 }
+let interval;
 
 let initialize = () => {
     setMainLoader(true)
@@ -115,7 +141,9 @@ let initialize = () => {
           makeGrid(res);
           setAttempt(res.id)
           setCurrent(res.lastque_sno)
-          setITime(res.time_left);
+          const time = new Date();
+          time.setSeconds(time.getSeconds() + res.time_left);
+          restart(time);
         }
         else{
             
@@ -123,6 +151,26 @@ let initialize = () => {
         fetchQuestion(res.id,res.lastque_sno);
     })
 }
+
+useEffect(()=>{
+    let time = 0;
+    if(minutes > 0){
+        time += minutes*60;
+
+    }
+    time += seconds;
+    
+    if(time % 5 === 0){
+        console.log("save time" ,time)
+        saveRemaining(time);
+
+    }
+    else{
+        console.log(time);
+    }
+
+
+},[seconds,minutes])
 
 let fetchQuestion = (attempt,current) => {
  
@@ -256,7 +304,8 @@ let handleChange = (entry) => {
 
 
  var saveRemaining = function(time){
-    dispatch(saveRemainingTime({time_left : time-1, attempt_id : attempt})).unwrap()
+   
+    dispatch(saveRemainingTime({time_left : time, attempt_id : attempt})).unwrap()
     .then(res => {
         setTimeout(() => {
             called = 0
@@ -496,36 +545,38 @@ let handleChange = (entry) => {
     })
 
   }
+ 
   let called = 0;
   let Timer =  function(){
   let [time,setTime] = useState(initialTime);
 
-    useEffect(() => {
-        if(time > 0 && !isSubmitted){
-          setTimeout(function(){
-              setTime(--time)
-              setITime(time);
-              if(time % 5 === 0 && called === 0){
-                  called = 1
-                  saveRemaining(time);
-              }
-          },1000)
-        }
-        if(time === 1){
-          handleSubmit();
-        }
+    // useEffect(() => {
+    //     if(time > 0 && !isSubmitted){
+    //       setTimeout(function(){
+    //           setTime(--time)
+    //           setITime(time);
+    //           if(time % 5 === 0 && called === 0){
+    //               called = 1
+    //               saveRemaining(time);
+    //           }
+    //       },1000)
+    //     }
+    //     if(time === 1){
+    //       handleSubmit();
+    //     }
   
-    },[time])
-    let tempTime =  time;
-    let hours = Math.floor(tempTime / 3600);
-    tempTime %= 3600;
-    let minutes = Math.floor(tempTime / 60);
-    let seconds = tempTime % 60;
+    // },[time])
+    // let tempTime =  time;
+    // let hours = Math.floor(tempTime / 3600);
+    // tempTime %= 3600;
+    // let minutes = Math.floor(tempTime / 60);
+    // let seconds = tempTime % 60;
 
     let timeString = `${minutes}:${seconds}`
     return <div className="time-left w-40 text-center text-white px-2 py-2 bg-timer shadow-sm">
         <div className="text-center text-white " >Time Left</div>
-        {timeString}
+        <span>{minutes}</span>:<span>{seconds}</span>
+
     </div>
   }
 
