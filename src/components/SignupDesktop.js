@@ -418,12 +418,6 @@ let instruction = []
       serLastNameError("")
     }
 
-    if(phone && phone.length !== 10){
-      serPhoneError("Please enter a valid phone number")
-    }
-    else{
-      serPhoneError("")
-    }
 
     if(password && password.length < 6){
       setpasswordError("Please enter a valid password")
