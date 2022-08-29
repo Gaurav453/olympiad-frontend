@@ -44,9 +44,9 @@ const EditProfile = () => {
   useEffect(() => {
     if(!user) return;
     getuserSchool();
-    console.log(localStorage.getItem('user'));
+    // console.log(localStorage.getItem('user'));
     let category = JSON.parse(localStorage.getItem('user') || "")?.category;
-    console.log(category);
+    // console.log(category);
     if(category === 'School'){
       setIsSchool(true);                                                                                                    
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
@@ -88,7 +88,7 @@ const EditProfile = () => {
       else{
         setSchoolName("")
       }
-      console.log(canSave);
+      // console.log(canSave);
     })
   },[schoolCode])
   if(!user){

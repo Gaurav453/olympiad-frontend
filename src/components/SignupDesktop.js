@@ -42,12 +42,13 @@ const SignupDesktop = () => {
     "email" : "",
     "state" : "",
     "city" : "",
-    "country" : "",
+    "country" : "India",
     "userip": "",
     "language" : "",
     "isSchool" : false,
     "class" : "",
     "school" : "",
+    "school_code" : "",
     "father" : ""
   
 
@@ -108,7 +109,7 @@ const SignupDesktop = () => {
   const [city,setCity] = useState('');
 
   const [countryList,setCountryList] = useState(Country.getAllCountries());
-  const [stateList,setStateList] = useState([]);
+  const [stateList,setStateList] = useState(State.getStatesOfCountry("IN"));
   const [cityList,setCityList] = useState([]);
 
   const [stateInput , setStateInput] =  useState("");
@@ -155,11 +156,13 @@ const SignupDesktop = () => {
   useEffect(() => {
     if(loginGuest.email){
       setLoginGuestErr(pre => {
-        return {
-          ...pre ,
-          email : pre.email.trim(),
-  
-        }
+        if(pre.email)
+          return {
+            ...pre ,
+            email : pre.email.trim(),
+    
+          }
+        else return pre;
       })
     }
    
@@ -222,23 +225,6 @@ const SignupDesktop = () => {
       })
     }
 
-    if(loginGuest.phone &&loginGuest.phone.length !== 10){
-      setLoginGuestErr(pre => {
-        return {
-          ...pre,
-          phone : "Please Enter a valid phone"
-        }
-      })
-
-    }
-    else{
-      setLoginGuestErr(pre => {
-        return {
-          ...pre,
-          phone : false
-        }
-      })
-    }
 
     if(loginGuest.whats_no && loginGuest.whats_no.length !== 10){
       setLoginGuestErr(pre => {
@@ -257,7 +243,7 @@ const SignupDesktop = () => {
         }
       })
     }
-    console.log(loginGuestErr)
+    // console.log(loginGuestErr)
 
 
 
@@ -284,7 +270,7 @@ const SignupDesktop = () => {
         return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
   
       })
-      console.log(temp)
+      // console.log(temp)
       setSearchedStateList(temp);
     }
     else{
@@ -362,7 +348,21 @@ let englishInstruction = [ '1. This test is based on MCQ pattern',
 `8. हर सही उत्तर के लिए Partial अंक भी दिए जायेंगे`,
 `9. इस परीक्षा को सबमिट करते ही, आपको तत्काल अपना परीक्षा परिणाम और प्रमाण पत्र प्राप्त हो जाएगा ।` ]
 
-let instruction = []
+let punjabiInstruction = [
+
+  "1. ਇਹ ਟੈਸਟ ਬਹੁ-ਚੋਣ ਪ੍ਰਸ਼ਨ ਪੈਟਰਨ ਤੇ ਅਧਾਰਿਤ ਹੈ",
+  "2. ਇਕ ਤੋਂ ਵੱਧ ਸਹੀ ਉੱਤਰ ਹੋ ਸਕਦੇ ਹਨ I",
+  "3. ਸਮਾਂ ਮਿਆਦ: 15 ਮਿੰਟ",
+  "4. ਪ੍ਰਸ਼ਨ: 25",
+  "5. ਮਾਰਕਿੰਗ ਸਕੀਮ:",
+  "ਪ੍ਰਸ਼ਨ 1-10 : +3 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ", 
+  "ਪ੍ਰਸ਼ਨ 11-20 : +4 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+  "ਪ੍ਰਸ਼ਨ 21-25 : +6 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+  "6. ਪਾਸਿੰਗ ਪ੍ਰਤੀਸ਼ਤ - 40% ਹੈ I",
+  "7. ਹਰ ਇਕ ਗਲਤ ਉਤਰ ਲਈ 1/4th ਅੰਕ ਕਟਿਆ ਜਾਏਗਾ I",
+  "8. ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ partial ਅੰਕ ਵੀ ਦਿੱਤੇ ਜਾਣਗੇ I",
+  "9. ਇਸ ਪ੍ਰੀਖਿਆ ਨੂੰ ਸੁਬਮਿਟ ਕਰਦੇ ਹੀ ਤੁਹਾਨੂੰ ਉਸੀ ਸਮੇਂ ਪ੍ਰੀਖਿਆ ਦਾ ਨਤੀਜਾ ਅਤੇ ਪ੍ਰਮਾਣ ਪੱਤਰ ਮਿਲ ਜਾਏਗਾ I",
+]
 
   function openModal() {
     setIsOpen(true);
@@ -398,7 +398,7 @@ let instruction = []
       {
         if(captcha === captchaValue){
           setValidateCaptcha(true);
-          console.log('matched');
+          // console.log('matched');
         }
       }
   },[captcha,captchaValue])
@@ -461,7 +461,7 @@ let instruction = []
   }
 
   let isDetailsFilled = function(){
-    if(!validateCaptchaValue) {
+    if(false && !validateCaptchaValue) {
       if(captcha === ""){
         errorMessage("Please fill captcha first")
         return;
@@ -485,7 +485,7 @@ let instruction = []
     }
     else if (isOtpGenrated && !isOtpVerified){
       errorMessage("Please Verify otp")
-      console.log('Please verify otp')
+      // console.log('Please verify otp')
       return;
 
     }
@@ -502,12 +502,13 @@ let instruction = []
 
   }
   let openLoginGuest = () => {
+    window.scrollTo(0, 0);
     setCaptcha(""); 
     setValidateCaptcha(false);
     setIsLoginGuest(true);
   }
   let handleLoginGuest = function(){
-    if(!validateCaptchaValue) {
+    if(false && !validateCaptchaValue) {
       if(captcha === ""){
         errorMessage("Please fill captcha first")
         return;
@@ -519,7 +520,7 @@ let instruction = []
      
     }
     let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language ,father} = loginGuest;
-    console.log(isSame);
+    // console.log(isSame);
     if(!state || !city || !country || (isSchool && (!loginGuest.class  || !father )) || !language ){  
       errorMessage("Please Fill all  details")
       return;
@@ -554,7 +555,7 @@ let instruction = []
         setuserName(res.data.username)
         setLoading(false);
         setIsOpen(true);
-          console.log('success')
+          // console.log('success')
       })
       .catch(() =>{
         setLoading(false);
@@ -583,7 +584,7 @@ let instruction = []
       .unwrap()
       .then((res) =>{
 
-        console.log('otp  verified',res);
+        // console.log('otp  verified',res);
         let {data} = res;
         setIsOtpGenrated(false);
         setverifyOtpToken(data.token);
@@ -638,9 +639,11 @@ let instruction = []
       data.school_code = schoolCode;
 
     }
+    setLoading(true);
     dispatch(lg(data))
     .unwrap()
     .then((res => {
+      setLoading(false);
       localStorage.setItem('language',loginGuest.language);
       setModalIsOpenIns(false);
       navigate('/quiz',{ replace: true })
@@ -653,7 +656,7 @@ let instruction = []
     })
    
   }
-  console.log(canRegister)
+  // console.log(canRegister)
   return ( 
     loading ?
     <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
@@ -731,15 +734,17 @@ let instruction = []
             <ClientCaptcha captchaCode={code => setCaptchaValue(code)} />
             <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
        </div>
-        <div  >
-                <button  onClick={() => { 
+        <div   >
+                <button style={{width:'100%'}}  onClick={() => { 
                   isDetailsFilled() ? handleSubmit() : console.log("Er") }} className="form-button"  >Register</button>
-                  <div style={{display : 'none',marginLeft : '10px'}} className="forgot">
-              <span onClick={openLoginGuest} >Login as guest</span>
+                  <p style={{margin: "15px 0",textAlign: "center"}}>or</p>
 
-            </div>
             
       </div>
+      <div>
+                  <button style={{width:'100%'}}  onClick={openLoginGuest} className="form-button"  >Login Without Registration</button>
+
+        </div>
     
           
 
@@ -780,7 +785,7 @@ let instruction = []
 
 <FontAwesomeIcon icon={faTimes} />
 </div>
-          <h5>Login As Guest</h5>
+          <h5>Login Without Registration</h5>
           <div className="box">
         <div className="form" >
           <div>
@@ -796,23 +801,27 @@ let instruction = []
 
           </div>
           <div>
-              <p>Phone Number</p>
+              <p>Phone Number (Optional)</p>
              <input  value={loginGuest.phone}  onChange={(e) => handleGuestLoginChange("phone",e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" ></input>
              <p className="error-message"  >{loginGuestErr.phone}</p> 
 
           </div>
-          <div  style={{display:'flex',margin:"10px 0"}} >
-            <div>
-              <input onClick={() => setisSame(!isSame)} type="checkbox" />
-            </div>
-            <div style={{marginLeft:20}}  >
+          {
+              loginGuest.phone ? 
+              <div  style={{display:'flex',margin:"10px 0"}} >
+              <div>
+                <input onClick={() => setisSame(!isSame)} type="checkbox" />
+              </div><div style={{marginLeft:20}}  >
               <span  >Check if WhatsApp  number is same as above</span>
             </div>
           </div>
+             : <>
+              </>
+            }
           {
-            !isSame ? 
+            !isSame && loginGuest.phone ? 
             <div>
-            <p>WhatsApp Number</p>
+            <p>WhatsApp Number (Optional)</p>
             <input value={loginGuest.whats_no}   onChange={(e) => handleGuestLoginChange("whats_no",e.target.value)}  placeholder="Please enter your WhatsApp Phone Number"className="form-input" ></input>
             <p className="error-message"  >{loginGuestErr.whats_no}</p> 
 
@@ -849,6 +858,7 @@ let instruction = []
                 { loginGuest.class ? loginGuest.class  :  "Enter Class"}
               </button>
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <button onClick={() => handleGuestLoginChange("class","5th")} className={loginGuest.class === "5th" ? 'dropdown-item active' : 'dropdown-item'}>5th</button>
                 <button onClick={() => handleGuestLoginChange("class","6th")} className={loginGuest.class === "6th" ? 'dropdown-item active' : 'dropdown-item'}>6th</button>
                 <button onClick={() => handleGuestLoginChange("class","7th")} className={loginGuest.class === "7th" ? 'dropdown-item active' : 'dropdown-item'}>7th</button>
                 <button onClick={() => handleGuestLoginChange("class","8th")} className={loginGuest.class === "8th" ? 'dropdown-item active' : 'dropdown-item'}>8th</button>
@@ -956,6 +966,8 @@ let instruction = []
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <button onClick={() => handleGuestLoginChange("language","ENGLISH")} className={loginGuest.language === "ENGLISH" ? 'dropdown-item active' : 'dropdown-item'}>English</button>
                 <button onClick={() =>  handleGuestLoginChange("language","HINDI")} className={loginGuest.language === "HINDI" ? 'dropdown-item active' : 'dropdown-item'}>Hindi</button>
+                <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button>
+
                 {/* <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button> */}
               </div>
             </div>
@@ -967,7 +979,7 @@ let instruction = []
             <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
         </div>
           <div  class="btnn">
-            <button onClick={handleLoginGuest} > Register</button>
+            <button onClick={handleLoginGuest} > Start Quiz</button>
           </div>
           </Modal>
 
@@ -988,7 +1000,13 @@ let instruction = []
                         {element}
                     </p>
                 </div>
-            }) :  hindiInstuction.map((element,index) =>{
+            }) : loginGuest.language === 'PUNJABI' ? punjabiInstruction.map((element,index) =>{
+              return <div key={index} >
+                  <p>
+                      {element}
+                  </p>
+              </div>
+          }) :   hindiInstuction.map((element,index) =>{
               return <div key={index} >
                   <p>
                       {element}

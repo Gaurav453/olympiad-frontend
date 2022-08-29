@@ -299,7 +299,7 @@ body {
         }
     }
     .form>div {
-        margin-bottom: 20px
+        margin-bottom: 10px
     }
 }
 
@@ -330,11 +330,15 @@ body {
         display: inline-block;
     }
 }
+.captcha{
+    display:  none !important;
+}
 
 .signup-mobile {
     padding-top: 12%;
     border-radius: 0px;
     box-shadow: none;
+    padding-bottom: 0;
     .mobile-logo {
         text-align: center;
     }

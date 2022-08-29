@@ -35,9 +35,6 @@ const LoginBar = ({isHome}) => {
   
 
 
-useEffect(() => {
-  console.log(user);
-})
 
 
 
@@ -132,11 +129,11 @@ useEffect(() => {
       .unwrap()
 
       .then(res => {
-        console.log(res);
+        // console.log(res);
         let usernames =  [];
 
         for(let user of res.data){
-          console.log(user)
+          // console.log(user)
           usernames.push( user.username)
         }
         if(usernames.length === 0){
@@ -154,7 +151,7 @@ useEffect(() => {
         
       })
       .catch(err => {
-        console.log(err);
+        // console.log(err);
       })
 
     }
@@ -167,13 +164,13 @@ useEffect(() => {
       dispatch(getUserName({phone,otp}))
       .unwrap()
       .then(res => {
-        console.log(res);
+        // console.log(res);
       
-        console.log(res);
+        // console.log(res);
         let usernames =  [];
 
         for(let user of res.data){
-          console.log(user)
+          // console.log(user)
           usernames.push( user.username)
         }
 
@@ -196,7 +193,7 @@ useEffect(() => {
       dispatch(forgetP({userName}))
       .unwrap()
       .then(res => {
-        console.log(res);
+        // console.log(res);
         setOtpSent(true);
       })
       .catch(err => {
@@ -231,7 +228,7 @@ useEffect(() => {
       dispatch(resetPassword({userName,otp,password}))
       .unwrap()
       .then(res => {
-        console.log(res);
+        // console.log(res);
         setOtpSent(false);
         setFotgetPassword(false);
         setOtpVerified(false);

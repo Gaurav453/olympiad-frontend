@@ -38,6 +38,7 @@ const customStyles = {
   margin: auto;
   margin-top: 15%;
 `;
+let initialized = false
 
 const Quiz = () => {
     const testDivRef = useRef(null);
@@ -64,8 +65,7 @@ const Quiz = () => {
   user = user?.user;
   const dispatch = useDispatch();
   const navigae = useNavigate()
-
-  const [attempt,setAttempt] =  useState(0);
+  const [attempt,setAttempt] =  useState("");
   const [grid,setGrid] =  useState([]);
   const [current , setCurrent ] = useState(1);
   const [question , setQuestion ] = useState(false);
@@ -103,7 +103,8 @@ const Quiz = () => {
           pause();
 
       }
-      else if(!isRunning){
+      else if(!isRunning && initialized){
+          console.log('timer stated');
           start();
       }
 
@@ -138,11 +139,12 @@ let initialize = () => {
     .unwrap()
     .then(res => {
         if(res){
+          initialized =  true;
           makeGrid(res);
-          setAttempt(res.id)
+          setAttempt(res.id);
           setCurrent(res.lastque_sno)
           const time = new Date();
-          time.setSeconds(time.getSeconds() + res.time_left);
+          time.setSeconds(time.getSeconds() + parseInt(res.time_left));
           restart(time);
         }
         else{
@@ -160,24 +162,20 @@ useEffect(()=>{
     }
     time += seconds;
     
-    if(time % 5 === 0){
-        console.log("save time" ,time)
-        saveRemaining(time);
-
+    if(time % 10 === 0){
+        if(initialized)
+            saveRemaining(time);
     }
     else{
-        console.log(time);
     }
 
 
 },[seconds,minutes])
 
-let fetchQuestion = (attempt,current) => {
- 
+let fetchQuestion = (attempt_id,current) => {
     if(!localStorage.getItem('language')) return;
-    console.log(attempt)
     let data = {
-        attempt_id : attempt,
+        attempt_id : attempt_id,
         language : localStorage.getItem('language'),
         question_sno : current || 1
     }
@@ -187,41 +185,46 @@ let fetchQuestion = (attempt,current) => {
   .unwrap()
   .then(res => {
       let que = JSON.parse(res.data.question)
-      if(!attempt){
-          initialize();
+      setAttempt(res.data.attempt_id)
+      if(!attempt_id){
+        makeGrid(res);
+        setCurrent(1)
+        const time = new Date();
+        console.log("time 900")
+        initialized = true
+        time.setSeconds(time.getSeconds() + 900);
+        restart(time);
       }
-      let temp = grid;
-      if(temp[current-1] ){
-       
-          console.log(temp)
-          console.log(que)
-          temp[current-1].question = que.qq.qid
-          console.log(temp[current-1])
-          setGrid(temp)
+      
+ 
+        let temp = grid;
+        if(temp[current-1] ){
+        
+            // console.log(temp)
+            // console.log(que)
+            temp[current-1].question = que.qq.qid
+            // console.log(temp[current-1])
+            setGrid(temp)
 
-      }
-     
+        }
+        setQuestion(que);
+        if(res.data.selected_answer){
+            setAnswer(res.data.selected_answer.split(","));
 
-      setQuestion(que);
-      if(res.data.selected_answer){
-          setAnswer(res.data.selected_answer.split(","));
-
-      }
-      else
-          setAnswer([]);
-  
-      setMainLoader(false);
-      try{
-          testDivRef.current.scrollIntoView(); 
-  
-          }
-          catch(e){
-              
-      }
-      setOptions(que);
-      setMainLoader(false);
-
-     
+        }
+        else
+            setAnswer([]);
+    
+        setMainLoader(false);
+        try{
+            testDivRef.current.scrollIntoView(); 
+    
+            }
+            catch(e){
+                
+        }
+        setOptions(que);
+        setMainLoader(false);
 
   })
   .catch(err =>{ 
@@ -271,7 +274,7 @@ let gridElementClass = function(element){
 
 }
 let handleChange = (entry) => {
-        handleSave(entry.id,false,false,true);
+        handleSave(entry.id,false,false,true,attempt);
     
       try{
       testDivRef.current.scrollIntoView(); 
@@ -303,14 +306,15 @@ let handleChange = (entry) => {
       navigae('/dashboard')
 
 
- var saveRemaining = function(time){
-   
+ var saveRemaining = (time) => {
+    if(!initialized ) return
+    if(!attempt) return;
     dispatch(saveRemainingTime({time_left : time, attempt_id : attempt})).unwrap()
     .then(res => {
         setTimeout(() => {
             called = 0
 
-        },5000)
+        },30000)
     })
  }
 
@@ -351,7 +355,7 @@ let handleChange = (entry) => {
     else{
         temp.push(value);
     }
-    console.log(temp);
+    // console.log(temp);
     setAnswer([...temp])
   }
 
@@ -425,7 +429,7 @@ let handleChange = (entry) => {
   }
 
   let handleReview = function(){
-    handleSave(undefined,false,true);
+    handleSave(undefined,false,true,attempt);
  
     
 
@@ -438,8 +442,10 @@ let handleChange = (entry) => {
 
   }
 
-  let handleSave =async function(id,bool,reviewed,sameReviewed){
-     if(false && answer.length ===  0) {
+  let handleSave = async (id,bool,reviewed,sameReviewed) => {
+    if(!initialized ) return
+
+     if(answer.length ===  0) {
         if(!bool){
             let temp = grid;
             if(temp[current-1] ){
@@ -530,6 +536,8 @@ let handleChange = (entry) => {
   }
 
   let handleSubmit = async function(){
+    if(!initialized ) return
+    if(!attempt) return;
     setSubmitted(true)
     await handleSave(current,true);
     setMainLoader(true);
@@ -588,7 +596,7 @@ let handleChange = (entry) => {
             <div className="saveBut col-lg-3 col-md-3 col-sm-3  col-6" >
             <div class="bottom" >
             
-                <button onClick={() =>handleSave(undefined,undefined,false)} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
+                <button onClick={() =>handleSave(undefined,undefined,false,attempt)} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
                     Save & Next
                 </button>
             </div>

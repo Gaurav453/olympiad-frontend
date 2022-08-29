@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { setMessage } from "./message";
 
 import QuizService from "../services/quiz.service";
+import AuthService from "../services/auth.service";
+
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -21,6 +23,7 @@ export const getPreviousAttempts = createAsyncThunk(
       thunkAPI.dispatch(setMessage(response.data.message));
       return response.data;
     } catch (error) {
+     
       toast.error(error.response.data.errMessage, {
         position: "bottom-center",
         autoClose: 2000,
@@ -38,8 +41,14 @@ export const getPreviousAttempts = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+
+        
+     
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();    }
   }
 );
 export const currentAttempt = createAsyncThunk(
@@ -68,8 +77,9 @@ export const currentAttempt = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();    }
   }
 );
 export const activeAttempts = createAsyncThunk(
@@ -98,8 +108,9 @@ export const activeAttempts = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();    }
   }
 );
 
@@ -128,7 +139,9 @@ export const getQuestion = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();   
     }
   }
 );
@@ -158,8 +171,9 @@ export const saveAnswer = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();    }
   }
 );
 export const submitQuiz = createAsyncThunk(
@@ -187,8 +201,9 @@ export const submitQuiz = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();    }
   }
 );
 
@@ -207,8 +222,9 @@ export const saveRemainingTime = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();    }
   }
 );
 
@@ -236,9 +252,12 @@ export const performance = createAsyncThunk(
           error.response.data.message) ||
         error.message ||
         error.toString();
+      console.log(error.response.data.errCode);
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+
+      return thunkAPI.rejectWithValue();    }
   }
 );
 
@@ -267,8 +286,9 @@ export const customMessage = createAsyncThunk(
         error.message ||
         error.toString();
       thunkAPI.dispatch(setMessage(message));
-      return thunkAPI.rejectWithValue();
-    }
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();    }
   }
 );
 

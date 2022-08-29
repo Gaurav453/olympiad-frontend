@@ -74,7 +74,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     setSearchedStateList(stateList)
-    console.log(searchedStateList);
+    // console.log(searchedStateList);
 
   },[stateList])
 
@@ -94,7 +94,7 @@ const ProfilePage = () => {
         return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
   
       })
-      console.log(temp)
+      // console.log(temp)
       setSearchedStateList(temp);
     }
     else{
@@ -142,7 +142,7 @@ const ProfilePage = () => {
 
   const dispatch = useDispatch();
 
-  console.log(user);
+  // console.log(user);
 
   let errorMessage = function(message){
     toast.error(message, {

@@ -114,7 +114,7 @@ const ProfilePage = () => {
         return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
   
       })
-      console.log(temp)
+      // console.log(temp)
       setSearchedStateList(temp);
     }
     else{
@@ -144,7 +144,7 @@ const ProfilePage = () => {
 
     
     let re = /^[a-zA-Z0-9]+$/
-    console.log(data.code)
+    // console.log(data.code)
     let a = re.test(data.code);
     if(data.code && !re.exec(data.code)){
       setDataError((prev) => {

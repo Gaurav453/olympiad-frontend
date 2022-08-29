@@ -84,7 +84,7 @@ const Dashboard = () => {
     dispatch(performance({}))
     .unwrap()
     .then((res)=>{
-      console.log(res);
+     // console.log(res);
       let temp = res.data;
       setPerformance(pre => {
         return {...pre,
@@ -92,8 +92,8 @@ const Dashboard = () => {
       }
 
       })
-      console.log("value " ,temp);
-      console.log(performance)
+      // console.log("value " ,temp);
+      // console.log(performance)
 
     })
     .catch(() =>{
@@ -103,7 +103,7 @@ const Dashboard = () => {
 
   }
   let previousAttempts = (v) => {
-    console.log(sort);
+    // console.log(sort);
     dispatch(getPreviousAttempts({sort:v || sort}))
     .unwrap()
     .then((res)=>{
@@ -212,6 +212,8 @@ const Dashboard = () => {
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <button onClick={() => setLangauge("ENGLISH")} className={language === "ENGLISH" ? 'dropdown-item active' : 'dropdown-item'}>English</button>
                 <button onClick={() => setLangauge("HINDI")} className={language === "HINDI" ? 'dropdown-item active' : 'dropdown-item'}>Hindi</button>
+                <button onClick={() => setLangauge("PUNJABI")} className={language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button>
+
                 {/* <button onClick={() => setLangauge("PUNJABI")} className={language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button> */}
               </div>
             </div>
@@ -384,6 +386,21 @@ const Dashboard = () => {
   `8. हर सही उत्तर के लिए Partial अंक भी दिए जायेंगे`,
   `9. इस परीक्षा को सबमिट करते ही, आपको तत्काल अपना परीक्षा परिणाम और प्रमाण पत्र प्राप्त हो जाएगा ।` ]
   
+  let punjabiInstruction = [
+
+    "1. ਇਹ ਟੈਸਟ ਬਹੁ-ਚੋਣ ਪ੍ਰਸ਼ਨ ਪੈਟਰਨ ਤੇ ਅਧਾਰਿਤ ਹੈ",
+    "2. ਇਕ ਤੋਂ ਵੱਧ ਸਹੀ ਉੱਤਰ ਹੋ ਸਕਦੇ ਹਨ I",
+    "3. ਸਮਾਂ ਮਿਆਦ: 15 ਮਿੰਟ",
+    "4. ਪ੍ਰਸ਼ਨ: 25",
+    "5. ਮਾਰਕਿੰਗ ਸਕੀਮ:",
+    "ਪ੍ਰਸ਼ਨ 1-10 : +3 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+    "ਪ੍ਰਸ਼ਨ 11-20 : +4 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+    "ਪ੍ਰਸ਼ਨ 21-25 : +6 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+    "6. ਪਾਸਿੰਗ ਪ੍ਰਤੀਸ਼ਤ - 40% ਹੈ I",
+    "7. ਹਰ ਇਕ ਗਲਤ ਉਤਰ ਲਈ 1/4th ਅੰਕ ਕਟਿਆ ਜਾਏਗਾ I",
+    "8. ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ partial ਅੰਕ ਵੀ ਦਿੱਤੇ ਜਾਣਗੇ I",
+    "9. ਇਸ ਪ੍ਰੀਖਿਆ ਨੂੰ ਸੁਬਮਿਟ ਕਰਦੇ ਹੀ ਤੁਹਾਨੂੰ ਉਸੀ ਸਮੇਂ ਪ੍ਰੀਖਿਆ ਦਾ ਨਤੀਜਾ ਅਤੇ ਪ੍ਰਮਾਣ ਪੱਤਰ ਮਿਲ ਜਾਏਗਾ I",
+  ]
 
 
   return (
@@ -408,7 +425,13 @@ const Dashboard = () => {
                       {element}
                   </p>
               </div>
-          }) :  hindiInstuction.map((element,index) =>{
+          }) : language === 'PUNJABI' ? punjabiInstruction.map((element,index) =>{
+            return <div key={index} >
+                <p>
+                    {element}
+                </p>
+            </div>
+        }) :   hindiInstuction.map((element,index) =>{
             return <div key={index} >
                 <p>
                     {element}

@@ -18,7 +18,7 @@ import imag from '../assets/images/try_again.jpg';
 const Result = (props) => {
     let score = localStorage.getItem('score');
     score=JSON.parse(score)
-    console.log(score);
+    // console.log(score);
 
 
     let user = useSelector(state => state.auth);
@@ -27,12 +27,12 @@ const Result = (props) => {
     let [message , setMessage] = useState("")
     const dispatch = useDispatch();
     user = user?.user;
-    console.log(user)
+    // console.log(user)
     let link = score.certificate_link;
     localStorage.removeItem('language')
 
     useEffect(() => {
-        console.log(score.id);
+        // console.log(score.id);
         dispatch(customMessage({attempt_id : score.id}))
         .unwrap()
         .then(res => {
@@ -46,7 +46,7 @@ const Result = (props) => {
     },[])
 
     const download = href => {
-        console.log(href);
+        // console.log(href);
         fetch(href, {
           method: "GET",
           headers: {}

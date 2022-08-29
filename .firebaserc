@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "olympiad-42b08"
+    "default": "olympiad-42b08",
+    "new" : "olympiad-latest"
   }
 }

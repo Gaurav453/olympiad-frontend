@@ -30,7 +30,7 @@ const Footer = () => {
     dispatch(activeAttempts({}))
     .unwrap()
     .then((res)=>{
-      console.log(res);
+      // console.log(res);
       setActive(res.active);
       setTotal(res.total);
 

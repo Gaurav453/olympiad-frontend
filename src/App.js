@@ -24,7 +24,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const App = () => {
 
   const { user: currentUser } = useSelector((state) => state.auth);
-  console.log(currentUser);
+  //console.log(currentUser);
   useEffect(() => {
 
   }, );

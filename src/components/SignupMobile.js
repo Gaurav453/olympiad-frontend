@@ -37,10 +37,11 @@ const SignupMobile = () => {
     "email" : "",
     "state" : "",
     "city" : "",
-    "country" : "",
+    "country" : "India",
     "userip": "",
     "language" : "",
     "isSchool" : false,
+    "school_code" : "",
     "class" : "",
     "school" : "",
   
@@ -80,7 +81,7 @@ const SignupMobile = () => {
   const [city,setCity] = useState('');
 
   const [countryList,setCountryList] = useState(Country.getAllCountries());
-  const [stateList,setStateList] = useState([]);
+  const [stateList,setStateList] = useState(State.getStatesOfCountry("IN"));
   const [cityList,setCityList] = useState([]);
 
   const [loading , setLoading ] = useState(false);
@@ -152,11 +153,13 @@ const SignupMobile = () => {
 
     if(loginGuest.email){
       setLoginGuestErr(pre => {
-        return {
-          ...pre ,
-          email : pre.email.trim(),
-  
-        }
+        if(pre.email)
+          return {
+            ...pre ,
+            email : pre.email.trim(),
+    
+          }
+        else return pre;
       })
     }
     let emailRegex = /\S+@\S+\.\S+/;
@@ -218,41 +221,6 @@ const SignupMobile = () => {
       })
     }
 
-    if(loginGuest.phone &&loginGuest.phone.length !== 10){
-      setLoginGuestErr(pre => {
-        return {
-          ...pre,
-          phone : "Please Enter a valid phone"
-        }
-      })
-
-    }
-    else{
-      setLoginGuestErr(pre => {
-        return {
-          ...pre,
-          phone : false
-        }
-      })
-    }
-
-    if(loginGuest.whats_no && loginGuest.whats_no.length !== 10){
-      setLoginGuestErr(pre => {
-        return {
-          ...pre,
-          whats_no : "Please Enter a valid whats phone"
-        }
-      })
-
-    }
-    else{
-      setLoginGuestErr(pre => {
-        return {
-          ...pre,
-          whats_no : false
-        }
-      })
-    }
     console.log(loginGuestErr)
 
 
@@ -281,7 +249,7 @@ const SignupMobile = () => {
         return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
   
       })
-      console.log(temp)
+      // console.log(temp)
       setSearchedStateList(temp);
     }
     else{
@@ -355,7 +323,7 @@ const SignupMobile = () => {
       {
         if(captcha === captchaValue){
           setValidateCaptcha(true);
-          console.log('matched');
+          // console.log('matched');
         }
       }
   },[captcha,captchaValue])
@@ -395,7 +363,7 @@ const SignupMobile = () => {
 
     closeModal();
 
-    if(!validateCaptchaValue) {
+    if(false && !validateCaptchaValue) {
       if(captcha === ""){
         errorMessage("Please fill captcha first")
         setLoading(false);
@@ -427,7 +395,7 @@ const SignupMobile = () => {
     dispatch(register({dataObj}))
     .unwrap()
     .then(() =>{
-      console.log('success')
+      // console.log('success')
       setLoading(false)
       return <Navigate to="/profile" />;
 
@@ -470,7 +438,7 @@ const SignupMobile = () => {
     .unwrap()
 
     .then(res => {
-      console.log(res);
+      // console.log(res);
       let usernames =  [];
 
       for(let user of res.data){
@@ -492,7 +460,7 @@ const SignupMobile = () => {
       
     })
     .catch(err => {
-      console.log(err);
+      // console.log(err);
     })
 
   }
@@ -512,7 +480,7 @@ const SignupMobile = () => {
       setuserName("");
     })
     .catch(err => {
-      console.log(err);
+      // console.log(err);
     })
   }
 
@@ -545,7 +513,7 @@ const SignupMobile = () => {
     dispatch(resetPassword({userName,otp,password}))
     .unwrap()
     .then(res => {
-      console.log(res);
+      // console.log(res);
       setOtpSent(false);
       setFotgetPassword(false);
       setOtpVerified(false);
@@ -615,7 +583,21 @@ const SignupMobile = () => {
   `7. प्रत्येक गलत उत्तर के लिये 1/4th  अंक काटा जाएगा।`,
   `8. हर सही उत्तर के लिए Partial अंक भी दिए जायेंगे`,
   `9. इस परीक्षा को सबमिट करते ही, आपको तत्काल अपना परीक्षा परिणाम और प्रमाण पत्र प्राप्त हो जाएगा ।` ]
-  
+  let punjabiInstruction = [
+
+    "1. ਇਹ ਟੈਸਟ ਬਹੁ-ਚੋਣ ਪ੍ਰਸ਼ਨ ਪੈਟਰਨ ਤੇ ਅਧਾਰਿਤ ਹੈ",
+    "2. ਇਕ ਤੋਂ ਵੱਧ ਸਹੀ ਉੱਤਰ ਹੋ ਸਕਦੇ ਹਨ I",
+    "3. ਸਮਾਂ ਮਿਆਦ: 15 ਮਿੰਟ",
+    "4. ਪ੍ਰਸ਼ਨ: 25",
+    "5. ਮਾਰਕਿੰਗ ਸਕੀਮ:",
+    "ਪ੍ਰਸ਼ਨ 1-10 : +3 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ", 
+    "ਪ੍ਰਸ਼ਨ 11-20 : +4 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+    "ਪ੍ਰਸ਼ਨ 21-25 : +6 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+    "6. ਪਾਸਿੰਗ ਪ੍ਰਤੀਸ਼ਤ - 40% ਹੈ I",
+    "7. ਹਰ ਇਕ ਗਲਤ ਉਤਰ ਲਈ 1/4th ਅੰਕ ਕਟਿਆ ਜਾਏਗਾ I",
+    "8. ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ partial ਅੰਕ ਵੀ ਦਿੱਤੇ ਜਾਣਗੇ I",
+    "9. ਇਸ ਪ੍ਰੀਖਿਆ ਨੂੰ ਸੁਬਮਿਟ ਕਰਦੇ ਹੀ ਤੁਹਾਨੂੰ ਉਸੀ ਸਮੇਂ ਪ੍ਰੀਖਿਆ ਦਾ ਨਤੀਜਾ ਅਤੇ ਪ੍ਰਮਾਣ ਪੱਤਰ ਮਿਲ ਜਾਏਗਾ I",
+  ]
 
   let handleGenrateOtp = function(){
     setLoading(true);
@@ -629,7 +611,7 @@ const SignupMobile = () => {
     })
   }
   let handleLoginGuest = function(){
-    if(!validateCaptchaValue) {
+    if(false && !validateCaptchaValue) {
       if(captcha === ""){
         errorMessage("Please fill captcha first")
         return;
@@ -641,7 +623,7 @@ const SignupMobile = () => {
      
     }
     let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language ,father} = loginGuest;
-    console.log(isSame);
+    // console.log(isSame);
     if(!state || !city || !country || (isSchool && (!loginGuest.class  || !father )) || !language ){  
       errorMessage("Please Fill all  details")
       return;
@@ -678,11 +660,13 @@ const SignupMobile = () => {
       data.category = "School"
 
     }
+    setLoading(true);
     dispatch(lg(data))
     .unwrap()
     .then((res => {
       localStorage.setItem('language',loginGuest.language);
       setModalIsOpenIns(false);
+      setLoading(false);
       navigate('/quiz',{ replace: true })
      
 
@@ -742,6 +726,7 @@ const SignupMobile = () => {
 
   }
   let openLoginGuest = () => {
+    window.scrollTo(0, 0)
     setCaptcha(""); 
     setValidateCaptcha(false);
     setIsLoginGuest(true);
@@ -810,13 +795,19 @@ const SignupMobile = () => {
                   <button  onClick={flag === 0  ? handleSubmit : handleLogin} className="form-button"  >Login</button>
             </div>
             <div style={{margin: "15px 0",textAlign: "center"}} >
-           <hr></hr>
-     </div>
+            <p style={{textAlign:'center',marginTop: 0}} >or</p>
+            </div>
+     <div >
+     <div>
+      <button  onClick={openLoginGuest} className="form-button"  >Login Without Registration</button>
+
+        </div>
+</div>
      <div >
            <button  onClick={()=> {setuserFlag(0);}  } className="form-button"  >Create Account</button>
     </div>
 
-     <h5 style={{color:'grey',textAlign: "center"}} >If attempting the Olympiad for the first time please create an account first.</h5>
+     <h5 style={{color:'grey',textAlign: "center"}} >If attempting the Olympiad for the first time please create an account or login without registration</h5>
 
         </div>
 
@@ -889,8 +880,9 @@ const SignupMobile = () => {
          </div>
    <div >
            <button onClick={handleSubmit} className="form-button"  >Register</button>
-           {/* <div style={{display : 'inline-block',marginLeft : '10px'}} className="forgot">
-                <span onClick={openLoginGuest} >Login as guest</span>
+           {/* <div >
+                <button  onClick={openLoginGuest} className="form-button"  >Login as guest</button>
+
 
               </div> */}
      </div>
@@ -1035,7 +1027,7 @@ className="instructions-div forget-modal"
 
 <FontAwesomeIcon icon={faTimes} />
 </div>
-          <h5>Login As Guest</h5>
+          <h5>Login Without Registration</h5>
           <div className="box">
         <div className="form" >
           <div>
@@ -1051,23 +1043,29 @@ className="instructions-div forget-modal"
 
           </div>
           <div>
-              <p>Phone Number</p>
+              <p>Phone Number (Optional) </p>
              <input  value={loginGuest.phone}  onChange={(e) => handleGuestLoginChange("phone",e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" ></input>
              <p className="error-message"  >{loginGuestErr.phone}</p> 
 
           </div>
-          <div  style={{display:'flex',margin:"10px 0"}} >
-            <div>
-              <input onClick={() => setisSame(!isSame)} type="checkbox" />
-            </div>
-            <div style={{marginLeft:20}}  >
+       
+            {
+              loginGuest.phone ? 
+              <div  style={{display:'flex',margin:"10px 0"}} >
+              <div>
+                <input onClick={() => setisSame(!isSame)} type="checkbox" />
+              </div><div style={{marginLeft:20}}  >
               <span  >Check if WhatsApp  number is same as above</span>
             </div>
           </div>
+             : <>
+              </>
+            }
+            
           {
-            !isSame ? 
+            !isSame &&  loginGuest.phone ? 
             <div>
-            <p>WhatsApp Number</p>
+            <p>WhatsApp Number (Optional)</p>
             <input value={loginGuest.whats_no}   onChange={(e) => handleGuestLoginChange("whats_no",e.target.value)}  placeholder="Please enter your WhatsApp Phone Number"className="form-input" ></input>
             <p className="error-message"  >{loginGuestErr.whats_no}</p> 
 
@@ -1105,6 +1103,7 @@ className="instructions-div forget-modal"
                 { loginGuest.class ? loginGuest.class  :  "Enter Class"}
               </button>
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <button onClick={() => handleGuestLoginChange("class","5th")} className={loginGuest.class === "5th" ? 'dropdown-item active' : 'dropdown-item'}>5th</button>
                 <button onClick={() => handleGuestLoginChange("class","6th")} className={loginGuest.class === "6th" ? 'dropdown-item active' : 'dropdown-item'}>6th</button>
                 <button onClick={() => handleGuestLoginChange("class","7th")} className={loginGuest.class === "7th" ? 'dropdown-item active' : 'dropdown-item'}>7th</button>
                 <button onClick={() => handleGuestLoginChange("class","8th")} className={loginGuest.class === "8th" ? 'dropdown-item active' : 'dropdown-item'}>8th</button>
@@ -1122,7 +1121,7 @@ className="instructions-div forget-modal"
             loginGuest.isSchool ? 
             <div class="school_code" >
             <p>School Olympiad Code</p>
-            <input placeholder="Enter Your School Olympiad Code"  onChange={(e) => setSchoolCode(e.target.value)} className="form-input" ></input>
+            <input placeholder="Enter Your School Olympiad Code"  onChange={(e) => handleGuestLoginChange('school_code',e.target.value)} className="form-input" ></input>
             <span>{schoolName}</span>
           </div> : <></>
           }
@@ -1213,6 +1212,8 @@ className="instructions-div forget-modal"
               <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <button onClick={() => handleGuestLoginChange("language","ENGLISH")} className={loginGuest.language === "ENGLISH" ? 'dropdown-item active' : 'dropdown-item'}>English</button>
                 <button onClick={() =>  handleGuestLoginChange("language","HINDI")} className={loginGuest.language === "HINDI" ? 'dropdown-item active' : 'dropdown-item'}>Hindi</button>
+                <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button>
+
                 {/* <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button> */}
               </div>
             </div>
@@ -1224,7 +1225,7 @@ className="instructions-div forget-modal"
             <input value={captcha} onChange={(e) => setCaptcha(e.target.value)} placeholder="Captcha"className="form-input" ></input>
         </div>
           <div  class="btnn">
-            <button onClick={handleLoginGuest} > Register</button>
+            <button onClick={handleLoginGuest} > Start Quiz</button>
           </div>
           </Modal>
 
@@ -1244,7 +1245,13 @@ className="instructions-div forget-modal"
                             {element}
                         </p>
                     </div>
-                }) :  hindiInstuction.map((element,index) =>{
+                }) : loginGuest.language === 'PUNJABI' ? punjabiInstruction.map((element,index) =>{
+                  return <div key={index} >
+                      <p>
+                          {element}
+                      </p>
+                  </div>
+              }) : hindiInstuction.map((element,index) =>{
                   return <div key={index} >
                       <p>
                           {element}
