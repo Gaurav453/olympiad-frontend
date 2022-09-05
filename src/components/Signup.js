@@ -808,7 +808,7 @@ let punjabiInstruction = [
         <h5>Instructions</h5>
         { 
        
-           loginGuest.language === 'ENGLISH' ?  englishInstruction.map((element,index) =>{
+           loginGuest.language === 'ENGLISH' || loginGuest.language === 'GERMAN' ?  englishInstruction.map((element,index) =>{
                 return <div key={index} >
                     <p>
                         {element}
