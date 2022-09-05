@@ -1,7 +1,7 @@
 import React , { useEffect,useState ,useRef} from "react";
 import {useSelector ,useDispatch } from 'react-redux';
 import { Link, Navigate } from "react-router-dom";
-import { currentAttempt,getQuestion,saveAnswer,submitQuiz,saveRemainingTime } from '../slices/quiz'
+import { currentAttempt,getQuestion,saveAnswer,submitQuiz,saveRemainingTime,getAllQuestions } from '../slices/quiz'
 import Modal from 'react-modal';
 import BounceLoader from "react-spinners/BounceLoader";
 
@@ -45,20 +45,21 @@ const Quiz = () => {
     let timer;
 
     let set = 0;
-    let gridArr = []
     // Modal.setAppElement('#quiz');
  
     let initializeGrid = () => {
+        let gridArr = {}
         for(let i=1; i<=25; i++){
-            gridArr.push({
+            gridArr[i] = {
                 id : i,
                 isOpened: false,
                 isReviewd : false, 
                 answer : "",
                 question : 0
         
-            })
+            }
         }
+        setGrid(gridArr)
     }
 
   let user = useSelector(state => state.auth);
@@ -74,6 +75,11 @@ const Quiz = () => {
   const [modalIsOpen, setIsOpen] = React.useState(false);
   const [isSubmitted, setSubmitted] = React.useState(false);
   let [option , setOption] = useState([])
+
+
+  let [questions, setQuestions] = useState([])
+  let [answers, setAnswers] = useState({});
+
 
   const {
     seconds,
@@ -105,53 +111,59 @@ const Quiz = () => {
       }
       else if(!isRunning && initialized){
           console.log('timer stated');
-          start();
+        //   start();
       }
 
   },[loading])
 
-
-  let makeGrid = (attempt) => {
-    setGrid([])
-  let answerRegex = /a[0-9]/
-  let questionRegex = /q[0-9]/
-
-  for(let key in attempt) {
-      if(answerRegex.test(key)){
-          if(!attempt[key]) continue
-          let index = parseInt(key.substring(1))-1;
-          gridArr[index].answer = attempt[key];
-      }
-      else if(questionRegex.test(key)){
-          if(!attempt[key]) continue
-          let index = parseInt(key.substring(1))-1;
-          gridArr[index].question = attempt[key];
-      }
-  }
-  setGrid(gridArr)
-
-}
 let interval;
 
 let initialize = () => {
     setMainLoader(true)
-    dispatch(currentAttempt({}))
+    if(  localStorage.getItem("attempt_id")){
+        setAttempt(localStorage.getItem("attempt_id"));
+        setQuestions((JSON.parse(localStorage.getItem("questions"))));
+        setAnswers((JSON.parse(localStorage.getItem("answers"))));
+        setGrid((JSON.parse(localStorage.getItem("grid"))));
+        setCurrent(((localStorage.getItem("current"))));
+
+
+
+        
+
+        const time = new Date();
+        time.setSeconds(time.getSeconds() + parseInt(localStorage.getItem('remaining_time')));
+        restart(time);
+        setLoading(false)
+        setMainLoader(false)
+        initialized =  true;
+
+
+
+    }
+    else{
+        dispatch(getAllQuestions({language : localStorage.getItem('language')}))
     .unwrap()
     .then(res => {
         if(res){
           initialized =  true;
-          makeGrid(res);
-          setAttempt(res.id);
-          setCurrent(res.lastque_sno)
+          setAttempt(res.data.attempt_id);
+          setQuestions(res.data.questions)
+          localStorage.setItem("questions", JSON.stringify(res.data.questions));
+          localStorage.setItem("attempt_id", res.data.attempt_id);
+
+          setCurrent(1)
+          setLoading(false)
+          setMainLoader(false)
           const time = new Date();
-          time.setSeconds(time.getSeconds() + parseInt(res.time_left));
+          localStorage.setItem('remaining_time',900)
+          time.setSeconds(time.getSeconds() + 900);
           restart(time);
         }
-        else{
-            
-        }
-        fetchQuestion(res.id,res.lastque_sno);
+ 
     })
+    }
+    
 }
 
 useEffect(()=>{
@@ -162,7 +174,7 @@ useEffect(()=>{
     }
     time += seconds;
     
-    if(time % 10 === 0){
+    if(time % 2 === 0){
         if(initialized)
             saveRemaining(time);
     }
@@ -172,69 +184,10 @@ useEffect(()=>{
 
 },[seconds,minutes])
 
-let fetchQuestion = (attempt_id,current) => {
-    if(!localStorage.getItem('language')) return;
-    let data = {
-        attempt_id : attempt_id,
-        language : localStorage.getItem('language'),
-        question_sno : current || 1
-    }
-    setMainLoader(true);
 
-  dispatch(getQuestion(data))
-  .unwrap()
-  .then(res => {
-      let que = JSON.parse(res.data.question)
-      setAttempt(res.data.attempt_id)
-      if(!attempt_id){
-        makeGrid(res);
-        setCurrent(1)
-        const time = new Date();
-        console.log("time 900")
-        initialized = true
-        time.setSeconds(time.getSeconds() + 900);
-        restart(time);
-      }
-      
- 
-        let temp = grid;
-        if(temp[current-1] ){
-        
-            // console.log(temp)
-            // console.log(que)
-            temp[current-1].question = que.qq.qid
-            // console.log(temp[current-1])
-            setGrid(temp)
-
-        }
-        setQuestion(que);
-        if(res.data.selected_answer){
-            setAnswer(res.data.selected_answer.split(","));
-
-        }
-        else
-            setAnswer([]);
-    
-        setMainLoader(false);
-        try{
-            testDivRef.current.scrollIntoView(); 
-    
-            }
-            catch(e){
-                
-        }
-        setOptions(que);
-        setMainLoader(false);
-
-  })
-  .catch(err =>{ 
-      setMainLoader(false)
-      navigae('/dashboard')
-  })
-}
 
 let setOptions = function(question){
-    let temp =  answer
+    let temp =  answer || []
     let arr =[]
     let optionRegex = /c[0-9]/;
     for(let key in question){
@@ -254,7 +207,6 @@ let setOptions = function(question){
 }
 
 let gridElementClass = function(element){
-  // console.log(element)
   if(!element.answer && !element.isReviewd && !element.question && element.id !== current){
       return "grid-element"
   }
@@ -274,7 +226,8 @@ let gridElementClass = function(element){
 
 }
 let handleChange = (entry) => {
-        handleSave(entry.id,false,false,true,attempt);
+        handleSave();
+        setCurrent(entry.id);
     
       try{
       testDivRef.current.scrollIntoView(); 
@@ -288,11 +241,33 @@ let handleChange = (entry) => {
 
   useEffect(() => {
     setMainLoader(true);
-
     initializeGrid();
-    setGrid([]);
     initialize();
   },[]); 
+
+  useEffect(() => {
+    setQuestion(questions[current-1]);
+    setOptions(questions[current-1]);
+    setAnswer(answers[current]);
+
+    if(grid[current]){
+        let tempGrid = {}
+        tempGrid[current] = {
+            ...grid[current],
+            isOpened : true,
+    
+    
+        }
+        setGrid(prev => {
+           return { 
+            ...prev,
+            ...tempGrid
+           } 
+        });
+    }
+   
+    
+  },[current,questions,setQuestions])
 
 
 
@@ -300,7 +275,7 @@ let handleChange = (entry) => {
     return <Navigate to="/" />;
 
   }
-  else if(!user.email)
+  else if(!user.id)
     return <Navigate to="/profile" />;
   else if(!localStorage.getItem('language'))
       navigae('/dashboard')
@@ -309,22 +284,24 @@ let handleChange = (entry) => {
  var saveRemaining = (time) => {
     if(!initialized ) return
     if(!attempt) return;
-    dispatch(saveRemainingTime({time_left : time, attempt_id : attempt})).unwrap()
-    .then(res => {
-        setTimeout(() => {
-            called = 0
-
-        },30000)
-    })
+    localStorage.setItem("remaining_time" ,time )
+    saveAnswers()
  }
+    var saveAnswers = () =>{
+        localStorage.setItem('answers',JSON.stringify(answers))
+        localStorage.setItem('grid',JSON.stringify(grid))
+        localStorage.setItem('current',(current))
 
+
+    }
 
 
   const GridDiv = function() {
       return <div className="grid" >
           <div className="row row-cols-5" >
               {
-                  grid.map(entry =>{
+                  Object.keys(grid).map(e =>{
+                    let entry  = grid[e];
                       return <div key={entry.id} className="col">
                             <div onClick={() => handleChange(entry)} className={gridElementClass(entry)} >
                                 {entry.id}
@@ -339,7 +316,7 @@ let handleChange = (entry) => {
   }
 
   let optionClass = function(element){
-      if(answer.includes(element.value)){
+      if(answer?.includes(element.value)){
           return "selected answerBlock"
       }
       else{
@@ -348,14 +325,15 @@ let handleChange = (entry) => {
   }
 
   let selectOption =  function({value}){
-    let temp = answer;
+    // console.log(value)
+    let temp = answer || [];
     if(temp.includes(value)){
         temp.splice(temp.indexOf(value),1);
     }
     else{
         temp.push(value);
     }
-    // console.log(temp);
+    console.log(temp);
     setAnswer([...temp])
   }
 
@@ -380,7 +358,6 @@ let handleChange = (entry) => {
     return r;
 }
   let Option = function(){
-
     return option.map((element,i) => {
         return <div className="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                 <p style={{textAlign: "center"}} > <strong>{String.fromCharCode(65 + i)}</strong></p>
@@ -400,7 +377,6 @@ let handleChange = (entry) => {
   }
 
   const Question = function(){
-     
     return  <div className="questionDiv" >
         {
             loading ?
@@ -429,109 +405,86 @@ let handleChange = (entry) => {
   }
 
   let handleReview = function(){
-    handleSave(undefined,false,true,attempt);
+    let tempGrid = {
+    }
+    if(grid[current]){
+        tempGrid[current] = {
+            ...grid[current],
+            isReviewd : grid[current].isReviewd ? false : true,
+    
+    
+        }
+        setGrid(prev => {
+           return { 
+            ...prev,
+            ...tempGrid
+           } 
+        });
+    }
+    setCurrent( current < 25 ? current+1 : current);
+  
+    handleSave(true);
  
     
 
   }
-  
   let handleBack = function(){
-    setCurrent(current-1)
-    fetchQuestion(attempt,current-1);
     
+    setCurrent( current > 1 ? current+1 : current);
+
+  }
+  let handleNext = function(){
+    let tempGrid = {}
+    handleSave();
+    setCurrent( current < 25 ? current+1 : current);
+    if(grid[current+1]){
+        tempGrid[current+1] = {
+            ...grid[current+1],
+            isOpened : true,
+    
+    
+        }
+        setGrid(prev => {
+           return { 
+            ...prev,
+            ...tempGrid
+           } 
+        });
+    }
 
   }
 
-  let handleSave = async (id,bool,reviewed,sameReviewed) => {
-    if(!initialized ) return
-
-     if(answer.length ===  0) {
-        if(!bool){
-            let temp = grid;
-            if(temp[current-1] ){
-                temp[current-1].answer = null;
-                if(reviewed){
-                    temp[current-1].isReviewd = true;
-
-                }
-                else{
-                    if(sameReviewed){
-
-                    }
-                    else{
-                        temp[current-1].isReviewd = false;
-
-                    }
-
-                }
-                setGrid(temp)
-        
-            }
-            if(current  >= 25){
-                setCurrent(typeof id === 'number' ? id: 25)
-                fetchQuestion(attempt,typeof id === 'number' ? id: 25);
-            }
-            else{
-                setCurrent(typeof id === 'number' ? id : current+1)
-                fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
-                
-            }
-        
-         
-          }
+  let handleSave = (review) => {
+    if(!answer || answer.length === 0){
         return;
-         
-     }
-      let temp = "";
-      for(let a of answer){
-          temp += a + ","
-      }
-      temp = temp.substring(0,temp.length - 1);
-      let data = {
-          answer :  temp,
-          attempt_id :  attempt,
-          question_sno :  current,
-      }
-      setMainLoader(true);
-     await  dispatch(saveAnswer(data)).unwrap()
-      .then(res => {
-          if(!bool){
-            let temp = grid;
-            if(temp[current-1] ){
-                if(reviewed){
-                    temp[current-1].isReviewd = true;
-
-                }
-                else{
-                    if(sameReviewed){
-
-                    }
-                    else{
-                        temp[current-1].isReviewd = false;
-
-                    }
-
-                }
-                temp[current-1].answer = answer.length === 0 ? false : temp;
-                setGrid(temp)
-        
-            }
-            if(current  >= 25){
-                setCurrent(typeof id === 'number' ? id: 25)
-                fetchQuestion(attempt,typeof id === 'number' ? id: 25);
-            }
-            else{
-                setCurrent(typeof id === 'number' ? id : current+1)
-                fetchQuestion(attempt,typeof id === 'number' ? id :current+1);
-                
-            }
-        
-          }
-      
-      })
-      .catch(err =>{
-          setMainLoader(false)
-      })
+    }
+    let tempAnswer = {
+    }
+    tempAnswer[current] = answer
+    console.log(tempAnswer)
+    setAnswers(prev => {
+       return {
+            ...prev,
+            ...tempAnswer
+        }
+    })
+    if(grid[current]){
+        let tempGrid= {}
+        tempGrid[current] = {
+            ...grid[current],
+            answer : true,
+            isReviewd : review
+    
+    
+        }
+        setGrid(prev => {
+           return { 
+            ...prev,
+            ...tempGrid
+           } 
+        });
+    }
+    
    
   }
 
@@ -539,9 +492,9 @@ let handleChange = (entry) => {
     if(!initialized ) return
     if(!attempt) return;
     setSubmitted(true)
-    await handleSave(current,true);
+    handleSave();
     setMainLoader(true);
-    dispatch(submitQuiz({attempt_id : attempt}))
+    dispatch(submitQuiz({attempt_id : attempt,answers:answers ,time_left : seconds}))
     .unwrap()
     .then(res => {
         localStorage.setItem('score',JSON.stringify(res.data));
@@ -558,29 +511,6 @@ let handleChange = (entry) => {
   let Timer =  function(){
   let [time,setTime] = useState(initialTime);
 
-    // useEffect(() => {
-    //     if(time > 0 && !isSubmitted){
-    //       setTimeout(function(){
-    //           setTime(--time)
-    //           setITime(time);
-    //           if(time % 5 === 0 && called === 0){
-    //               called = 1
-    //               saveRemaining(time);
-    //           }
-    //       },1000)
-    //     }
-    //     if(time === 1){
-    //       handleSubmit();
-    //     }
-  
-    // },[time])
-    // let tempTime =  time;
-    // let hours = Math.floor(tempTime / 3600);
-    // tempTime %= 3600;
-    // let minutes = Math.floor(tempTime / 60);
-    // let seconds = tempTime % 60;
-
-    let timeString = `${minutes}:${seconds}`
     return <div className="time-left w-40 text-center text-white px-2 py-2 bg-timer shadow-sm">
         <div className="text-center text-white " >Time Left</div>
         <span>{minutes}</span>:<span>{seconds}</span>
@@ -596,7 +526,7 @@ let handleChange = (entry) => {
             <div className="saveBut col-lg-3 col-md-3 col-sm-3  col-6" >
             <div class="bottom" >
             
-                <button onClick={() =>handleSave(undefined,undefined,false,attempt)} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
+                <button onClick={() =>handleNext()} className="text-white px-2 py-2 bg-main rounded-lg shadow-sm font-bold" >
                     Save & Next
                 </button>
             </div>

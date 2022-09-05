@@ -1,0 +1,846 @@
+import { useEffect ,useState} from 'react';
+import { useDispatch } from 'react-redux';
+import { genrateOtp , verifyOtp ,register , loginGuest as lg} from "../slices/auth";
+import { Navigate,Link ,useNavigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEdit ,faEye } from '@fortawesome/free-solid-svg-icons'
+import Modal from 'react-modal';
+import { Country, State, City }  from 'country-state-city';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import ClientCaptcha from "react-client-captcha";
+import {saveProfile ,school } from '../slices/auth'
+
+
+
+import logo from '../assets/images/Logo009_min2.png';
+
+
+
+
+
+
+import useMergedState from '../hooks/MergeState';
+
+import BounceLoader from "react-spinners/BounceLoader";
+const override = `
+  display: block;
+  margin: 0 auto;
+  border-color: #f0962e;
+  margin-top: 50%
+`;
+
+const SignupDesktop = () => {
+
+  const navigate = useNavigate();
+
+  let loginGuestObj = {
+    "firstName": "",
+    "lastName" : "",
+    "phone" : "",
+    "whats_no":"",
+    "email" : "",
+    "state" : "",
+    "city" : "",
+    "country" : "India",
+    "userip": "",
+    "language" : "",
+    "isSchool" : false,
+    "class" : "",
+    "school" : "",
+    "school_code" : "",
+    "father" : ""
+  
+
+  }
+  let loginGuestErrObj = {
+    "firstName": false,
+    "lastName" : false,
+    "phone" : false,
+    "whats_no":false,
+    "email" : false,
+
+  }
+
+  const [ firstName , setfirstName ] = useMergedState("");
+  const [ lastName , setlastName ] = useMergedState("");
+  const [ phone , setphone ] = useMergedState("");
+  const [ password , setpassword ] = useMergedState("");
+  const [ otp , setOtp ] = useMergedState("");
+  const [ isSame , setisSame ] = useState(false);
+  const [captcha,setCaptcha] = useState("");
+  const [captchaValue,setCaptchaValue] = useState("");
+  const [canRegister,setCanRegister] = useState(1);
+  let [schoolName , setSchoolName] = useState("");
+  let [schoolCode , setSchoolCode] = useState("");
+
+
+  const [validateCaptchaValue, setValidateCaptcha] = useState(false);
+
+
+
+  let [loading , setLoading ] = useMergedState(false);
+  const [isOtpGenrated , setIsOtpGenrated ] = useMergedState(false);
+  const [isOtpVerified , setIsOtpVerified ] = useMergedState(true);
+  const [shouldGenrateOtp , setshouldGenrateOtp ] = useMergedState(false);
+
+
+  const [firstNameError , serFirstNameError ] = useMergedState("");
+  const [lastNameError , serLastNameError ] = useMergedState("");
+  const [phoneError , serPhoneError ] = useMergedState("");
+  const [passwordError , setpasswordError ] = useMergedState("");
+
+  const [verifyOtpToken , setverifyOtpToken ] = useMergedState("");
+  const [userName , setuserName ] = useMergedState("");
+
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  const [modalIsOpenIns, setModalIsOpenIns] = useState(false);
+
+  const [loginGuest,setLoginGuest] = useState(loginGuestObj);
+  const [loginGuestErr,setLoginGuestErr] = useState(loginGuestErrObj);
+
+  
+  const [isLoginGuest,setIsLoginGuest] = useState(false);
+
+
+  const [country,setCountry] = useState();
+  const [state,setState] = useState('');
+  const [city,setCity] = useState('');
+
+  const [countryList,setCountryList] = useState(Country.getAllCountries());
+  const [stateList,setStateList] = useState(State.getStatesOfCountry("IN"));
+  const [cityList,setCityList] = useState([]);
+
+  const [stateInput , setStateInput] =  useState("");
+  const [cityInput , setCityInput] =  useState("");
+  const [countryInput , setCountryInput] =  useState("");
+
+
+  const [searchedStateList , setSearchedStateList]= useState(State.getStatesOfCountry(country));
+  const [searchedCityList , setSearchedCityList]= useState([]);
+  const [searchedCountryList , setSearchedCountryList]= useState([]);
+  const [showPassword , setShowPassword ] = useState(false);
+
+
+  // useEffect( () =>{
+  //   const start = 2 * 60  // minutes
+  //   const end = 5 * 60 // minutes
+  //   var now = new Date();
+  //   var currentTime = now.getHours() * 60 + now.getMinutes(); // Minutes since Midnight
+    
+  //   if(currentTime < start || currentTime > end){
+  //     setCanRegister(1);
+  //    }
+  //    else{
+  //     setCanRegister(0);
+  //    }
+     
+  // },[])
+
+  useEffect(() => {
+    if(!schoolCode) return;
+    dispatch(school({
+      code : schoolCode
+    }))
+    .unwrap()
+    .then(res => {
+      if(res.data?.name){
+        setSchoolName(res.data?.name)
+      }
+      else{
+        setSchoolName("")
+      }
+    })
+  },[schoolCode])
+  useEffect(() => {
+    if(loginGuest.email){
+      setLoginGuestErr(pre => {
+        if(pre.email)
+          return {
+            ...pre ,
+            email : pre.email.trim(),
+    
+          }
+        else return pre;
+      })
+    }
+   
+    let emailRegex = /\S+@\S+\.\S+/;
+    let nameRegex = /^[a-z ,.'-]+$/i;
+
+    if(loginGuest.firstName && !nameRegex.test(loginGuest.firstName)){
+
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          firstName : "Please Enter a valid first Name"
+        }
+      })
+      
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          firstName : false
+        }
+      })
+    }
+
+    if(loginGuest.lastName && !nameRegex.test(loginGuest.lastName)){
+
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          lastName : "Please Enter a valid last Name"
+        }
+      })
+      
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          lastName : false
+        }
+      })
+    }
+    if(loginGuest.email && !emailRegex.test(loginGuest.email)){
+
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          email : "Please Enter a valid email"
+        }
+      })
+      
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          email : false
+        }
+      })
+    }
+
+
+    if(loginGuest.whats_no && loginGuest.whats_no.length !== 10){
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          whats_no : "Please Enter a valid whats phone"
+        }
+      })
+
+    }
+    else{
+      setLoginGuestErr(pre => {
+        return {
+          ...pre,
+          whats_no : false
+        }
+      })
+    }
+    // console.log(loginGuestErr)
+
+
+
+
+  },[loginGuest])
+
+  useEffect(() => {
+    setSearchedStateList(stateList)
+
+  },[stateList])
+
+  useEffect(() => {
+    setSearchedCityList(cityList)
+
+  },[cityList])
+  useEffect(() => {
+    setSearchedCountryList(countryList)
+
+  },[countryList]);
+
+  useEffect(() => {
+    if(stateInput.length > 0){
+      let temp = stateList.filter(a => {
+        return a.name.substring(0,stateInput.length).toLowerCase() === stateInput.toLowerCase();
+  
+      })
+      // console.log(temp)
+      setSearchedStateList(temp);
+    }
+    else{
+      setSearchedStateList(stateList)
+    }
+   
+    
+  },[stateInput,stateList])
+
+  useEffect(() => {
+    if(cityInput.length  > 0 ){
+      let temp = cityList.filter(a => {
+        return a.name.substring(0,cityInput.length).toLowerCase() === cityInput.toLowerCase();
+  
+      })
+      setSearchedCityList(temp);
+    }
+    else{
+      setSearchedCityList(cityList);
+
+    }
+
+    
+  },[cityInput,cityList])
+
+  useEffect(() => {
+    if(countryInput.length  > 0 ){
+      let temp = countryList.filter(a => {
+        return a.name.substring(0,countryInput.length).toLowerCase() === countryInput.toLowerCase();
+  
+      })
+      setSearchedCountryList(temp);
+    }
+    else{
+      setSearchedCountryList(countryList);
+
+    }
+  },[countryInput,countryList])
+
+///State.getStatesOfCountry(country)
+
+let englishInstruction = [ '1. This test is based on MCQ pattern',
+
+'2. There can be more than one correct option (even for a single fill in the blanks)',
+
+
+'3. Time duration : 15 minutes',
+
+'4. Questions : 25',
+
+'5. Marking Scheme: ',
+
+'Q. No. 1-10: +3 for every right answer',
+'Q. No. 11-20: +4 for every right answer',
+'Q. No. 21-25: +6 for every right answer',
+
+ "6. Passing percentage : 40%",
+
+  "7. For every wrong answer 1/4th marks will be deducted",
+  "8. Partial marking will be given for each correct option marked",
+  "9. Instant result and certificate after submission of test"]
+
+  let hindiInstuction = [
+    
+    "1. यह परीक्षा बाहुल्य चयन प्रश्नों (MCQ's) पर आधारित है।",
+  `2.  दिए गए विकल्पों में से एक से अधिक विकल्प भी सही हो सकते हैं। ( यहाँ तक कि रिक्त स्थान की एकाकी  पूर्ति के लिए भी)`,
+  '3. समय सीमा - 15 मिनट है।',
+  '4. कुल प्रश्न - 25 हैं।',
+  `5. अंक आबंटन प्रक्रिया:- 
+प्रश्न  1 - 10 : +3 अंक प्रत्येक सही उत्तर के लिये
+प्रश्न  11 - 20 : +4 अंक प्रत्येक सही उत्तर के लिये
+प्रश्न  21 - 25 : +6 अंक प्रत्येक सही उत्तर के लिये`,
+  `6. पासिंग प्रतिशत - 40% है।`,
+`7. प्रत्येक गलत उत्तर के लिये 1/4th  अंक काटा जाएगा।`,
+`8. हर सही उत्तर के लिए Partial अंक भी दिए जायेंगे`,
+`9. इस परीक्षा को सबमिट करते ही, आपको तत्काल अपना परीक्षा परिणाम और प्रमाण पत्र प्राप्त हो जाएगा ।` ]
+
+let punjabiInstruction = [
+
+  "1. ਇਹ ਟੈਸਟ ਬਹੁ-ਚੋਣ ਪ੍ਰਸ਼ਨ ਪੈਟਰਨ ਤੇ ਅਧਾਰਿਤ ਹੈ",
+  "2. ਇਕ ਤੋਂ ਵੱਧ ਸਹੀ ਉੱਤਰ ਹੋ ਸਕਦੇ ਹਨ I",
+  "3. ਸਮਾਂ ਮਿਆਦ: 15 ਮਿੰਟ",
+  "4. ਪ੍ਰਸ਼ਨ: 25",
+  "5. ਮਾਰਕਿੰਗ ਸਕੀਮ:",
+  "ਪ੍ਰਸ਼ਨ 1-10 : +3 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ", 
+  "ਪ੍ਰਸ਼ਨ 11-20 : +4 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+  "ਪ੍ਰਸ਼ਨ 21-25 : +6 ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ",
+  "6. ਪਾਸਿੰਗ ਪ੍ਰਤੀਸ਼ਤ - 40% ਹੈ I",
+  "7. ਹਰ ਇਕ ਗਲਤ ਉਤਰ ਲਈ 1/4th ਅੰਕ ਕਟਿਆ ਜਾਏਗਾ I",
+  "8. ਹਰ ਇਕ ਸਹੀ ਉਤਰ ਲਈ partial ਅੰਕ ਵੀ ਦਿੱਤੇ ਜਾਣਗੇ I",
+  "9. ਇਸ ਪ੍ਰੀਖਿਆ ਨੂੰ ਸੁਬਮਿਟ ਕਰਦੇ ਹੀ ਤੁਹਾਨੂੰ ਉਸੀ ਸਮੇਂ ਪ੍ਰੀਖਿਆ ਦਾ ਨਤੀਜਾ ਅਤੇ ਪ੍ਰਮਾਣ ਪੱਤਰ ਮਿਲ ਜਾਏਗਾ I",
+]
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  
+  let errorMessage = function(message){
+    toast.error(message, {
+      position: "bottom-center",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      theme: "dark",
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      });
+
+  }
+
+
+  const dispatch = useDispatch();
+
+  let emailRegex = /\S+@\S+\.\S+/;
+
+  useEffect(() => {
+    if(captcha.length > 0)
+      {
+        if(captcha === captchaValue){
+          setValidateCaptcha(true);
+          // console.log('matched');
+        }
+      }
+  },[captcha,captchaValue])
+
+  useEffect(() => {
+    let nameRegex = /^[a-z ,.'-]+$/i;
+    if(firstName && !nameRegex.test(firstName)){
+      serFirstNameError("Please enter a valid Name")
+    }
+    else{
+      serFirstNameError("")
+    }
+    if(lastName && !nameRegex.test(lastName)){
+      serLastNameError("Please enter a valid last Name")
+    }
+    else{
+      serLastNameError("")
+    }
+
+
+    if(password && password.length < 6){
+      setpasswordError("Please enter a valid password")
+    }
+    else{
+      setpasswordError("")
+    }
+
+
+  },[firstName,lastName,phone,password])
+
+  // useEffect(() => {
+  //   if(phone.length === 10) {
+  //     setshouldGenrateOtp(true)
+  //   }
+  //   else{
+  //     setshouldGenrateOtp(false)
+
+  //   }
+  //   setIsOtpGenrated(false);
+  //   setIsOtpVerified(false);
+
+
+
+  // },[phone,firstName,lastName])
+
+ 
+  let handleGenrateOtp = function(){
+    setLoading(true);
+    dispatch(genrateOtp({phone}))
+    .unwrap()
+    .then(() =>{
+      console.log('otp sent successfully')
+      setLoading(false);
+      setIsOtpGenrated(true);
+    })
+    .catch(() =>{
+      setLoading(false);
+
+    })
+  }
+
+  let isDetailsFilled = function(){
+    if(false && !validateCaptchaValue) {
+      if(captcha === ""){
+        errorMessage("Please fill captcha first")
+        return;
+      }
+      else{
+        errorMessage("Wrong Captcha Entered!")
+        return;
+      }
+     
+    }
+    if(!firstName || !lastName || !phone || firstNameError || lastNameError || phoneError){  
+      errorMessage("Please Fill all correct details")
+      return;
+
+    }
+
+    if(!isOtpGenrated && !isOtpVerified){
+      errorMessage("Please Generate OTP first")
+      return;
+
+    }
+    else if (isOtpGenrated && !isOtpVerified){
+      errorMessage("Please Verify otp")
+      // console.log('Please verify otp')
+      return;
+
+    }
+    else if(isOtpVerified && (!password || passwordError)){
+      errorMessage("Please Enter Password")
+      return;
+    }
+    else if(isOtpVerified){
+      return true;
+    }
+
+    return false;
+    
+
+  }
+  let openLoginGuest = () => {
+    window.scrollTo(0, 0);
+    setCaptcha(""); 
+    setValidateCaptcha(false);
+    setIsLoginGuest(true);
+  }
+  let handleLoginGuest = function(){
+
+    
+    let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language ,father} = loginGuest;
+    // console.log(isSame);
+    if(!state || !city || !country || !language ){  
+      errorMessage("Please Fill all  details")
+      return;
+
+    }
+
+
+    setModalIsOpenIns(true)
+
+
+
+
+  }
+
+  let handleSubmit  = function(){
+
+
+      setLoading(true);
+
+      let dataObj = {
+        phone,
+        password,
+        first_name : firstName,
+        last_name : lastName,
+      }
+      dispatch(register({dataObj}))
+      .unwrap()
+      .then((res) =>{
+        setuserName(res.data.username)
+        setLoading(false);
+        setIsOpen(true);
+          // console.log('success')
+      })
+      .catch(() =>{
+        setLoading(false);
+  
+      })
+
+  }
+  let handleOtpSubmit  = function(){
+
+    if(!phone){
+      return;
+    }
+    if(otp.length !== 6) {
+      errorMessage("Please enter a valid otp")
+    }
+    else{
+      setLoading(true);
+
+      let dataObj = {
+        phone,
+        otp,
+        first_name : firstName,
+        last_name : lastName,
+      }
+      dispatch(verifyOtp(dataObj))
+      .unwrap()
+      .then((res) =>{
+
+        // console.log('otp  verified',res);
+        let {data} = res;
+        setIsOtpGenrated(false);
+        setverifyOtpToken(data.token);
+        setuserName(data.username);
+        setIsOtpVerified(true)
+        setLoading(false);
+
+
+
+      })
+      .catch(() =>{
+        setLoading(false);
+  
+      })
+    }
+    
+
+  }
+  const customStyles = {
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+      padding : "20px",
+      borderRadius : "15px"
+    },
+  };
+
+  let handleGuestLoginChange = (key,value) =>{
+    let  obj = {};
+    obj[key] = value
+    setLoginGuest(pre => {
+    return {
+        ...pre,
+        ...obj
+      }
+    })
+    // console.log(loginGuest);
+  }
+
+
+  let navigateQuiz = () =>{
+    let data = loginGuest;
+    setLoading(true);
+    dispatch(lg(data))
+    .unwrap()
+    .then((res => {
+      setLoading(false);
+      localStorage.setItem('language',loginGuest.language);
+      localStorage.setItem('gueest',"true");
+
+      setModalIsOpenIns(false);
+      navigate('/quiz',{ replace: true })
+     
+
+
+    }))
+    .catch(err =>{ 
+      console.log(err);
+    })
+   
+  }
+  // console.log(canRegister)
+  return ( 
+    loading ?
+    <BounceLoader color="#f0962e" loading={true} css={override} size={100} />
+    :
+    <div style={{height: '100%'}} className="signup-desktop instructions-div">
+    { 
+      canRegister ?  <div className="box">
+      <div className="signup-logo">
+      <div >   
+          <img alt="main-logo"  src={logo}/>
+
+      </div>
+      <div>
+      <h1>Humanity Olympiad</h1>
+
+      </div>
+
+
+    </div>
+    <hr />
+      <h5>Please Enter Your Details</h5>
+      <div className="box">
+    <div className="form" >
+      <div>
+         <p>First Name</p> 
+         <input value={loginGuest.firstName} onChange={(e) => handleGuestLoginChange("firstName",e.target.value)} placeholder="Please enter your First Name"className="form-input" ></input>
+         <p className="error-message"  >{loginGuestErr.firstName}</p> 
+
+      </div>
+      <div>
+         <p>Last Name</p>
+         <input  value={loginGuest.lastName}  onChange={(e) => handleGuestLoginChange("lastName",e.target.value)}  placeholder="Please enter your Last Name"className="form-input" ></input>
+         <p className="error-message"  >{loginGuestErr.lastName}</p> 
+
+      </div>
+      <div>
+          <p>Phone Number (Optional)</p>
+         <input  value={loginGuest.phone}  onChange={(e) => handleGuestLoginChange("phone",e.target.value)}  placeholder="Please enter your Phone Number"className="form-input" ></input>
+         <p className="error-message"  >{loginGuestErr.phone}</p> 
+
+      </div>
+
+      <div>
+         <p>Email  (Optional) </p> 
+         <input  value={loginGuest.email}  onChange={(e) => handleGuestLoginChange("email",e.target.value)} placeholder="Please enter your Email"className="form-input" ></input>
+        <p className="error-message"  >{loginGuestErr.email}</p> 
+
+      </div>
+     
+      
+
+
+
+<div style={{margin:"20px 0"}} className="userLocation">
+      <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Country state and city</p>
+      <div className="drop-downs">
+      <div style={{marginRight : "10px"}} className="dropdown">
+          <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {loginGuest.country ? loginGuest.country :"Select Country"} 
+          </button>
+          <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <div class="dropdown-item" >
+            <input placeholder="Search your Country" onChange={(e) => setCountryInput(e.target.value)}  value={countryInput} class="form-input" ></input>
+
+          </div>
+           {
+             searchedCountryList.map(entry => {
+               return <button onClick={() => { handleGuestLoginChange('country',entry.name);setStateList(State.getStatesOfCountry(entry.isoCode))}} key={entry.isoCode} className={country === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                 {entry.name}
+
+                 </button>
+
+             })
+           }
+          </div>
+        </div>
+        {
+          loginGuest.country ? 
+          <div style={{marginRight : "10px",marginTop  : "10px"}}   className="dropdown">
+          <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {loginGuest.state ? loginGuest.state :"Select State"} 
+          </button>
+          <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <div class="dropdown-item" >
+              <input placeholder="Search your state" onChange={(e) => setStateInput(e.target.value)}  value={stateInput} class="form-input" ></input>
+
+            </div>
+           {
+             searchedStateList.map(entry => {
+               return <button onClick={() => { handleGuestLoginChange('state',entry.name);setCityList(City.getCitiesOfState(entry.countryCode,entry.isoCode)) }} key={entry.isoCode} className={state === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                 {entry.name}
+
+                 </button>
+
+             })
+           }
+          </div>
+        </div> : <></>
+
+        }
+ 
+        {
+          loginGuest.state ? 
+          <div  style={{marginTop  : "10px"}} className="dropdown">
+          <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {loginGuest.city ? loginGuest.city :"Select City"} 
+          </button>
+          <div style={{maxHeight:'500px',overflow:'auto'}} className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <div class="dropdown-item" >
+            <input placeholder="Search your city" onChange={(e) => setCityInput(e.target.value)}  value={cityInput} class="form-input" ></input>
+
+          </div>
+           {
+             searchedCityList.map(entry => {
+               return <button onClick={() => handleGuestLoginChange('city',entry.name)} key={entry.name} className={city === entry.name ? 'dropdown-item active' : 'dropdown-item' } >
+                 {entry.name}
+
+                 </button>
+
+             })
+           }
+          </div>
+           
+        </div>  : <></>
+        }
+ 
+   
+      </div>
+
+      </div> 
+      <p style={{marginTop: '10px',fontWeight: 'bold'}}>Select Your Language</p>
+      <div  className="dropdown">
+          <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            { loginGuest.language  ? loginGuest.language : "Select Language" }
+          </button>
+          <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <button onClick={() => handleGuestLoginChange("language","ENGLISH")} className={loginGuest.language === "ENGLISH" ? 'dropdown-item active' : 'dropdown-item'}>English</button>
+            <button onClick={() => handleGuestLoginChange("language","GERMAN")} className={loginGuest.language === "GERMAN" ? 'dropdown-item active' : 'dropdown-item'}>German</button>
+            <button onClick={() =>  handleGuestLoginChange("language","HINDI")} className={loginGuest.language === "HINDI" ? 'dropdown-item active' : 'dropdown-item'}>Hindi</button>
+            <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button>
+
+            {/* <button onClick={() =>  handleGuestLoginChange("language","PUNJABI")} className={loginGuest.language === "PUNJABI" ? 'dropdown-item active' : 'dropdown-item'}>Punjabi</button> */}
+          </div>
+        </div>
+    </div>
+
+  </div>
+   
+      <div  class="btnn">
+        <button onClick={handleLoginGuest} > Start Quiz</button>
+      </div>
+
+    </div> : <div className="endTime">
+                You can Only Register between 11 AM and 5 Pm
+    </div>
+    }
+     
+        <Modal
+        isOpen={modalIsOpenIns}
+        onRequestClose={() => setModalIsOpenIns(false)}
+        style={customStyles}
+        contentLabel="instructions"
+        shouldCloseOnOverlayClick={false}
+        className="instructions-div"
+        >
+        <h5>Instructions</h5>
+        { 
+       
+           loginGuest.language === 'ENGLISH' ?  englishInstruction.map((element,index) =>{
+                return <div key={index} >
+                    <p>
+                        {element}
+                    </p>
+                </div>
+            }) : loginGuest.language === 'PUNJABI' ? punjabiInstruction.map((element,index) =>{
+              return <div key={index} >
+                  <p>
+                      {element}
+                  </p>
+              </div>
+          }) :   hindiInstuction.map((element,index) =>{
+              return <div key={index} >
+                  <p>
+                      {element}
+                  </p>
+              </div>
+            })
+        }
+        <div class="btnn">
+        <button onClick={() => navigateQuiz()} >Start</button>
+
+        </div>
+        </Modal>
+
+    </div>
+  );
+};
+
+export default SignupDesktop;
+
+// <div style={{display : 'none',marginLeft : '10px'}} className="forgot">
+//               <span onClick={openLoginGuest} >Login as guest</span>
+
+//             </div>

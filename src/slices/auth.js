@@ -470,7 +470,7 @@ reducers: {
       state.isLoggedIn = true;
       state.isGuest = false;
       state.user = action.payload.data.user;
-      state.isProfileCompleted = action.payload.data.user.email ? true : false
+      state.isProfileCompleted = action.payload.data.user.id ? true : false
       localStorage.setItem('user',JSON.stringify(action.payload.data.user));
       localStorage.setItem('token',JSON.stringify(action.payload.data.token));
       localStorage.setItem('guest','false');

@@ -285,13 +285,27 @@ body {
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
     padding-left: 10px;
 }
+.signup-logo{
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-content: center;
+    img{
+        height: 90px;
+    }
+    div{
 
+    }
+    h1{
+        text-align: center;
+    }
+}
 .signup-desktop,
 .signup-mobile {
     background-color: #fff;
     border-radius: 15px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    padding: 20% 40px;
+    padding: 15px 40px;
     padding-right: 5vw;
     .form {
         p {
@@ -1105,7 +1119,7 @@ th svg {
     overflow: auto;
     h5 {
         text-align: center;
-        font-size: 2.25em;
+        font-size: 1.75em;
         margin-bottom: 15px;
     }
     a,
@@ -1124,6 +1138,7 @@ th svg {
     }
     .box {
         margin: 30px;
+        margin-top: 15px;
     }
     .form p {
         margin-bottom: 2px;
@@ -1168,6 +1183,13 @@ a:hover {
 
 .homepage {
     min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+.main-signup{
 }
 
 .homepage>.row {

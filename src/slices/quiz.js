@@ -146,6 +146,37 @@ export const getQuestion = createAsyncThunk(
   }
 );
 
+export const getAllQuestions = createAsyncThunk(
+  "quiz/allQuestion",
+  async (data, thunkAPI) => {
+    try {
+      const response = await QuizService.getAllQuestions(data);
+      thunkAPI.dispatch(setMessage(response.data.message));
+      return response.data;
+    } catch (error) {
+      toast.error(error.response.data.errMessage, {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        theme: "dark",
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        });
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      thunkAPI.dispatch(setMessage(message));
+      if(error.response.data.errCode === 400 && error.response.data.errMessage ==  "Access is denied")
+        await AuthService.logout();
+      return thunkAPI.rejectWithValue();   
+    }
+  }
+);
 export const saveAnswer = createAsyncThunk(
   "quiz/saveAnswer",
   async (data, thunkAPI) => {

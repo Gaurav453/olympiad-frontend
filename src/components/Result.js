@@ -21,6 +21,7 @@ const Result = (props) => {
     // console.log(score);
 
 
+
     let user = useSelector(state => state.auth);
     let state = useSelector(state => state.auth);
 
@@ -30,6 +31,7 @@ const Result = (props) => {
     // console.log(user)
     let link = score.certificate_link;
     localStorage.removeItem('language')
+    localStorage.clear();
 
     useEffect(() => {
         // console.log(score.id);

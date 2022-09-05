@@ -1,9 +1,9 @@
 import axios from "axios";
 import authHeader from "./auth-header";
-//https://schoolofequanimity.org
+//https://satyugdarshansangeetkalakendra.org
 
-// const API_URL = "https://schoolofequanimity.org/api/quiz/v1/";
-const API_URL = "https://schoolofequanimity.org/api/quiz/v1/";
+// const API_URL = "https://satyugdarshansangeetkalakendra.org/api/quiz/v1/";
+const API_URL = "https://satyugdarshansangeetkalakendra.org/api/quiz/v1/";
 
 const getPreviousAttempts = (sort) => {
   if(!authHeader().key) return false;
@@ -41,6 +41,17 @@ const getQuestion = (data) => {
   if(!authHeader().key) return false;
 
   return axios.post(API_URL + "question",
+  data,
+  {
+    headers:authHeader(),
+  }
+
+  );
+};
+const getAllQuestions = (data) => {
+  if(!authHeader().key) return false;
+
+  return axios.post(API_URL + "allQuestion",
   data,
   {
     headers:authHeader(),
@@ -111,6 +122,7 @@ const quizService = {
   saveRemainingTime,
   performance,
   activeAttempts,
+  getAllQuestions,
   customMessage
   
 };

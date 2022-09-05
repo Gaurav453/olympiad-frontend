@@ -2,7 +2,7 @@ import React, {useEffect } from "react";
 import {useSelector} from 'react-redux';
 import useViewport  from '../hooks/Viewport';
 import SignupMobile from './SignupMobile'
-import SignupDesktop from './SignupDesktop'
+import Signup from './Signup'
 import { Navigate } from "react-router-dom";
 
 import LoginBar from './LoginBar'
@@ -23,7 +23,7 @@ const Home = () => {
 
   }, []);
   if(user && !state.isGuest) {
-    if(user.email){
+    if(user.id){
       return <Navigate to="/dashboard" />;
     } 
     else{
@@ -34,30 +34,11 @@ const Home = () => {
   }
 
   const Layout = function (){
-    if(width <= breakpoint ){
-      return (
-        <div className="row">
-          <div className="col" >
-            <SignupMobile/>
-          </div>
-        </div>
-      )
-    } 
-    else return (
+    return (
       <>
-      <div className="row">
-        <div className="col">
-          <LoginBar isHome={true} />
+        <div className="main-signup">
+          <Signup/>
         </div>
-      </div>
-      <div className="row">
-        <div className="col-8">
-          <MainBanner/>
-        </div>
-        <div className="col-4">
-          <SignupDesktop/>
-        </div>
-      </div>
       </>
    
     

@@ -21,7 +21,7 @@ const Profile = () => {
 
   }, []);
   if(user) {
-    if(user.email){
+    if(user.id){
       return <Navigate to="/dashboard" />;
     } 
   }

@@ -1,8 +1,8 @@
 import authHeader from "./auth-header";
 import axios from "axios";
 
-// const API_URL = "https://schoolofequanimity.org/api/";
-const API_URL = "https://schoolofequanimity.org/api/";
+// const API_URL = "https://satyugdarshansangeetkalakendra.org/api/";
+const API_URL = "https://satyugdarshansangeetkalakendra.org/api/";
 
 
 const register = (data) => {

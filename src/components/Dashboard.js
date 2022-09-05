@@ -337,7 +337,7 @@ const Dashboard = () => {
     return <Navigate to="/" />;
 
   }
-  else if(!user.email)
+  else if(!user.id)
     return <Navigate to="/profile" />;
   const customStyles = {
     content: {
