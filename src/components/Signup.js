@@ -43,7 +43,7 @@ const SignupDesktop = () => {
     "email" : "",
     "state" : "",
     "city" : "",
-    "country" : "India",
+    "country" : "Germany",
     "userip": "",
     "language" : "",
     "isSchool" : false,
@@ -513,7 +513,7 @@ let punjabiInstruction = [
     
     let {firstName, lastName,phone,email,whats_no,state,city,country,isSchool ,language ,father} = loginGuest;
     // console.log(isSame);
-    if(!state || !city || !country || !language ){  
+    if(!country || !language ){  
       errorMessage("Please Fill all  details")
       return;
 
@@ -716,7 +716,7 @@ let punjabiInstruction = [
            }
           </div>
         </div>
-        {
+        {/* {
           loginGuest.country ? 
           <div style={{marginRight : "10px",marginTop  : "10px"}}   className="dropdown">
           <button className="bg-main text-white px-2 py-1 rounded-lg dropdown-toggle form-button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -739,7 +739,7 @@ let punjabiInstruction = [
           </div>
         </div> : <></>
 
-        }
+        } */}
  
         {
           loginGuest.state ? 
